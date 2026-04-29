@@ -1,3 +1,5 @@
+import { reviewsData } from "@/constants/reviewData";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -76,7 +78,7 @@ export default function Home() {
       </section>
 
       {/* about section */}
-      <section className="w-full bg-white px-8 py-16">
+      <section className="section-layout">
         <div className="grid-12">
           <div className="col-span-2">
             <h6 className="section-title">Tentang Kami</h6>
@@ -121,7 +123,7 @@ export default function Home() {
       </section>
 
       {/* areas section */}
-      <section className="w-full bg-white px-8 py-16">
+      <section className="section-layout">
         <div className="mb-5">
           <h6 className="section-title">Areas</h6>
         </div>
@@ -279,7 +281,96 @@ export default function Home() {
       </section>
 
       {/* testimonials section */}
-      <section className="w-full bg-white px-8 py-16"></section>
+      <section className="section-layout bg-[#0F131F]">
+        <div className="grid-12">
+          <div className="col-span-5 flex flex-col gap-3">
+            <h3 className="section-headline text-white">Testimonials</h3>
+            <p className="section-subheadline text-white">
+              Ribuan momen berharga telah tercipta di Bango Parc. Ini kata
+              mereka yang sudah mempercayakan hari istimewanya kepada kami.
+            </p>
+          </div>
+        </div>
+
+        {/* testimonial cards */}
+        <div className="grid-12 mt-10">
+          {reviewsData.map((testi, i) => (
+            <div className="col-span-3 w-full h-auto aspect-square bg-[#f1f0ee] px-7 py-10 rounded-lg gap-8 flex flex-col justify-between">
+              <div className="flex flex-col">
+                <svg
+                  className="w-10 h-10"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 290 290"
+                >
+                  <path
+                    d="M22.12 145v97.65h97.65V145H70.95c0-26.92 21.9-48.82 48.82-48.82V47.35c-53.93 0-97.65 43.72-97.65 97.65zm245.76-48.82V47.35c-53.93 0-97.65 43.72-97.65 97.65v97.65h97.65V145h-48.82c-.01-26.92 21.89-48.82 48.82-48.82z"
+                    fill="#646952"
+                  ></path>
+                </svg>
+                {/* <div className="h-0.5 w-full bg-[#C08B5C]" /> */}
+                <p className="font-crimson-text text-lg leading-5.5 mt-3">
+                  {testi.review}
+                </p>
+              </div>
+              <div className="flex flex-row items-center justify-start gap-2">
+                <div className="h-10 w-10 bg-slate-300 rounded-full"></div>
+                <div className="flex flex-col">
+                  <span className="font-crimson-pro text-xl">{testi.name}</span>
+                  <span className="text-xs">{testi.role}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* occasion section */}
+      <section className="section-layout">
+        <div className="grid-12">
+          <div className="col-span-5 flex flex-col justify-between">
+            <h6 className="section-title">Occasion</h6>
+            <div className="mb-3">
+              <div className="flex flex-col items-start gap-3">
+                <h3 className="section-headline">
+                  Apapun acaranya, Bango Parc siap menyambutmu
+                </h3>
+                <p className="section-subheadline">
+                  Pernikahan, ulang tahun, gathering kantor, pengajian, atau
+                  sekadar momen kebersamaan keluarga — kami hadir untuk semua
+                  perayaan yang berarti bagimu.
+                </p>
+              </div>
+              <div className="flex gap-3 mt-5">
+                <div className="h-10 w-10 border rounded-full flex justify-center items-center">
+                  <ChevronLeft strokeWidth={1.5} />
+                </div>
+                <div className="h-10 w-10 border rounded-full flex justify-center items-center">
+                  <ChevronRight strokeWidth={1.5} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-span-2 relative col-start-7 bg-black w-full h-auto aspect-9/16">
+            <div
+              style={{ backgroundImage: "url(/famget.jpg)" }}
+              className="absolute inset-0 bg-cover bg-center"
+            />
+          </div>
+          <div className="col-span-2 relative bg-black w-full h-auto aspect-9/16">
+            <div
+              style={{ backgroundImage: "url(/yoga.jpg)" }}
+              className="absolute inset-0 bg-cover bg-center"
+            />
+          </div>
+          <div className="col-span-2 relative bg-black w-full h-auto aspect-9/16">
+            <div
+              style={{ backgroundImage: "url(/wedding .jpg)" }}
+              className="absolute inset-0 bg-cover bg-center"
+            />
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
