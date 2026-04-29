@@ -5,17 +5,14 @@
   --foreground: #171717;
 }
 
-:root {
-  font-family: var(--font-inter);
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
+
+  /* Font family utilities */
+  --font-sans: var(--font-inter); /* font-sans → Inter */
   --font-mono: var(--font-geist-mono);
-  --font-inter: var(--font-inter);
-  --font-crimson-pro: var(--font-crimson-pro);
-  --font-crimson-text: var(--font-crimson-text);
-  --font-cinzel: var(--font-cinzel-deco);
+  --font-crimson-pro: var(--font-crimson-pro); /* font-crimson-pro */
+  --font-crimson-text: var(--font-crimson-text); /* font-crimson-text */
+  --font-cinzel: var(--font-cinzel-deco); /* font-cinzel */
 }
