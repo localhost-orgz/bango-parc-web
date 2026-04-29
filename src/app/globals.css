@@ -16,3 +16,21 @@
   --font-crimson-text: var(--font-crimson-text); /* font-crimson-text */
   --font-cinzel: var(--font-cinzel-deco); /* font-cinzel */
 }
+
+@layer components {
+  .section-title {
+    @apply font-sans font-semibold uppercase;
+  }
+
+  .section-headline {
+    @apply font-crimson-text text-4xl tracking-tight;
+  }
+
+  .section-subheadline {
+    @apply font-sans;
+  }
+
+  .grid-12 {
+    @apply w-full grid grid-cols-12 gap-6;
+  }
+}
