@@ -1,9 +1,23 @@
+"use client";
+
+import HeroContent from "@/components/Landing/HeroContent";
+import Navbar from "@/components/Landing/Navbar";
+import { faq_list } from "@/constants/faq";
+import { list_gallery } from "@/constants/gallery";
 import { reviewsData } from "@/constants/reviewData";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import UpperAbout from "@/components/Landing/About/UpperAbout";
+import BottomAbout from "@/components/Landing/About/BottomAbout";
+import AreasHeadline from "@/components/Landing/Areas/AreasHeadline";
+import AreasContent from "@/components/Landing/Areas/AreasContent";
+import TestimonialHeadline from "@/components/Landing/Testimonials/TestimonialHeadline";
+import TestimonialCards from "@/components/Landing/Testimonials/TestimonialCards";
+import OccasionLeft from "@/components/Landing/Occasion/OccasionLeft";
+import OccasionRight from "@/components/Landing/Occasion/OccasionRight";
 
 export default function Home() {
+  const [openIndex, setOpenIndex] = useState(0);
   return (
     <main className="min-h-screen relative w-full">
       {/* hero section */}
@@ -13,364 +27,196 @@ export default function Home() {
           style={{ backgroundImage: "url('/hero-bg.jpg')" }}
         />
         <div className="absolute inset-0 bg-[#0F131F]/50" />
-        <header className="w-full h-20 bg-black/10 fixed top-0 left-0 flex items-center">
-          <nav className="w-full flex flex-row justify-between items-center px-10">
-            <Image src={"/logo-full.png"} alt="logo" width={85} height={85} />
-            <ul className="flex flex-row gap-10 text-white font-light text-md">
-              <li>
-                <Link href={"#"}>Beranda</Link>
-              </li>
-              <li>
-                <Link href={"#"}>Tentang</Link>
-              </li>
-              <li>
-                <Link href={"#"}>Akomodasi</Link>
-              </li>
-              <li>
-                <Link href={"#"}>Galeri</Link>
-              </li>
-            </ul>
-            <div className="bg-white py-2 px-3">
-              <span className="text-black font-crimson-pro">Login</span>
-            </div>
-          </nav>
-        </header>
 
-        <div className="p-1 z-1 flex flex-col items-center gap-7">
-          <div className="flex flex-row items-center gap-5">
-            {/* kiri */}
-            <svg
-              className="mt-5"
-              width="177"
-              height="1"
-              viewBox="0 0 177 1"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <line y1="0.5" x2="177" y2="0.5" stroke="white" strokeWidth={1} />
-            </svg>
-
-            <Image src={"/logo-icon.png"} alt="logo" width={50} height={50} />
-
-            {/* kanan */}
-            <svg
-              className="mt-5"
-              width="177"
-              height="1"
-              viewBox="0 0 177 1"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <line y1="0.5" x2="177" y2="0.5" stroke="white" strokeWidth={1} />
-            </svg>
-          </div>
-
-          <div className="flex flex-col items-center gap-2">
-            <h1 className="font-cinzel text-white text-center text-5xl font-light">
-              Ruang untuk Momen yang Tak Terlupakan
-            </h1>
-            <h5 className="text-white text-center font-light text-lg w-[60%]">
-              Bango Parc hadir sebagai ruang yang hangat, elegan, dan siap
-              menjadi latar terbaik untuk setiap perayaan hidupmu.
-            </h5>
-          </div>
-        </div>
+        {/* konten */}
+        <Navbar />
+        <HeroContent />
       </section>
 
       {/* about section */}
       <section className="section-layout">
-        <div className="grid-12">
-          <div className="col-span-2">
-            <h6 className="section-title">Tentang Kami</h6>
-          </div>
-          <div className="col-start-7 col-span-6">
-            <h3 className="section-headline">
-              Bango Parc adalah ruang di mana setiap perayaan terasa seperti di
-              rumah sendiri
-            </h3>
-          </div>
-        </div>
-        <div className="grid-12 mt-10">
-          <div className="col-span-6 w-full flex flex-row gap-5">
-            <Image
-              className="w-full"
-              src={"/about-1.jpg"}
-              alt="about-photo"
-              height={100}
-              width={100}
-            />
-            <Image
-              className="w-full"
-              src={"/about-2.jpg"}
-              alt="about-photo"
-              height={100}
-              width={100}
-            />
-          </div>
-          <div className="col-span-6 w-full">
-            <p>
-              Berawal dari sebuah rumah dengan halaman yang asri, Bango Parc
-              kini hadir sebagai venue serbaguna yang memadukan kehangatan rumah
-              dengan keeleganan sebuah venue premium.
-              <br />
-              <br />
-              Kami percaya bahwa setiap momen — sekecil apapun — layak dirayakan
-              dengan cara yang istimewa. Biarkan kami menjadi bagian dari cerita
-              itu.
-            </p>
-          </div>
-        </div>
+        <UpperAbout />
+        <BottomAbout />
       </section>
 
       {/* areas section */}
       <section className="section-layout">
-        <div className="mb-5">
-          <h6 className="section-title">Areas</h6>
-        </div>
-        <div className="grid-12">
-          <div className="col-span-5 flex flex-col gap-3">
-            <h3 className="section-headline">
-              Temukan ruang yang tepat untuk setiap acara
-            </h3>
-            <p className="section-subheadline">
-              Dari suasana terbuka yang segar hingga ruang indoor yang intim —
-              Bango Parc menyediakan tiga pilihan area yang bisa didekorasi dan
-              disesuaikan sepenuhnya.
-            </p>
-          </div>
-        </div>
-        <div className="grid-12 mt-5">
-          <div className="relative col-span-4 w-full h-auto aspect-video bg-slate-200">
-            <div
-              style={{ backgroundImage: "url('/indoor.jpg')" }}
-              className="absolute inset-0 top-0 left-0 bg-cover bg-center"
-            />
-            <div className="bg-black/40 absolute inset-0 flex justify-center items-center">
-              <span className="font-crimson-text text-white text-2xl">
-                Indoor
-              </span>
-              <div className="absolute bottom-3 right-3 py-1.5 px-2.5 flex flex-row gap-2 bg-white items-center">
-                <svg
-                  className="w-5 h-5"
-                  width="64"
-                  height="64"
-                  viewBox="0 0 64 64"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g clip-path="url(#clip0_148_32)">
-                    <path
-                      d="M32 42.6666H42.6667V53.3333"
-                      stroke="black"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M51.8879 29.4446C54.1812 23.1353 53.8132 17.2313 50.2879 13.7113C44.2292 7.64727 31.1279 10.9246 21.0266 21.0259C10.9253 31.1273 7.64792 44.2286 13.7093 50.2899C19.6479 56.2259 32.3412 53.2046 42.3492 43.5833"
-                      stroke="black"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_148_32">
-                      <rect width="64" height="64" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-
-                <span className="text-sm">EXPLORE 360°</span>
-              </div>
-            </div>
-          </div>
-          <div className="relative col-span-4 w-full h-auto aspect-video bg-slate-200">
-            <div
-              style={{ backgroundImage: "url(/semi-indoor.jpg)" }}
-              className="absolute inset-0 top-0 left-0 bg-cover bg-center"
-            />
-            <div className="bg-black/40 absolute inset-0 flex justify-center items-center">
-              <span className="font-crimson-text text-white text-2xl">
-                Semi-indoor
-              </span>
-              <div className="absolute bottom-3 right-3 py-1.5 px-2.5 flex flex-row gap-2 bg-white items-center">
-                <svg
-                  className="w-5 h-5"
-                  width="64"
-                  height="64"
-                  viewBox="0 0 64 64"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g clip-path="url(#clip0_148_32)">
-                    <path
-                      d="M32 42.6666H42.6667V53.3333"
-                      stroke="black"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M51.8879 29.4446C54.1812 23.1353 53.8132 17.2313 50.2879 13.7113C44.2292 7.64727 31.1279 10.9246 21.0266 21.0259C10.9253 31.1273 7.64792 44.2286 13.7093 50.2899C19.6479 56.2259 32.3412 53.2046 42.3492 43.5833"
-                      stroke="black"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_148_32">
-                      <rect width="64" height="64" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-
-                <span className="text-sm">EXPLORE 360°</span>
-              </div>
-            </div>
-          </div>
-          <div className="relative col-span-4 w-full h-auto aspect-video bg-slate-200">
-            <div
-              style={{
-                backgroundImage: "url(/outdoor.jpg)",
-              }}
-              className="absolute inset-0 top-0 left-0 bg-center bg-cover"
-            />
-            <div className="bg-black/40 absolute inset-0 flex justify-center items-center">
-              <span className="font-crimson-text text-white text-2xl">
-                Outdoor
-              </span>
-              <div className="absolute bottom-3 right-3 py-1.5 px-2.5 flex flex-row gap-2 bg-white items-center">
-                <svg
-                  className="w-5 h-5"
-                  width="64"
-                  height="64"
-                  viewBox="0 0 64 64"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g clip-path="url(#clip0_148_32)">
-                    <path
-                      d="M32 42.6666H42.6667V53.3333"
-                      stroke="black"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M51.8879 29.4446C54.1812 23.1353 53.8132 17.2313 50.2879 13.7113C44.2292 7.64727 31.1279 10.9246 21.0266 21.0259C10.9253 31.1273 7.64792 44.2286 13.7093 50.2899C19.6479 56.2259 32.3412 53.2046 42.3492 43.5833"
-                      stroke="black"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_148_32">
-                      <rect width="64" height="64" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-
-                <span className="text-sm">EXPLORE 360°</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AreasHeadline />
+        <AreasContent />
       </section>
 
       {/* testimonials section */}
       <section className="section-layout bg-[#0F131F]">
-        <div className="grid-12">
-          <div className="col-span-5 flex flex-col gap-3">
-            <h3 className="section-headline text-white">Testimonials</h3>
-            <p className="section-subheadline text-white">
-              Ribuan momen berharga telah tercipta di Bango Parc. Ini kata
-              mereka yang sudah mempercayakan hari istimewanya kepada kami.
-            </p>
-          </div>
-        </div>
+        <TestimonialHeadline />
 
         {/* testimonial cards */}
-        <div className="grid-12 mt-10">
-          {reviewsData.map((testi, i) => (
-            <div className="col-span-3 w-full h-auto aspect-square bg-[#f1f0ee] px-7 py-10 rounded-lg gap-8 flex flex-col justify-between">
-              <div className="flex flex-col">
-                <svg
-                  className="w-10 h-10"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 290 290"
-                >
-                  <path
-                    d="M22.12 145v97.65h97.65V145H70.95c0-26.92 21.9-48.82 48.82-48.82V47.35c-53.93 0-97.65 43.72-97.65 97.65zm245.76-48.82V47.35c-53.93 0-97.65 43.72-97.65 97.65v97.65h97.65V145h-48.82c-.01-26.92 21.89-48.82 48.82-48.82z"
-                    fill="#646952"
-                  ></path>
-                </svg>
-                {/* <div className="h-0.5 w-full bg-[#C08B5C]" /> */}
-                <p className="font-crimson-text text-lg leading-5.5 mt-3">
-                  {testi.review}
-                </p>
-              </div>
-              <div className="flex flex-row items-center justify-start gap-2">
-                <div className="h-10 w-10 bg-slate-300 rounded-full"></div>
-                <div className="flex flex-col">
-                  <span className="font-crimson-pro text-xl">{testi.name}</span>
-                  <span className="text-xs">{testi.role}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <TestimonialCards />
       </section>
 
       {/* occasion section */}
       <section className="section-layout">
         <div className="grid-12">
-          <div className="col-span-5 flex flex-col justify-between">
-            <h6 className="section-title">Occasion</h6>
-            <div className="mb-3">
-              <div className="flex flex-col items-start gap-3">
-                <h3 className="section-headline">
-                  Apapun acaranya, Bango Parc siap menyambutmu
-                </h3>
-                <p className="section-subheadline">
-                  Pernikahan, ulang tahun, gathering kantor, pengajian, atau
-                  sekadar momen kebersamaan keluarga — kami hadir untuk semua
-                  perayaan yang berarti bagimu.
-                </p>
-              </div>
-              <div className="flex gap-3 mt-5">
-                <div className="h-10 w-10 border rounded-full flex justify-center items-center">
-                  <ChevronLeft strokeWidth={1.5} />
-                </div>
-                <div className="h-10 w-10 border rounded-full flex justify-center items-center">
-                  <ChevronRight strokeWidth={1.5} />
-                </div>
-              </div>
+          <OccasionLeft />
+          <div className="col-span-1" />
+          <OccasionRight />
+        </div>
+      </section>
+
+      {/* gallery section */}
+      <section className="w-full px-8 py-16 bg-white">
+        <h3 className="section-headline mb-10">Gallery</h3>
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-3">
+          {list_gallery.map((img) => (
+            <div key={img.id} className="break-inside-avoid mb-3">
+              <img src={img.src} alt="foto" className="w-full object-cover" />
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* faq section */}
+      <section className="section-layout">
+        <div className="grid-12">
+          <div className="col-span-5 flex flex-col gap-3">
+            <h3 className="section-headline">
+              FAQ (Frequently Asked Questions)
+            </h3>
+            <p className="section-subheadline w-[80%]">
+              Kami kumpulkan pertanyaan yang paling sering ditanyakan. Kalau
+              belum terjawab, jangan ragu untuk langsung
+              <a href="#" className="underline">
+                {" "}
+                menghubungi kami.
+              </a>
+            </p>
           </div>
 
-          <div className="col-span-2 relative col-start-7 bg-black w-full h-auto aspect-9/16">
-            <div
-              style={{ backgroundImage: "url(/famget.jpg)" }}
-              className="absolute inset-0 bg-cover bg-center"
-            />
-          </div>
-          <div className="col-span-2 relative bg-black w-full h-auto aspect-9/16">
-            <div
-              style={{ backgroundImage: "url(/yoga.jpg)" }}
-              className="absolute inset-0 bg-cover bg-center"
-            />
-          </div>
-          <div className="col-span-2 relative bg-black w-full h-auto aspect-9/16">
-            <div
-              style={{ backgroundImage: "url(/wedding .jpg)" }}
-              className="absolute inset-0 bg-cover bg-center"
-            />
+          <div className="col-span-6 col-start-7">
+            {faq_list.map((faq, i) => (
+              <FAQItem
+                key={i}
+                faq={faq}
+                index={i}
+                isOpen={openIndex === i}
+                onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+              />
+            ))}
           </div>
         </div>
       </section>
+
+      {/* cta section */}
+      <section className="w-full h-130 relative">
+        <div
+          style={{ backgroundImage: "url(/cta.jpg)" }}
+          className="absolute inset-0 bg-cover bg-center"
+        />
+        <div className="absolute inset-0 bg-black/40 w-full h-full flex flex-col justify-center items-center">
+          <span className="text-white font-crimson-text uppercase">
+            Siap Memulai?
+          </span>
+          <h3 className="text-white font-crimson-text text-4xl mt-2">
+            Momen impianmu dimulai dari satu langkah.
+          </h3>
+          <p className="text-white font-light">
+            Cek ketersediaan tanggal dan amankan venue pilihanmu sekarang.
+          </p>
+          <div className="py-2 px-5 bg-white font-crimson-text text-lg mt-5">
+            Cek Ketersediaan
+          </div>
+        </div>
+      </section>
+
+      <section className="section-layout">
+        <div className="grid-12">
+          <div className="col-span-2 flex flex-col gap-3">
+            <h3 className="section-headline">Find Us!</h3>
+            <p className="section-subheadline">
+              Kunjungi Bango Parc dan lihat langsung bagaimana setiap sudut
+              ruang kami bisa menjadi latar sempurna untuk acaramu.
+            </p>
+          </div>
+
+          <div className="col-span-7 w-full">
+            <iframe
+              className="w-full"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.669179388451!2d106.80400329999999!3d-6.3071217!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69ef99bc243df9%3A0x2829114f0e30059f!2sBANGO%20PARC!5e0!3m2!1sid!2sid!4v1777508028731!5m2!1sid!2sid"
+              height="450"
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+          <div className="col-span-3 w-full border h-50"></div>
+        </div>
+      </section>
     </main>
+  );
+}
+function FAQItem({ faq, index, isOpen, onToggle }) {
+  const answerRef = useRef(null);
+  const [height, setHeight] = useState(0);
+
+  useEffect(() => {
+    if (answerRef.current) {
+      setHeight(isOpen ? answerRef.current.scrollHeight : 0);
+    }
+  }, [isOpen]);
+
+  return (
+    <div
+      className="border-b border-stone-200 group"
+      style={{
+        animationDelay: `${index * 60}ms`,
+      }}
+    >
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between py-5 text-left gap-6 cursor-pointer"
+        aria-expanded={isOpen}
+      >
+        <span
+          className={`tracking-wide font-crimson-text text-lg transition-colors duration-300 ${
+            isOpen ? "text-stone-900" : "text-black"
+          }`}
+        >
+          {faq.question}
+        </span>
+        <span
+          className={`flex-shrink-0 w-5 h-5 flex items-center justify-center text-stone-400 transition-all duration-300 ${
+            isOpen ? "rotate-45" : "rotate-0 group-hover:text-stone-700"
+          }`}
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <line x1="7" y1="1" x2="7" y2="13" />
+            <line x1="1" y1="7" x2="13" y2="7" />
+          </svg>
+        </span>
+      </button>
+
+      <div
+        style={{
+          height: `${height}px`,
+          overflow: "hidden",
+          transition: "height 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+      >
+        <div
+          ref={answerRef}
+          className={`pb-5 text-sm text-stone-500 leading-relaxed pr-8 transition-opacity duration-300 ${
+            isOpen ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {faq.answer}
+        </div>
+      </div>
+    </div>
   );
 }
