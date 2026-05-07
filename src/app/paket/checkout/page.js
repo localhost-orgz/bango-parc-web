@@ -101,14 +101,14 @@ function page() {
               />
 
               {/* Venue Details */}
-              <div className="flex flex-col gap-1.5 flex-1">
-                <h6 className="font-crimson-pro text-xl text-[#2c2218]">
+              <div className="flex flex-col justify-between py-1 flex-1">
+                <h6 className="font-crimson-pro text-2xl text-[#2c2218]">
                   {bookingData.venueName}
                 </h6>
-                <div className="flex items-center gap-1.5 text-black/40 text-xs">
+                {/* <div className="flex items-center gap-1.5 text-black/40 text-xs">
                   <MapPin size={11} strokeWidth={1.5} />
                   <span>{bookingData.venueLocation}</span>
-                </div>
+                </div> */}
                 <div className="flex flex-wrap gap-3 mt-2">
                   <div className="flex items-center gap-1.5 text-xs text-black/60 bg-[#896d51]/5 border border-[#896d51]/15 px-2.5 py-1.5">
                     <CalendarDays size={12} strokeWidth={1.5} color="#896d51" />
@@ -180,7 +180,7 @@ function page() {
           </div>
 
           {/* Metode Pembayaran */}
-          <div className="bg-white border border-[#896d51]/15 p-6">
+          {/* <div className="bg-white border border-[#896d51]/15 p-6">
             <h5 className="font-crimson-pro text-xl text-[#2c2218] mb-1">
               Metode Pembayaran
             </h5>
@@ -232,7 +232,7 @@ function page() {
                 </label>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Catatan */}
           <div className="flex items-start gap-2.5 p-4 border border-amber-200 bg-amber-50">
@@ -243,7 +243,7 @@ function page() {
               className="shrink-0 mt-0.5"
             />
             <p className="text-xs text-amber-700 leading-relaxed">
-              Booking belum dikonfirmasi sampai pembayaran DP diterima. Tim kami
+              Booking belum dikonfirmasi sampai pembayaran diterima. Tim kami
               akan menghubungi Anda dalam 1×24 jam setelah pembayaran.
             </p>
           </div>
