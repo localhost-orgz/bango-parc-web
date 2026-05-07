@@ -2,19 +2,6 @@
 
 import HeroContent from "@/components/Landing/HeroContent";
 import Navbar from "@/components/Landing/Navbar";
-import { faq_list } from "@/constants/faq";
-import { list_gallery } from "@/constants/gallery";
-import { reviewsData } from "@/constants/reviewData";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import UpperAbout from "@/components/Landing/About/UpperAbout";
-import BottomAbout from "@/components/Landing/About/BottomAbout";
-import AreasHeadline from "@/components/Landing/Areas/AreasHeadline";
-import AreasContent from "@/components/Landing/Areas/AreasContent";
-import TestimonialHeadline from "@/components/Landing/Testimonials/TestimonialHeadline";
-import TestimonialCards from "@/components/Landing/Testimonials/TestimonialCards";
-import OccasionLeft from "@/components/Landing/Occasion/OccasionLeft";
-import OccasionRight from "@/components/Landing/Occasion/OccasionRight";
 import CtaSection from "@/components/Landing/CtaSection";
 import FindUsSection from "@/components/Landing/FindUsSection";
 import GallerySection from "@/components/Landing/GallerySection";
