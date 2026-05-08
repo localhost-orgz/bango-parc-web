@@ -178,21 +178,18 @@ function ImageGallery() {
         />
         <button
           onClick={() => goTo(activeIndex - 1)}
-          className="bg-white rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -left-3 shadow-2xl border border-[#896d51] hover:bg-[#896d51] group transition-colors"
+          className="rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 bg-[#0F131F] -left-3 shadow-2xl border border-[#0F131F]bg-[#0F131F] group transition-all cursor-pointer hover:scale-105"
         >
           <ChevronLeft
-            color="#896d51"
+            color="#fff"
             className="group-hover:stroke-white transition-colors"
           />
         </button>
         <button
           onClick={() => goTo(activeIndex + 1)}
-          className="bg-white rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -right-3 shadow-2xl border border-[#896d51] hover:bg-[#896d51] group transition-colors"
+          className="rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -right-3 shadow-2xl border border-[#0F131F] bg-[#0F131F] group transition-all hover:scale-105 cursor-pointer"
         >
-          <ChevronRight
-            color="#896d51"
-            className="group-hover:stroke-white transition-colors"
-          />
+          <ChevronRight color="#fff" />
         </button>
       </div>
 
@@ -204,7 +201,7 @@ function ImageGallery() {
             onClick={() => goTo(i)}
             className={`w-full h-auto aspect-video bg-gray-400 cursor-pointer transition-opacity bg-cover bg-center ${
               i === activeIndex
-                ? "ring-2 ring-[#896d51] opacity-100"
+                ? "ring-2 ring-[#0F131F] opacity-100"
                 : "opacity-60 hover:opacity-100"
             }`}
             style={{ backgroundImage: `url(${src})` }}
@@ -238,17 +235,17 @@ function VenueDescription() {
 function FacilitiesGrid() {
   return (
     <div className="mt-8">
-      <h4 className="font-crimson-pro text-3xl text-[#2c2218] mb-4">
+      <h4 className="font-crimson-pro text-3xl text-[#0F131F] mb-4">
         Fasilitas
       </h4>
       <div className="grid grid-cols-4 gap-3">
         {FACILITIES.map(({ icon: Icon, label }) => (
           <div
             key={label}
-            className="flex items-center gap-2.5 p-3 border border-[#896d51]/20 bg-white"
+            className="flex items-center gap-2.5 p-3 border border-[#0F131F]/20 bg-white"
           >
-            <Icon size={18} color="#896d51" strokeWidth={1.5} />
-            <span className="text-xs text-black/70">{label}</span>
+            <Icon size={18} color="#0F131F" strokeWidth={1.5} />
+            <span className="text-xs text-[#0F131F]">{label}</span>
           </div>
         ))}
       </div>
@@ -259,7 +256,7 @@ function FacilitiesGrid() {
 function BookingTerms() {
   return (
     <div className="mt-8 mb-10">
-      <h4 className="font-crimson-pro text-3xl text-[#2c2218] mb-4">
+      <h4 className="font-crimson-pro text-3xl text-[#0F131F] mb-4">
         Ketentuan Booking
       </h4>
       <div className="flex flex-col gap-2">
@@ -267,7 +264,7 @@ function BookingTerms() {
           <div key={item} className="flex items-start gap-2.5">
             <CheckCircle2
               size={15}
-              color="#896d51"
+              color="#0F131F"
               strokeWidth={1.5}
               className="mt-0.5 shrink-0"
             />
@@ -343,7 +340,7 @@ function TimeSlotPicker({
       </div>
 
       {!selectedDate ? (
-        <div className="border border-dashed border-[#896d51]/30 p-4 text-xs text-black/40">
+        <div className="border border-dashed border-[#0F131F]/30 p-4 text-xs text-black/40">
           Pilih tanggal terlebih dahulu untuk melihat slot jam tersedia
         </div>
       ) : (
@@ -356,7 +353,7 @@ function TimeSlotPicker({
               <select
                 value={selectedStart}
                 onChange={(e) => onStartChange(e.target.value)}
-                className="h-11 border-b-2 border-[#896d51] bg-transparent text-sm outline-none"
+                className="h-11 border-b-2 border-[#0F131F] bg-transparent text-sm outline-none"
               >
                 <option value="">Jam mulai</option>
                 {TIME_SLOTS.map((time) => {
@@ -375,7 +372,7 @@ function TimeSlotPicker({
               className="shrink-0 mt-2"
               size={20}
               strokeWidth={1.5}
-              color="#896d51"
+              color="#0F131F"
             />
 
             {/* End time */}
@@ -384,7 +381,7 @@ function TimeSlotPicker({
                 value={selectedEnd}
                 onChange={(e) => onEndChange(e.target.value)}
                 disabled={!selectedStart}
-                className={`h-11 border-b-2 border-[#896d51] bg-transparent text-sm outline-none ${
+                className={`h-11 border-b-2 border-[#0F131F] bg-transparent text-sm outline-none ${
                   !selectedStart ? "opacity-40 cursor-not-allowed" : ""
                 }`}
               >
@@ -417,7 +414,7 @@ function TimeSlotPicker({
 
           <AvailabilityLegend bookedHours={bookedHours} />
 
-          <div className="mt-4 p-3 bg-[#896d51]/5 border border-[#896d51]/15">
+          <div className="mt-4 p-3 bg-[#0F131F]/5 border border-[#0F131F]/15">
             <p className="text-[11px] text-black/50 leading-relaxed">
               Slot merah sudah digunakan oleh acara lain. Kamu hanya bisa
               memilih jam yang masih tersedia.
@@ -438,16 +435,16 @@ function DatePickerField({ selectedDate, onOpenCalendar }) {
       <div className="flex items-stretch gap-4 w-full">
         <button
           onClick={onOpenCalendar}
-          className="h-13 w-13 bg-[#896d51] flex justify-center items-center shrink-0 hover:bg-[#755840] transition-colors"
+          className="h-13 w-13 bg-[#0F131F] flex justify-center items-center shrink-0 hover:bg-[#192034] transition-colors"
         >
           <CalendarDays size={24} strokeWidth={1.5} color="#fff" />
         </button>
         <button
           onClick={onOpenCalendar}
-          className="flex flex-1 border-2 border-[#896d51]/70 items-center px-3 h-13 bg-white text-left"
+          className="flex flex-1 border-2 border-[#0F131F]/70 items-center px-3 h-13 bg-white text-left"
         >
           <span
-            className={`text-sm ${selectedDate ? "text-[#2c2218]" : "text-gray-400"}`}
+            className={`text-sm ${selectedDate ? "text-[#0F131F]" : "text-gray-400"}`}
           >
             {selectedDate?.label ?? "Pilih tanggal acara"}
           </span>
@@ -467,7 +464,7 @@ function BookingCard({
   onEndChange,
 }) {
   return (
-    <div className="w-full p-5 border-2 border-[#896d51] mt-8 bg-white">
+    <div className="w-full p-5 border-2 border-[#0F131F] mt-8 bg-white">
       <h6 className="text-xl font-crimson-text font-semibold mb-1">
         Booking Paket
       </h6>
@@ -491,17 +488,17 @@ function BookingCard({
         />
 
         <div className="flex items-center gap-1.5 mt-1">
-          <Clock size={12} color="#896d51" strokeWidth={1.5} />
+          <Clock size={12} color="#0F131F" strokeWidth={1.5} />
           <span className="text-[11px] text-black/40">
             Jam operasional: 07.00 – 22.00 WIB · Min. 3 jam
           </span>
         </div>
 
-        <div className="h-px w-full bg-[#896d51]/70 mb-1 mt-3" />
+        <div className="h-px w-full bg-[#0F131F]/70 mb-1 mt-3" />
 
         <Link
           href="/paket/checkout"
-          className="bg-[#896d51] flex justify-center items-center py-3 text-sm font-medium text-white hover:bg-[#7a6047] transition-colors"
+          className="bg-[#0F131F] flex justify-center items-center py-3 text-sm font-medium text-white hover:bg-[#7a6047] transition-colors"
         >
           Lanjutkan Booking
         </Link>
@@ -517,7 +514,7 @@ function BookingCard({
 function CalendarModal({ onClose, onDateSelect }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-      <div className="relative bg-white w-full max-w-120 border border-[#896d51]/20 shadow-2xl p-5">
+      <div className="relative bg-white w-full max-w-120 border border-[#0F131F]/20 shadow-2xl p-5">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-black/40 hover:text-black transition-colors"
@@ -526,7 +523,7 @@ function CalendarModal({ onClose, onDateSelect }) {
         </button>
 
         <div className="mb-5">
-          <h3 className="font-crimson-pro text-4xl text-[#2c2218]">
+          <h3 className="font-crimson-pro text-4xl text-[#0F131F]">
             Cek Ketersediaan
           </h3>
           <p className="text-sm text-black/50 mt-1">
@@ -536,10 +533,10 @@ function CalendarModal({ onClose, onDateSelect }) {
 
         <BookingCalendar onDateSelect={onDateSelect} />
 
-        <div className="mt-5 pt-4 border-t border-[#896d51]/10 flex items-start gap-2">
+        <div className="mt-5 pt-4 border-t border-[#0F131F]/10 flex items-start gap-2">
           <Clock
             size={14}
-            color="#896d51"
+            color="#0F131F"
             strokeWidth={1.5}
             className="mt-0.5 shrink-0"
           />
@@ -563,7 +560,7 @@ function VenueSidebar({
 }) {
   return (
     <div className="w-full px-15 col-span-5">
-      <h3 className="text-5xl font-crimson-pro text-[#2c2218]">
+      <h3 className="text-5xl font-crimson-pro text-[#0F131F]">
         Semi-Indoor &amp; Outdoor
       </h3>
 
@@ -571,7 +568,7 @@ function VenueSidebar({
         {VENUE_TAGS.map((tag) => (
           <span
             key={tag}
-            className="text-xs px-2.5 py-1 border-2 border-[#896d51]/70 text-[#896d51]"
+            className="text-xs px-2.5 py-1 border-2 border-[#0F131F]/70 text-[#0F131F]"
           >
             {tag}
           </span>
@@ -584,11 +581,11 @@ function VenueSidebar({
       </p>
 
       <div className="flex mt-5 items-end gap-2">
-        <span className="text-3xl font-semibold text-[#2c2218]">
+        <span className="text-3xl font-semibold text-[#0F131F]">
           Rp2.000.000
         </span>
         <span className="line-through text-black/30 mb-0.5">Rp2.500.000</span>
-        <span className="font-semibold text-[#896d51]">/ 3 jam</span>
+        <span className="font-semibold text-[#0F131F]">/ 3 jam</span>
       </div>
 
       <p className="text-xs text-black/40 mt-1">
@@ -630,7 +627,7 @@ export default function DetailPaketPage() {
   }
 
   return (
-    <main className="w-full min-h-screen bg-[#faf8f5]">
+    <main className="w-full min-h-screen bg-[#f3f4f7]">
       <PageHeader />
 
       <section className="section-layout grid-12">

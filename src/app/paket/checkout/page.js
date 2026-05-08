@@ -3,18 +3,6 @@
 import LeftColumn from "@/components/Checkout/LeftColumn";
 import PageHeader from "@/components/Checkout/PageHeader";
 import RightColumn from "@/components/Checkout/RightColumn";
-import {
-  CalendarDays,
-  Clock,
-  Users,
-  ChevronRight,
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  AlertCircle,
-  Building2,
-} from "lucide-react";
-import Link from "next/link";
 import React from "react";
 
 // ─── Dummy Data ────────────────────────────────────────────────────────────────
@@ -32,8 +20,6 @@ const bookingData = {
   total: 2200000,
   image: "/about-us2.jpg",
 };
-
-// ─── Sub-components ────────────────────────────────────────────────────────────
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
