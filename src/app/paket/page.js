@@ -1,4 +1,5 @@
 "use client";
+import Footer from "@/components/Footer";
 import { wedding_packages } from "@/constants/package";
 import {
   Armchair,

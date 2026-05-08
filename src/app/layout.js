@@ -18,6 +18,7 @@ import {
   Cinzel_Decorative,
 } from "next/font/google";
 import "./globals.css";
+import Footer from "@/components/Footer";
 
 // 1. Definisikan tiap font ✍️
 const inter = Inter({
@@ -54,6 +55,7 @@ export default function RootLayout({ children }) {
         className={`${inter.variable} ${crimsonPro.variable} ${crimsonText.variable} ${cinzelDeco.variable} font-sans antialiased`}
       >
         {children}
+        <Footer />
       </body>
     </html>
   );

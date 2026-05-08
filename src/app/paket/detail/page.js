@@ -20,6 +20,7 @@ import { useState } from "react";
 
 // ─── Internal Components ──────────────────────────────────────────────────────
 import BookingCalendar from "@/components/BookingCalendar";
+import Footer from "@/components/Footer";
 
 const TIME_SLOTS = [
   "07:00",
