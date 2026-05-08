@@ -78,7 +78,7 @@ function Footer() {
     ],
   };
   return (
-    <footer className="w-full bg-[#36210b] grid-12 px-8 pt-10 pb-4">
+    <footer className="w-full bg-[#0F131F] grid-12 px-8 pt-10 pb-4">
       <div className="col-span-3">
         <Image
           src={"/logo-full.png"}

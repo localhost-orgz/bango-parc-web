@@ -79,7 +79,7 @@ export default function BookingPage() {
           </div>
 
           {/* Selected Date Preview */}
-          <div className="bg-white border border-[#896d51]/20 p-6 flex flex-col gap-4 min-h-[220px]">
+          <div className="bg-white border border-[#896d51]/20 p-6 flex flex-col gap-4 min-h-55">
             <div className="flex flex-col gap-2">
               <span className="text-xs uppercase tracking-[0.25em] text-[#896d51] font-semibold">
                 Tanggal Dipilih
