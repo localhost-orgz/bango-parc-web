@@ -51,6 +51,15 @@ const FACILITIES = [
   { icon: Users, label: "Kapasitas 200 orang" },
 ];
 
+const GALLERY_IMAGES = [
+  "https://images.unsplash.com/photo-1524824267900-2fa9cbf7a506?w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1478146059778-26028b07395a?w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&auto=format&fit=crop",
+];
+
 const BOOKING_TERMS = [
   "Pembayaran DP minimal 50% untuk konfirmasi booking",
   "Acara pernikahan hanya 1 per hari (full day exclusive)",
@@ -121,29 +130,83 @@ function PageHeader() {
   );
 }
 
+// function ImageGallery() {
+//   return (
+//     <div>
+//       <div className="w-full h-auto aspect-video bg-gray-400 relative">
+//         <div
+//           className="inset-0 absolute bg-cover bg-center"
+//           style={{ backgroundImage: "url(/about-us2.jpg)" }}
+//         />
+//         <button className="bg-white rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -left-3 shadow-2xl border border-[#896d51]">
+//           <ChevronLeft color="#896d51" />
+//         </button>
+//         <button className="bg-white rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -right-3 shadow-2xl border border-[#896d51]">
+//           <ChevronRight color="#896d51" />
+//         </button>
+//       </div>
+
+//       <div className="flex gap-2 mt-5">
+//         {[0, 1, 2, 3].map((i) => (
+//           <div
+//             key={i}
+//             className={`w-full h-auto aspect-video bg-gray-400 cursor-pointer transition-opacity ${
+//               i === 0 ? "ring-2 ring-[#896d51]" : "opacity-70 hover:opacity-100"
+//             }`}
+//           />
+//         ))}
+//       </div>
+//     </div>
+//   );
+// }
+
 function ImageGallery() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  function goTo(index) {
+    setActiveIndex((index + GALLERY_IMAGES.length) % GALLERY_IMAGES.length);
+  }
+
   return (
     <div>
-      <div className="w-full h-auto aspect-video bg-gray-400 relative">
+      {/* Main image */}
+      <div className="w-full h-auto aspect-video bg-gray-400 relative shadow-xs">
         <div
-          className="inset-0 absolute bg-cover bg-center"
-          style={{ backgroundImage: "url(/about-us2.jpg)" }}
+          className="inset-0 absolute bg-cover bg-center transition-all duration-500"
+          style={{ backgroundImage: `url(${GALLERY_IMAGES[activeIndex]})` }}
         />
-        <button className="bg-white rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -left-3 shadow-2xl border border-[#896d51]">
-          <ChevronLeft color="#896d51" />
+        <button
+          onClick={() => goTo(activeIndex - 1)}
+          className="bg-white rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -left-3 shadow-2xl border border-[#896d51] hover:bg-[#896d51] group transition-colors"
+        >
+          <ChevronLeft
+            color="#896d51"
+            className="group-hover:stroke-white transition-colors"
+          />
         </button>
-        <button className="bg-white rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -right-3 shadow-2xl border border-[#896d51]">
-          <ChevronRight color="#896d51" />
+        <button
+          onClick={() => goTo(activeIndex + 1)}
+          className="bg-white rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -right-3 shadow-2xl border border-[#896d51] hover:bg-[#896d51] group transition-colors"
+        >
+          <ChevronRight
+            color="#896d51"
+            className="group-hover:stroke-white transition-colors"
+          />
         </button>
       </div>
 
+      {/* Thumbnails */}
       <div className="flex gap-2 mt-5">
-        {[0, 1, 2, 3].map((i) => (
-          <div
+        {GALLERY_IMAGES.map((src, i) => (
+          <button
             key={i}
-            className={`w-full h-auto aspect-video bg-gray-400 cursor-pointer transition-opacity ${
-              i === 0 ? "ring-2 ring-[#896d51]" : "opacity-70 hover:opacity-100"
+            onClick={() => goTo(i)}
+            className={`w-full h-auto aspect-video bg-gray-400 cursor-pointer transition-opacity bg-cover bg-center ${
+              i === activeIndex
+                ? "ring-2 ring-[#896d51] opacity-100"
+                : "opacity-60 hover:opacity-100"
             }`}
+            style={{ backgroundImage: `url(${src})` }}
           />
         ))}
       </div>
@@ -453,7 +516,7 @@ function BookingCard({
 function CalendarModal({ onClose, onDateSelect }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-      <div className="relative bg-white w-full max-w-[480px] border border-[#896d51]/20 shadow-2xl p-5">
+      <div className="relative bg-white w-full max-w-120 border border-[#896d51]/20 shadow-2xl p-5">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-black/40 hover:text-black transition-colors"
