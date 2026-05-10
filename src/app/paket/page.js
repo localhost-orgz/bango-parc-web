@@ -1,5 +1,6 @@
 "use client";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Landing/Navbar";
 import { wedding_packages } from "@/constants/package";
 import {
   Armchair,
@@ -120,6 +121,7 @@ function page() {
           </button>
         </div>
       </section> */}
+      <Navbar />
 
       <section className="section-layout grid-12">
         <div className="w-full col-span-12 flex justify-center items-center flex-col gap-4">
@@ -208,7 +210,7 @@ function page() {
 
               {/* btn */}
               <Link
-                href={"/paket"}
+                href={"/paket/detail"}
                 className="w-full items-center gap-2 flex justify-center py-3 bg-[#0F131F] text-white"
               >
                 <span className="text-sm font-medium">Lihat Detail & Book</span>
@@ -291,10 +293,13 @@ function page() {
               <div className="w-full h-px bg-[#0F131F]/30 my-5"></div>
 
               {/* btn */}
-              <div className="w-full items-center gap-2 flex justify-center py-3 bg-[#0F131F] text-white">
+              <Link
+                href={"/paket/detail"}
+                className="w-full items-center gap-2 flex justify-center py-3 bg-[#0F131F] text-white"
+              >
                 <span className="text-sm font-medium">Lihat Detail & Book</span>
                 <ArrowRight size={17} strokeWidth={3} />
-              </div>
+              </Link>
             </div>
           </div>
         </div>
@@ -351,7 +356,7 @@ function page() {
 
                   <div className="h-0.5 w-full bg-[#0F131F]/30 mb-3 mt-5"></div>
                   <Link
-                    href={"/paket"}
+                    href={"/paket/detail"}
                     className="w-full py-3 bg-[#0F131F] flex justify-center items-center gap-1"
                   >
                     <span className="text-xs font-semibold text-white">

@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function PriceBreakdown({ data }) {
   return (
@@ -42,10 +43,13 @@ export default function PriceBreakdown({ data }) {
 
       <div className="h-px w-full bg-[#0F131F]/12 my-5" />
 
-      <button className="w-full bg-[#0F131F] flex justify-center items-center gap-2 py-3.5 text-sm font-medium text-white hover:bg-[#1e2540] transition-colors">
+      <Link
+        href={"/paket/checkout/payment"}
+        className="w-full bg-[#0F131F] flex justify-center items-center gap-2 py-3.5 text-sm font-medium text-white hover:bg-[#1e2540] transition-colors"
+      >
         Lanjutkan ke Pembayaran
         <ArrowRight size={16} strokeWidth={1.5} />
-      </button>
+      </Link>
 
       <p className="text-[10px] text-center text-black/30 mt-3">
         Dengan melanjutkan, Anda menyetujui{" "}

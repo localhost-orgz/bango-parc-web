@@ -35,16 +35,16 @@ function Navbar() {
           }`}
         >
           <li>
-            <Link href={"#"}>Beranda</Link>
+            <Link href={"/"}>Beranda</Link>
           </li>
           <li>
-            <Link href={"#"}>Tentang</Link>
+            <Link href={"/about"}>Tentang</Link>
           </li>
           <li>
-            <Link href={"#"}>Akomodasi</Link>
+            <Link href={"/paket"}>Paket & Venue</Link>
           </li>
           <li>
-            <Link href={"#"}>Galeri</Link>
+            <Link href={"/gallery"}>Galeri</Link>
           </li>
         </ul>
         <div

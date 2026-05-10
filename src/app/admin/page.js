@@ -26,6 +26,9 @@ import {
   Cell,
 } from "recharts";
 import { PieChart, Pie, Legend } from "recharts";
+import BookingCalendar from "@/components/BookingCalendar";
+
+import { bookedDates } from "@/constants/bookings";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -49,57 +52,70 @@ const venueData = [
   { name: "Area Belakang", count: 2, max: 14 },
 ];
 
-const recentReservations = [
-  { code: "B-001", event: "Reguler - 2 Mei", status: "Canceled" },
-  { code: "B-002", event: "Wedding - 21 Mei", status: "Approved" },
-];
+// const recentReservations = [
+//   { code: "B-001", event: "Reguler - 2 Mei", status: "Canceled" },
+//   { code: "B-002", event: "Wedding - 21 Mei", status: "Approved" },
+// ];
 
-const MONTHS = [
-  "Januari",
-  "Februari",
-  "Maret",
-  "April",
-  "Mei",
-  "Juni",
-  "Juli",
-  "Agustus",
-  "September",
-  "Oktober",
-  "November",
-  "Desember",
-];
+const recentReservations = Object.entries(bookedDates)
+  .flatMap(([date, data], index) =>
+    data.events.map((event, eventIndex) => ({
+      code: `B-${String(index + eventIndex + 1).padStart(3, "0")}`,
+      event: `${event.name} - ${date}`,
+      status:
+        data.status === "wedding" || data.status === "full"
+          ? "Approved"
+          : "Pending",
+    })),
+  )
+  .slice(0, 5);
 
-const DAYS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
+// const MONTHS = [
+//   "Januari",
+//   "Februari",
+//   "Maret",
+//   "April",
+//   "Mei",
+//   "Juni",
+//   "Juli",
+//   "Agustus",
+//   "September",
+//   "Oktober",
+//   "November",
+//   "Desember",
+// ];
+
+// const DAYS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
 // Calendar occupancy data for May 2026
-const occupancyData = {
-  "2026-05-02": "full",
-  "2026-05-04": "full",
-  "2026-05-09": "full",
-  "2026-05-13": "full",
-  "2026-05-15": "full",
-  "2026-05-18": "full",
-  "2026-05-21": "full",
-  "2026-05-22": "full",
-  "2026-05-25": "full",
-  "2026-05-03": "partial",
-  "2026-05-12": "partial",
-  "2026-05-17": "partial",
-};
+// const occupancyData = {
+//   "2026-05-02": "full",
+//   "2026-05-04": "full",
+//   "2026-05-09": "full",
+//   "2026-05-13": "full",
+//   "2026-05-15": "full",
+//   "2026-05-18": "full",
+//   "2026-05-21": "full",
+//   "2026-05-22": "full",
+//   "2026-05-25": "full",
+//   "2026-05-03": "partial",
+//   "2026-05-12": "partial",
+//   "2026-05-17": "partial",
+// };
 
-function toKey(year, month, day) {
-  return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
+// function toKey(year, month, day) {
+//   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+// }
 
-function getDaysInMonth(year, month) {
-  return new Date(year, month + 1, 0).getDate();
-}
+// function getDaysInMonth(year, month) {
+//   return new Date(year, month + 1, 0).getDate();
+// }
 
-function getFirstDayOfMonth(year, month) {
-  // Returns 0=Sun...6=Sat, convert to Mon-first: Mon=0..Sun=6
-  const raw = new Date(year, month, 1).getDay();
-  return (raw + 6) % 7;
-}
+// function getFirstDayOfMonth(year, month) {
+//   // Returns 0=Sun...6=Sat, convert to Mon-first: Mon=0..Sun=6
+//   const raw = new Date(year, month, 1).getDay();
+//   return (raw + 6) % 7;
+// }
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 
@@ -359,71 +375,71 @@ function CategoryCard() {
 
 // ─── Occupancy Calendar ───────────────────────────────────────────────────────
 
-function OccupancyCalendar() {
-  const year = 2026;
-  const month = 4; // May (0-indexed)
-  const daysInMonth = getDaysInMonth(year, month);
-  const firstDay = getFirstDayOfMonth(year, month); // Mon-first offset
+// function OccupancyCalendar() {
+//   const year = 2026;
+//   const month = 4; // May (0-indexed)
+//   const daysInMonth = getDaysInMonth(year, month);
+//   const firstDay = getFirstDayOfMonth(year, month); // Mon-first offset
 
-  return (
-    <div className="bg-white border border-[#0F131F]/10 p-5 flex flex-col gap-4">
-      <h3 className="font-crimson-pro text-xl text-[#0F131F]">
-        Kalender Okupansi — Mei 2026
-      </h3>
+//   return (
+//     <div className="bg-white border border-[#0F131F]/10 p-5 flex flex-col gap-4">
+//       <h3 className="font-crimson-pro text-xl text-[#0F131F]">
+//         Kalender Okupansi — Mei 2026
+//       </h3>
 
-      {/* Day headers (Mon–Sun) */}
-      <div className="grid grid-cols-7 text-center">
-        {DAYS.map((d) => (
-          <div
-            key={d}
-            className="text-[10px] font-semibold uppercase tracking-wide text-black/35 pb-2"
-          >
-            {d}
-          </div>
-        ))}
-      </div>
+//       {/* Day headers (Mon–Sun) */}
+//       <div className="grid grid-cols-7 text-center">
+//         {DAYS.map((d) => (
+//           <div
+//             key={d}
+//             className="text-[10px] font-semibold uppercase tracking-wide text-black/35 pb-2"
+//           >
+//             {d}
+//           </div>
+//         ))}
+//       </div>
 
-      {/* Day cells */}
-      <div className="grid grid-cols-7 gap-1.5">
-        {Array.from({ length: firstDay }).map((_, i) => (
-          <div key={`e-${i}`} />
-        ))}
-        {Array.from({ length: daysInMonth }).map((_, i) => {
-          const day = i + 1;
-          const key = toKey(year, month, day);
-          const status = occupancyData[key];
+//       {/* Day cells */}
+//       <div className="grid grid-cols-7 gap-1.5">
+//         {Array.from({ length: firstDay }).map((_, i) => (
+//           <div key={`e-${i}`} />
+//         ))}
+//         {Array.from({ length: daysInMonth }).map((_, i) => {
+//           const day = i + 1;
+//           const key = toKey(year, month, day);
+//           const status = occupancyData[key];
 
-          let bg = "bg-[#0F131F] text-white hover:bg-[#0F131F]/80";
-          if (status === "full") bg = "bg-red-500 text-white";
-          if (status === "partial") bg = "bg-blue-500 text-white";
+//           let bg = "bg-[#0F131F] text-white hover:bg-[#0F131F]/80";
+//           if (status === "full") bg = "bg-red-500 text-white";
+//           if (status === "partial") bg = "bg-blue-500 text-white";
 
-          return (
-            <div
-              key={day}
-              className={`aspect-square flex items-center justify-center text-sm font-medium cursor-default transition-opacity rounded-none ${bg}`}
-            >
-              {day}
-            </div>
-          );
-        })}
-      </div>
+//           return (
+//             <div
+//               key={day}
+//               className={`aspect-square flex items-center justify-center text-sm font-medium cursor-default transition-opacity rounded-none ${bg}`}
+//             >
+//               {day}
+//             </div>
+//           );
+//         })}
+//       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap items-center gap-4 pt-1">
-        {[
-          { color: "bg-[#0F131F]", label: "Tersedia" },
-          { color: "bg-red-500", label: "Full" },
-          { color: "bg-blue-500", label: "Terisi tapi masih tersedia" },
-        ].map(({ color, label }) => (
-          <div key={label} className="flex items-center gap-1.5">
-            <span className={`w-3 h-3 ${color} rounded-none`} />
-            <span className="text-[11px] text-black/50">{label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+//       {/* Legend */}
+//       <div className="flex flex-wrap items-center gap-4 pt-1">
+//         {[
+//           { color: "bg-[#0F131F]", label: "Tersedia" },
+//           { color: "bg-red-500", label: "Full" },
+//           { color: "bg-blue-500", label: "Terisi tapi masih tersedia" },
+//         ].map(({ color, label }) => (
+//           <div key={label} className="flex items-center gap-1.5">
+//             <span className={`w-3 h-3 ${color} rounded-none`} />
+//             <span className="text-[11px] text-black/50">{label}</span>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// }
 
 // ─── Recent Reservations ──────────────────────────────────────────────────────
 
@@ -559,7 +575,12 @@ export default function AdminDashboard() {
           {/* Calendar + Recent Row */}
           <section className="grid grid-cols-12 gap-4">
             <div className="col-span-7">
-              <OccupancyCalendar />
+              {/* <OccupancyCalendar /> */}
+              <BookingCalendar
+                onDateSelect={(data) => {
+                  console.log("Selected date:", data);
+                }}
+              />
             </div>
             <div className="col-span-5">
               <RecentReservations />

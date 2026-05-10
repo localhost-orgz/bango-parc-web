@@ -1,4 +1,5 @@
 import AreasContent from "@/components/Landing/Areas/AreasContent";
+import Navbar from "@/components/Landing/Navbar";
 import React from "react";
 
 function page() {
@@ -13,6 +14,7 @@ function page() {
 
         <h1 className="font-crimson-pro text-white text-5xl z-1">About Us</h1>
       </header>
+      <Navbar />
       <section className="section-layout">
         <div className="grid-12">
           <div className="col-span-7 w-full flex flex-col items-start gap-5">
