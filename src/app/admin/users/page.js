@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import SortHeader from "@/components/admin/users/SortHeader";
 import RoleBadge from "@/components/admin/users/RoleBadge";
-import DetailPanel from "@/components/admin/verification/DetailPanel";
+import DetailPanel from "@/components/admin/users/DetailPanel";
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 

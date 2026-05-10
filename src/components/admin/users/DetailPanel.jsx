@@ -1,4 +1,16 @@
-import { ReceiptText, Users, X } from "lucide-react";
+import {
+  CalendarIcon,
+  CheckCircle2,
+  Clock,
+  Mail,
+  Phone,
+  ReceiptText,
+  ShieldCheck,
+  Users,
+  Wallet,
+  X,
+  XCircle,
+} from "lucide-react";
 import RoleBadge from "./RoleBadge";
 import MiniStat from "./MiniStat";
 import OrderStatusBadge from "./OrderStatusBadge";
@@ -60,7 +72,11 @@ function DetailPanel({ user, onClose }) {
                 label: "Role",
                 value: user.role === "admin" ? "Administrator" : "User",
               },
-              { icon: CalIcon, label: "Bergabung", value: user.joinedAt },
+              {
+                icon: CalendarIcon,
+                label: "Bergabung",
+                value: user.joinedAt,
+              },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="flex items-center gap-3">
                 <div className="w-6 shrink-0 flex justify-center">

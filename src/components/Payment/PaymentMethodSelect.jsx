@@ -6,8 +6,8 @@ const PaymentMethodSelect = ({
   paymentMethods,
 }) => {
   return (
-    <div className="bg-white border border-[#896d51]/15 p-6">
-      <h5 className="font-crimson-pro text-xl text-[#2c2218] mb-1">
+    <div className="bg-white border border-[#0f131f]/15 p-6">
+      <h5 className="font-crimson-pro text-xl text-[#0f131f] mb-1">
         Metode Pembayaran
       </h5>
       <p className="text-xs text-black/40 mb-5">

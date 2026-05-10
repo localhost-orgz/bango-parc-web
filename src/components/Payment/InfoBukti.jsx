@@ -2,10 +2,10 @@ import { AlertCircle } from "lucide-react";
 
 const InfoBukti = () => {
   return (
-    <div className="mt-4 p-4 border border-[#896d51]/15 bg-[#896d51]/5 flex flex-col gap-2">
+    <div className="mt-4 p-4 border border-[#0f131f]/15 bg-[#0f131f]/5 flex flex-col gap-2">
       <div className="flex items-center gap-2 mb-1">
-        <AlertCircle size={14} color="#896d51" strokeWidth={1.5} />
-        <span className="text-xs font-semibold text-[#896d51]">
+        <AlertCircle size={14} color="#0f131f" strokeWidth={1.5} />
+        <span className="text-xs font-semibold text-[#0f131f]">
           Informasi Penting:
         </span>
       </div>
@@ -18,7 +18,7 @@ const InfoBukti = () => {
         "Mohon simpan bukti pembayaran asli hingga menerima tiket check-in",
       ].map((item) => (
         <div key={item} className="flex items-start gap-2">
-          <span className="text-[#896d51] text-xs mt-0.5 shrink-0">·</span>
+          <span className="text-[#0f131f] text-xs mt-0.5 shrink-0">·</span>
           <span className="text-xs text-black/55 leading-relaxed">{item}</span>
         </div>
       ))}

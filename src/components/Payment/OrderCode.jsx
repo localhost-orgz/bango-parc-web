@@ -1,6 +1,6 @@
 const OrderCode = ({ code }) => {
   return (
-    <div className="bg-[#896d51] p-4 flex flex-col gap-1">
+    <div className="bg-[#0f131f] p-4 flex flex-col gap-1">
       <span className="text-white/70 text-xs uppercase tracking-wider">
         Kode Pemesanan
       </span>

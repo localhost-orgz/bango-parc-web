@@ -10,24 +10,17 @@ import QrisPayment from "@/components/Payment/QrisPayment";
 import TransferPayment from "@/components/Payment/TransferPayment";
 import VenueInfo from "@/components/Payment/VenueInfo";
 import {
-  ChevronRight,
   Upload,
   CloudUpload,
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  CalendarDays,
-  ArrowRight,
   X,
   FileImage,
   QrCode,
   Landmark,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useRef } from "react";
 
-// Simulasi data dari halaman checkout
+// Simulasi data tetap sama
 const orderData = {
   venueName: "Semi-Indoor & Outdoor",
   venueLocation: "Jl. Contoh No. 12, Depok",
@@ -72,12 +65,6 @@ export default function PaymentPage() {
 
   const selected = paymentMethods.find((m) => m.id === selectedMethod);
 
-  const handleCopy = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
@@ -91,40 +78,29 @@ export default function PaymentPage() {
   };
 
   return (
-    <main className="w-full min-h-screen bg-[#faf8f5]">
-      {/* Header */}
+    <main className="w-full min-h-screen bg-[#F4F7FA]">
+      {" "}
+      {/* Sedikit lebih cool-toned gray */}
       <HeaderPayment />
-
-      {/* Content */}
       <section className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-12 gap-8">
         {/* LEFT — Order Summary */}
         <div className="col-span-4 flex flex-col gap-4">
-          {/* Order Code */}
           <OrderCode code={orderData.orderCode} />
-
-          {/* Venue Info */}
           <VenueInfo orderData={orderData} />
-
-          {/* Price Breakdown */}
           <PriceBreakdown orderData={orderData} />
-
-          {/* Timer notice */}
           <AlertPayment />
         </div>
 
-        {/* RIGHT — Payment Method + QR/Transfer + Upload */}
+        {/* RIGHT — Payment Detail */}
         <div className="col-span-8 flex flex-col gap-5">
-          {/* Payment Method Selector */}
           <PaymentMethodSelect
             selectedMethod={selectedMethod}
             paymentMethods={paymentMethods}
             onSelectedMethod={setSelectedMethod}
           />
 
-          {/* Payment Detail — QRIS */}
           {selected.type === "qris" && <QrisPayment orderData={orderData} />}
 
-          {/* Payment Detail — Transfer / VA */}
           {selected.type === "transfer" && (
             <TransferPayment
               selected={selected}
@@ -134,14 +110,13 @@ export default function PaymentPage() {
             />
           )}
 
-          {/* Upload Bukti */}
-          <div className="bg-white border border-[#896d51]/15 p-6">
-            <h5 className="font-crimson-pro text-xl text-[#2c2218] mb-1">
+          {/* Upload Bukti - Color Updated to 0f131f */}
+          <div className="bg-white border border-[#0f131f]/10 p-6 shadow-sm">
+            <h5 className="font-crimson-pro text-xl text-[#0f131f] mb-1">
               Upload Bukti Pembayaran
             </h5>
-            <div className="w-full h-px bg-[#896d51]/20 mb-5" />
+            <div className="w-full h-px bg-[#0f131f]/10 mb-5" />
 
-            {/* Drop Zone */}
             <div
               onDragOver={(e) => {
                 e.preventDefault();
@@ -150,12 +125,12 @@ export default function PaymentPage() {
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`w-full border-2 border-dashed flex flex-col items-center justify-center gap-3 py-10 cursor-pointer transition-colors ${
+              className={`w-full border-2 border-dashed flex flex-col items-center justify-center gap-3 py-10 cursor-pointer transition-all ${
                 isDragging
-                  ? "border-[#896d51] bg-[#896d51]/5"
+                  ? "border-[#0f131f] bg-[#0f131f]/5"
                   : uploadedFile
                     ? "border-green-400 bg-green-50"
-                    : "border-[#896d51]/30 hover:border-[#896d51] hover:bg-[#896d51]/5"
+                    : "border-[#0f131f]/20 hover:border-[#0f131f] hover:bg-[#0f131f]/5"
               }`}
             >
               <input
@@ -167,7 +142,11 @@ export default function PaymentPage() {
               />
               {uploadedFile ? (
                 <>
-                  <FileImage size={36} color="#22c55e" strokeWidth={1.5} />
+                  <FileImage
+                    size={36}
+                    className="text-green-500"
+                    strokeWidth={1.5}
+                  />
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-sm font-medium text-green-700">
                       {uploadedFile.name}
@@ -181,19 +160,22 @@ export default function PaymentPage() {
                       e.stopPropagation();
                       setUploadedFile(null);
                     }}
-                    className="flex items-center gap-1.5 text-xs text-red-400 border border-red-200 px-3 py-1 hover:bg-red-50 transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-red-500 border border-red-100 px-3 py-1 hover:bg-red-50 transition-colors"
                   >
-                    <X size={12} />
-                    Hapus file
+                    <X size={12} /> Hapus file
                   </button>
                 </>
               ) : (
                 <>
-                  <CloudUpload size={36} color="#896d51" strokeWidth={1.5} />
+                  <CloudUpload
+                    size={36}
+                    className="text-[#0f131f]/60"
+                    strokeWidth={1.5}
+                  />
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-sm text-black/60">
                       Klik untuk upload atau{" "}
-                      <span className="text-[#896d51] font-medium">
+                      <span className="text-[#0f131f] font-semibold">
                         drag & drop
                       </span>
                     </span>
@@ -205,36 +187,33 @@ export default function PaymentPage() {
               )}
             </div>
 
-            {/* Info Penting */}
             <InfoBukti />
 
-            {/* Submit */}
             <div className="mt-5 flex flex-col gap-3">
               <button
                 disabled={!uploadedFile}
-                className={`w-full flex justify-center items-center gap-2 py-3.5 text-sm font-medium transition-colors ${
+                className={`w-full flex justify-center items-center gap-2 py-3.5 text-sm font-medium transition-all ${
                   uploadedFile
-                    ? "bg-[#896d51] text-white hover:bg-[#7a6047]"
-                    : "bg-[#896d51]/30 text-white/50 cursor-not-allowed"
+                    ? "bg-[#0f131f] text-white hover:bg-[#1a2135] active:scale-[0.98]"
+                    : "bg-[#0f131f]/20 text-[#0f131f]/40 cursor-not-allowed"
                 }`}
               >
                 <Upload size={16} strokeWidth={1.5} />
                 Kirim Bukti Pembayaran
               </button>
-              <p className="text-[10px] text-center text-black/30">
+              <p className="text-[10px] text-center text-black/40">
                 Dengan mengirim, Anda menyetujui{" "}
-                <span className="underline cursor-pointer">
+                <span className="underline cursor-pointer hover:text-[#0f131f]">
                   syarat & ketentuan
                 </span>{" "}
-                pembayaran kami.
+                kami.
               </p>
             </div>
           </div>
 
-          {/* Back */}
           <Link
             href="/checkout"
-            className="flex items-center gap-2 text-sm text-[#896d51] hover:text-[#7a6047] transition-colors w-fit"
+            className="flex items-center gap-2 text-sm text-[#0f131f]/70 hover:text-[#0f131f] transition-colors w-fit font-medium"
           >
             ← Kembali ke Checkout
           </Link>
