@@ -3,8 +3,8 @@ import React from "react";
 
 function BottomAbout() {
   return (
-    <div className="grid-12 mt-10">
-      <div className="col-span-6 w-full flex flex-row gap-5">
+    <div className="grid-12 lg:mt-10 mt-7">
+      <div className="lg:col-span-6 col-span-12 w-full flex flex-row lg:gap-5 gap-3 lg:order-1 order-2">
         <Image
           className="w-full"
           src={"/about-1.jpg"}
@@ -20,7 +20,7 @@ function BottomAbout() {
           width={100}
         />
       </div>
-      <div className="col-span-6 w-full">
+      <div className="lg:col-span-6 col-span-12 w-full lg:order-2 order-1">
         <p>
           Berawal dari sebuah rumah dengan halaman yang asri, Bango Parc kini
           hadir sebagai venue serbaguna yang memadukan kehangatan rumah dengan

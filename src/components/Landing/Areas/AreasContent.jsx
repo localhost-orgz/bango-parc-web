@@ -11,7 +11,7 @@ function AreasContent() {
       {areas_list.map((area) => (
         <div
           key={area.id}
-          className="relative col-span-4 w-full h-auto aspect-video bg-slate-200"
+          className="relative lg:col-span-4 col-span-12 w-full h-auto aspect-video bg-slate-200"
         >
           <div
             style={{ backgroundImage: `url('${area.src}')` }}

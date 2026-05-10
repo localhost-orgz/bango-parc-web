@@ -2,13 +2,10 @@ import React from "react";
 
 function TestimonialCard({ testi }) {
   return (
-    <div
-      key={testi.id}
-      className="col-span-3 w-full h-auto aspect-square bg-[#f1f0ee] px-7 py-10 rounded-lg gap-8 flex flex-col justify-between"
-    >
+    <div className="w-full min-h-[320px] sm:min-h-[350px] bg-[#f1f0ee] px-5 sm:px-7 py-7 sm:py-10 rounded-2xl gap-8 flex flex-col justify-between">
       <div className="flex flex-col">
         <svg
-          className="w-10 h-10"
+          className="w-8 h-8 sm:w-10 sm:h-10"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 290 290"
         >
@@ -17,16 +14,23 @@ function TestimonialCard({ testi }) {
             fill="#646952"
           ></path>
         </svg>
-        {/* <div className="h-0.5 w-full bg-[#C08B5C]" /> */}
-        <p className="font-crimson-text text-lg leading-5.5 mt-3">
+
+        <p className="font-crimson-text text-base sm:text-lg leading-6 mt-4 text-neutral-800">
           {testi.review}
         </p>
       </div>
-      <div className="flex flex-row items-center justify-start gap-2">
-        <div className="h-10 w-10 bg-slate-300 rounded-full"></div>
+
+      <div className="flex flex-row items-center justify-start gap-3">
+        <div className="h-10 w-10 sm:h-11 sm:w-11 bg-slate-300 rounded-full shrink-0"></div>
+
         <div className="flex flex-col">
-          <span className="font-crimson-pro text-xl">{testi.name}</span>
-          <span className="text-xs">{testi.role}</span>
+          <span className="font-crimson-pro text-lg sm:text-xl leading-none">
+            {testi.name}
+          </span>
+
+          <span className="text-xs sm:text-sm text-neutral-500 mt-1">
+            {testi.role}
+          </span>
         </div>
       </div>
     </div>

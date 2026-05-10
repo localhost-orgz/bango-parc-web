@@ -35,6 +35,6 @@
   }
 
   .section-layout {
-    @apply w-full px-8 py-16;
+    @apply w-full lg:px-8 lg:py-16 px-4 py-8;
   }
 }

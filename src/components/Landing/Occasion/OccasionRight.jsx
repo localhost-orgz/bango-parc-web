@@ -1,6 +1,8 @@
+"use client";
+
 import React from "react";
 
-function OccasionRight() {
+function OccasionRight({ scrollRef }) {
   const occasion_list = [
     {
       id: 1,
@@ -17,26 +19,38 @@ function OccasionRight() {
       src: "/wedding.jpg",
       label: "Wedding",
     },
+    {
+      id: 4,
+      src: "/famget.jpg",
+      label: "Birthday",
+    },
   ];
+
   return (
-    <>
-      {occasion_list.map((occ) => (
-        <div
-          key={occ.id}
-          className="col-span-2 relative bg-black w-full h-auto aspect-9/16"
-        >
+    <div className="lg:col-span-6 col-span-12 overflow-hidden">
+      <div
+        ref={scrollRef}
+        className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+      >
+        {occasion_list.map((occ) => (
           <div
-            style={{ backgroundImage: `url(${occ.src})` }}
-            className="absolute inset-0 bg-cover bg-center"
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent flex items-end py-5 px-3">
-            <span className="font-crimson-text text-white text-2xl">
-              {occ.label}
-            </span>
+            key={occ.id}
+            className="relative min-w-[260px] sm:min-w-[320px] lg:min-w-[280px] aspect-[9/16] shrink-0 bg-black"
+          >
+            <div
+              style={{ backgroundImage: `url(${occ.src})` }}
+              className="absolute inset-0 bg-cover bg-center"
+            />
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end py-5 px-4">
+              <span className="font-crimson-text text-white text-2xl">
+                {occ.label}
+              </span>
+            </div>
           </div>
-        </div>
-      ))}
-    </>
+        ))}
+      </div>
+    </div>
   );
 }
 

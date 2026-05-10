@@ -13,7 +13,7 @@ import OccasionSection from "@/components/Landing/OccasionSection";
 
 export default function Home() {
   return (
-    <main className="min-h-screen relative w-full">
+    <main className="min-h-screen relative w-full overflow-x-hidden">
       {/* hero section */}
       <section className="w-full h-screen relative flex justify-center items-center">
         <div
