@@ -131,36 +131,6 @@ function PageHeader() {
   );
 }
 
-// function ImageGallery() {
-//   return (
-//     <div>
-//       <div className="w-full h-auto aspect-video bg-gray-400 relative">
-//         <div
-//           className="inset-0 absolute bg-cover bg-center"
-//           style={{ backgroundImage: "url(/about-us2.jpg)" }}
-//         />
-//         <button className="bg-white rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -left-3 shadow-2xl border border-[#896d51]">
-//           <ChevronLeft color="#896d51" />
-//         </button>
-//         <button className="bg-white rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -right-3 shadow-2xl border border-[#896d51]">
-//           <ChevronRight color="#896d51" />
-//         </button>
-//       </div>
-
-//       <div className="flex gap-2 mt-5">
-//         {[0, 1, 2, 3].map((i) => (
-//           <div
-//             key={i}
-//             className={`w-full h-auto aspect-video bg-gray-400 cursor-pointer transition-opacity ${
-//               i === 0 ? "ring-2 ring-[#896d51]" : "opacity-70 hover:opacity-100"
-//             }`}
-//           />
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
 function ImageGallery() {
   const [activeIndex, setActiveIndex] = useState(0);
 

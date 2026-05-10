@@ -59,7 +59,7 @@ function page() {
   };
 
   return (
-    <main className="w-full min-h-screen bg-[#fffaee]">
+    <main className="w-full min-h-screen bg-[#f3f4f7]">
       <header className="h-90 w-full relative flex justify-center items-center">
         <div
           style={{ backgroundImage: "url(/about-header.jpg)" }}
@@ -71,14 +71,13 @@ function page() {
           Paket & Venue
         </h1>
       </header>
-      <section className="section-layout grid-12">
+      {/* <section className="section-layout grid-12">
         <div className="col-span-4">
           <h3 className="section-headline">
             Temukan paket sesuai kebutuhanmu.
           </h3>
         </div>
         <div className="col-span-8 w-full flex justify-between items-end gap-4">
-          {/* dropdowns */}
           <div className="flex flex-1 items-end gap-4">
             {filters.map(({ id, label, icon: Icon, options }) => (
               <div
@@ -100,7 +99,6 @@ function page() {
                   />
                 </button>
 
-                {/* dropdown menu */}
                 {open === id && (
                   <div className="absolute top-full left-0 z-50 mt-1 w-full border border-[#896d51] bg-white ">
                     {options.map((opt) => (
@@ -117,19 +115,18 @@ function page() {
               </div>
             ))}
           </div>
-          {/* cta */}
           <button className="srhink-0 bg-[#896d51] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#896d51]/50">
             Terapkan Filter
           </button>
         </div>
-      </section>
+      </section> */}
 
       <section className="section-layout grid-12">
         <div className="w-full col-span-12 flex justify-center items-center flex-col gap-4">
           <h2 className="text-5xl font-crimson-text tracking-light">
             Pilihan Paket
           </h2>
-          <div className="w-50 h-0.5 bg-[#896d51]"></div>
+          <div className="w-50 h-0.5 bg-[#0F131F]"></div>
         </div>
       </section>
 
@@ -145,7 +142,7 @@ function page() {
               />
             </div>
             <div className="flex flex-col items-start p-4">
-              <span className="text-3xl font-crimson-text text-[#5a4f44] tracking-tight">
+              <span className="text-3xl font-crimson-text text-[#0F131F] tracking-tight">
                 Semi-Indoor & Outdoor
               </span>
               <div className="flex flex-row items-end gap-2 mt-1">
@@ -153,7 +150,7 @@ function page() {
                 <span className="line-through text-sm mb-0.5 font-medium text-black/50">
                   Rp1.600.000
                 </span>
-                <span className=" text-sm font-medium mb-0.5 text-[#80654c]">
+                <span className=" text-sm font-medium mb-0.5 text-[#0F131F]">
                   / 3 jam
                 </span>
               </div>
@@ -164,7 +161,7 @@ function page() {
               <div className="w-full mt-6 flex flex-row justify-between gap-2">
                 <div className="w-full">
                   <div className="flex flex-row gap-3 items-center">
-                    <Users className="text-[#80654c]" />
+                    <Users className="text-[#0F131F]" />
                     <div className="flex flex-col items-start">
                       <span className="text-xs font-semibold">Kapasitas</span>
                       <span className="text-sm font-medium">
@@ -175,7 +172,7 @@ function page() {
                 </div>
                 <div className="w-full">
                   <div className="flex flex-row gap-3 items-center">
-                    <Zap className="text-[#80654c]" strokeWidth={1.7} />
+                    <Zap className="text-[#0F131F]" strokeWidth={1.7} />
                     <div className="flex flex-col items-start">
                       <span className="text-xs font-semibold">Listrik</span>
                       <span className="text-sm font-medium">300 Watt</span>
@@ -186,7 +183,7 @@ function page() {
               <div className="w-full mt-4 flex flex-row justify-between gap-2">
                 <div className="w-full">
                   <div className="flex flex-row gap-3 items-center">
-                    <PartyPopper className="text-[#80654c]" strokeWidth={1.8} />
+                    <PartyPopper className="text-[#0F131F]" strokeWidth={1.8} />
                     <div className="flex flex-col items-start">
                       <span className="text-xs font-semibold">Area</span>
                       <span className="text-sm font-medium">Bisa Didekor</span>
@@ -195,7 +192,7 @@ function page() {
                 </div>
                 <div className="w-full">
                   <div className="flex flex-row gap-3 items-center">
-                    <Armchair className="text-[#80654c]" />
+                    <Armchair className="text-[#0F131F]" />
                     <div className="flex flex-col items-start">
                       <span className="text-xs font-semibold">
                         Kursi Variasi
@@ -207,12 +204,12 @@ function page() {
               </div>
 
               {/* line */}
-              <div className="w-full h-px bg-[#80654c]/30 my-5"></div>
+              <div className="w-full h-px bg-[#0F131F]/30 my-5"></div>
 
               {/* btn */}
               <Link
                 href={"/paket"}
-                className="w-full items-center gap-2 flex justify-center py-3 bg-[#80654c] text-white"
+                className="w-full items-center gap-2 flex justify-center py-3 bg-[#0F131F] text-white"
               >
                 <span className="text-sm font-medium">Lihat Detail & Book</span>
                 <ArrowRight size={17} strokeWidth={3} />
@@ -229,7 +226,7 @@ function page() {
               />
             </div>
             <div className="flex flex-col items-start p-4">
-              <span className="text-3xl font-crimson-text text-[#5a4f44] tracking-tight">
+              <span className="text-3xl font-crimson-text text-[#0F131F] tracking-tight">
                 Semi-Indoor & Outdoor
               </span>
               <div className="flex flex-row items-end gap-2 mt-1">
@@ -237,7 +234,7 @@ function page() {
                 <span className="line-through text-sm mb-0.5 font-medium text-black/50">
                   Rp1.600.000
                 </span>
-                <span className=" text-sm font-medium mb-0.5 text-[#80654c]">
+                <span className=" text-sm font-medium mb-0.5 text-[#0F131F]">
                   / 3 jam
                 </span>
               </div>
@@ -248,7 +245,7 @@ function page() {
               <div className="w-full mt-6 flex flex-row justify-between gap-2">
                 <div className="w-full">
                   <div className="flex flex-row gap-3 items-center">
-                    <Users className="text-[#80654c]" />
+                    <Users className="text-[#0F131F]" />
                     <div className="flex flex-col items-start">
                       <span className="text-xs font-semibold">Kapasitas</span>
                       <span className="text-sm font-medium">
@@ -259,7 +256,7 @@ function page() {
                 </div>
                 <div className="w-full">
                   <div className="flex flex-row gap-3 items-center">
-                    <Zap className="text-[#80654c]" strokeWidth={1.7} />
+                    <Zap className="text-[#0F131F]" strokeWidth={1.7} />
                     <div className="flex flex-col items-start">
                       <span className="text-xs font-semibold">Listrik</span>
                       <span className="text-sm font-medium">300 Watt</span>
@@ -270,7 +267,7 @@ function page() {
               <div className="w-full mt-4 flex flex-row justify-between gap-2">
                 <div className="w-full">
                   <div className="flex flex-row gap-3 items-center">
-                    <PartyPopper className="text-[#80654c]" strokeWidth={1.8} />
+                    <PartyPopper className="text-[#0F131F]" strokeWidth={1.8} />
                     <div className="flex flex-col items-start">
                       <span className="text-xs font-semibold">Area</span>
                       <span className="text-sm font-medium">Bisa Didekor</span>
@@ -279,7 +276,7 @@ function page() {
                 </div>
                 <div className="w-full">
                   <div className="flex flex-row gap-3 items-center">
-                    <Armchair className="text-[#80654c]" />
+                    <Armchair className="text-[#0F131F]" />
                     <div className="flex flex-col items-start">
                       <span className="text-xs font-semibold">
                         Kursi Variasi
@@ -291,10 +288,10 @@ function page() {
               </div>
 
               {/* line */}
-              <div className="w-full h-px bg-[#80654c]/30 my-5"></div>
+              <div className="w-full h-px bg-[#0F131F]/30 my-5"></div>
 
               {/* btn */}
-              <div className="w-full items-center gap-2 flex justify-center py-3 bg-[#80654c] text-white">
+              <div className="w-full items-center gap-2 flex justify-center py-3 bg-[#0F131F] text-white">
                 <span className="text-sm font-medium">Lihat Detail & Book</span>
                 <ArrowRight size={17} strokeWidth={3} />
               </div>
@@ -316,7 +313,7 @@ function page() {
                 />
               </div>
               <div className="flex flex-1 px-3 py-4 flex-col">
-                <span className="text-2xl font-crimson-text text-[#5a4f44] tracking-tight">
+                <span className="text-2xl font-crimson-text text-[#0F131F] tracking-tight">
                   {wed.name}
                 </span>
                 <div className="flex flex-row items-end mt-2 gap-1">
@@ -324,7 +321,7 @@ function page() {
                   <span className="font-medium text-xs line-through text-black/50">
                     {wed.current_three_hours}
                   </span>
-                  <span className="font-medium text-xs text-[#80654c]">
+                  <span className="font-medium text-xs text-[#0F131F]">
                     / 3 jam
                   </span>
                 </div>
@@ -333,7 +330,7 @@ function page() {
                   <span className="font-medium text-xs line-through text-black/50">
                     {wed.current_five_hours}
                   </span>
-                  <span className="font-medium text-xs text-[#80654c]">
+                  <span className="font-medium text-xs text-[#0F131F]">
                     / 5 jam
                   </span>
                 </div>
@@ -345,17 +342,17 @@ function page() {
                       key={id}
                       className="flex flex-row items-center justify-start gap-1"
                     >
-                      <Icon size={15} className="text-[#80654c]" />
-                      <span className="text-xs font-medium text-[#80654c]">
+                      <Icon size={15} className="text-[#0F131F]" />
+                      <span className="text-xs font-medium text-[#0F131F]">
                         {label}
                       </span>
                     </div>
                   ))}
 
-                  <div className="h-0.5 w-full bg-[#80654c]/30 mb-3 mt-5"></div>
+                  <div className="h-0.5 w-full bg-[#0F131F]/30 mb-3 mt-5"></div>
                   <Link
                     href={"/paket"}
-                    className="w-full py-3 bg-[#80654c] flex justify-center items-center gap-1"
+                    className="w-full py-3 bg-[#0F131F] flex justify-center items-center gap-1"
                   >
                     <span className="text-xs font-semibold text-white">
                       Lihat Detail & Booking
@@ -391,10 +388,12 @@ function page() {
               </ul>
             </div>
             <Link
-              className="flex items-center gap-1 text-[#896d51]"
+              className="flex items-center gap-1 text-[#0F131F]"
               href={"/paket"}
             >
-              <span className="underline">Lihat Semua Ketentuan</span>
+              <span className="underline underline-offset-2">
+                Lihat Semua Ketentuan
+              </span>
               <MoveRight size={17} />
             </Link>
           </div>
@@ -416,7 +415,7 @@ function page() {
               </span>
               <Link
                 href={"/paket"}
-                className="flex items-center text-sm gap-2 bg-[#896d51] relative text-white py-3 px-6 mt-5"
+                className="flex items-center text-sm gap-2 bg-[#0F131F] relative text-white py-3 px-6 mt-5"
               >
                 <Phone size={17} /> Hubungi Kami
               </Link>
