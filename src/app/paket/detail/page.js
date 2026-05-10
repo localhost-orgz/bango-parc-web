@@ -21,6 +21,7 @@ import { useState } from "react";
 // ─── Internal Components ──────────────────────────────────────────────────────
 import BookingCalendar from "@/components/BookingCalendar";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Landing/Navbar";
 
 const TIME_SLOTS = [
   "07:00",
@@ -599,6 +600,7 @@ export default function DetailPaketPage() {
   return (
     <main className="w-full min-h-screen bg-[#f3f4f7]">
       <PageHeader />
+      <Navbar />
 
       <section className="section-layout grid-12">
         {/* Left column — gallery + info */}

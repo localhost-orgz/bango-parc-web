@@ -9,7 +9,7 @@ export default function PageHeader() {
       />
       <div className="absolute inset-0 bg-[#0F131F]/60" />
       <div className="z-10 flex flex-col items-center gap-2 px-4">
-        <div className="flex items-center gap-1 text-white/50 text-xs mb-1 flex-wrap justify-center">
+        {/* <div className="flex items-center gap-1 text-white/50 text-xs mb-1 flex-wrap justify-center">
           <span>Beranda</span>
           <ChevronRight size={12} />
           <span>Venue</span>
@@ -17,7 +17,7 @@ export default function PageHeader() {
           <span>Detail Paket</span>
           <ChevronRight size={12} />
           <span className="text-white">Checkout</span>
-        </div>
+        </div> */}
         <h1 className="font-crimson-pro text-white text-4xl sm:text-5xl text-center">
           Detail Pesanan
         </h1>

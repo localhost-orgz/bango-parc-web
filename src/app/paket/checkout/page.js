@@ -3,6 +3,7 @@
 import LeftColumn from "@/components/Checkout/LeftColumn";
 import PageHeader from "@/components/Checkout/PageHeader";
 import RightColumn from "@/components/Checkout/RightColumn";
+import Navbar from "@/components/Landing/Navbar";
 import React from "react";
 
 // ─── Dummy Data ────────────────────────────────────────────────────────────────
@@ -27,6 +28,7 @@ function Page() {
   return (
     <main className="w-full min-h-screen bg-[#f3f4f7]">
       <PageHeader />
+      <Navbar />
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10 grid grid-cols-12 gap-6 sm:gap-8">
         <LeftColumn data={bookingData} />
         <RightColumn data={bookingData} />
