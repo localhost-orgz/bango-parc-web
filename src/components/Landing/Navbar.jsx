@@ -23,7 +23,7 @@ function Navbar() {
       className={`w-full fixed top-0 left-0 z-50 transition-all duration-500 ${
         scrolled
           ? "bg-white/80 backdrop-blur-xl border-b border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.04)]"
-          : "bg-gradient-to-b from-black/40 to-transparent"
+          : "bg-linear-to-b from-black/40 to-transparent"
       }`}
     >
       <nav className="max-w-7xl mx-auto h-20 flex items-center justify-between px-5 sm:px-8 lg:px-12">
@@ -34,7 +34,7 @@ function Navbar() {
             alt="logo"
             width={90}
             height={90}
-            className="w-[72px] sm:w-[85px] h-auto transition-all duration-300"
+            className="w-18 sm:w-21.25 h-auto transition-all duration-300"
           />
         </Link>
 

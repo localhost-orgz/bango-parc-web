@@ -1,8 +1,10 @@
+import { Box, Compass } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 function CtaSection() {
   return (
-    <section className="w-full h-[500px] sm:h-[600px] lg:h-[650px] relative overflow-hidden">
+    <section className="w-full h-125 sm:h-150 lg:h-162.5 relative overflow-hidden">
       {/* Background */}
       <div
         style={{ backgroundImage: "url(/cta.jpg)" }}
@@ -23,9 +25,12 @@ function CtaSection() {
           Cek ketersediaan tanggal dan amankan venue pilihanmu sekarang.
         </p>
 
-        <button className="mt-7 py-3 px-6 sm:px-8 bg-white text-black font-crimson-text text-base sm:text-lg hover:bg-[#f3f3f3] transition-all duration-300">
-          Cek Ketersediaan
-        </button>
+        <Link href={"/paket"}>
+          <button className="mt-7 py-2 px-5 sm:px-8 bg-white text-black  cursor-pointer font-crimson-text text-base sm:text-lg hover:bg-[#f3f3f3] transition-all duration-300 flex flex-row items-center gap-2">
+            <Box size={20} strokeWidth={1.6} />
+            Cek Paket
+          </button>
+        </Link>
       </div>
     </section>
   );

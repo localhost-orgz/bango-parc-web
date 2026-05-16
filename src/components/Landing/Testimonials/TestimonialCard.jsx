@@ -2,7 +2,7 @@ import React from "react";
 
 function TestimonialCard({ testi }) {
   return (
-    <div className="w-full min-h-[320px] sm:min-h-[350px] bg-[#f1f0ee] px-5 sm:px-7 py-7 sm:py-10 rounded-2xl gap-8 flex flex-col justify-between">
+    <div className="w-full min-h-80 sm:min-h-87.5 bg-[#f1f0ee] px-5 sm:px-7 py-7 sm:py-10 rounded-2xl gap-8 flex flex-col justify-between">
       <div className="flex flex-col">
         <svg
           className="w-8 h-8 sm:w-10 sm:h-10"
@@ -21,7 +21,14 @@ function TestimonialCard({ testi }) {
       </div>
 
       <div className="flex flex-row items-center justify-start gap-3">
-        <div className="h-10 w-10 sm:h-11 sm:w-11 bg-slate-300 rounded-full shrink-0"></div>
+        <div className="h-10 w-10 sm:h-11 sm:w-11 bg-slate-300 rounded-full relative shrink-0">
+          <div
+            className="absolute inset-0 bg-cover bg-center rounded-full"
+            style={{
+              backgroundImage: `url(${testi.avatar})`,
+            }}
+          />
+        </div>
 
         <div className="flex flex-col">
           <span className="font-crimson-pro text-lg sm:text-xl leading-none">

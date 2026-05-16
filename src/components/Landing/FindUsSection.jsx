@@ -18,7 +18,7 @@ function FindUsSection() {
         {/* Map */}
         <div className="lg:col-span-7 w-full overflow-hidden border border-black/10">
           <iframe
-            className="w-full h-[350px] sm:h-[450px] lg:h-[500px]"
+            className="w-full h-87.5 sm:h-112.5 lg:h-125"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.669179388451!2d106.80400329999999!3d-6.3071217!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69ef99bc243df9%3A0x2829114f0e30059f!2sBANGO%20PARC!5e0!3m2!1sid!2sid!4v1777508028731!5m2!1sid!2sid"
             allowFullScreen=""
             loading="lazy"
@@ -27,7 +27,7 @@ function FindUsSection() {
         </div>
 
         {/* Right Box */}
-        <div className="lg:col-span-3 w-full border border-black/10 h-auto lg:h-[500px] flex flex-col justify-between p-6">
+        <div className="lg:col-span-3 w-full border border-black/10 h-auto lg:h-125 flex flex-col justify-between p-6">
           <div className="flex flex-col gap-7">
             <div>
               <span className="uppercase tracking-[0.2em] text-xs text-neutral-500">

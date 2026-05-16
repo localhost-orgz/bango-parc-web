@@ -35,14 +35,14 @@ function OccasionRight({ scrollRef }) {
         {occasion_list.map((occ) => (
           <div
             key={occ.id}
-            className="relative min-w-[260px] sm:min-w-[320px] lg:min-w-[280px] aspect-[9/16] shrink-0 bg-black"
+            className="relative min-w-65 sm:min-w-[320px] lg:min-w-70 aspect-9/16 shrink-0 bg-black"
           >
             <div
               style={{ backgroundImage: `url(${occ.src})` }}
               className="absolute inset-0 bg-cover bg-center"
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end py-5 px-4">
+            <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent flex items-end py-5 px-4">
               <span className="font-crimson-text text-white text-2xl">
                 {occ.label}
               </span>
