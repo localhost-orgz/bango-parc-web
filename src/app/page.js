@@ -18,7 +18,7 @@ export default function Home() {
       <section className="w-full h-screen relative flex justify-center items-center">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/hero-bg.jpg')" }}
+          style={{ backgroundImage: "url('/hero.jpg')" }}
         />
         <div className="absolute inset-0 bg-[#0F131F]/50" />
 

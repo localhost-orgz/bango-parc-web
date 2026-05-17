@@ -2,9 +2,9 @@ import React from "react";
 
 function AreasContent() {
   const areas_list = [
-    { id: 1, src: "/indoor.jpg", text: "Indoor" },
-    { id: 2, src: "/semi-indoor.jpg", text: "Semi-indoor" },
-    { id: 3, src: "/outdoor.jpg", text: "Outdoor" },
+    { id: 1, src: "/depan.jpg", text: "Depan" },
+    { id: 2, src: "/tengah.jpg", text: "Ruang Tengah" },
+    { id: 3, src: "/belakang.jpg", text: "Belakang" },
   ];
   return (
     <div className="grid-12 mt-5">
