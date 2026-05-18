@@ -5,29 +5,36 @@ import React from "react";
 function page() {
   return (
     <main className="min-h-screen w-full">
-      <header className="h-90 w-full relative flex justify-center items-center">
+      <header className="h-[320px] md:h-90 w-full relative flex justify-center items-center px-4">
         <div
           style={{ backgroundImage: "url(/about-header.jpg)" }}
           className="absolute inset-0 bg-cover bg-center"
         />
         <div className="absolute inset-0 bg-black/10" />
 
-        <h1 className="font-crimson-pro text-white text-5xl z-1">About Us</h1>
+        <h1 className="font-crimson-pro text-white text-4xl md:text-5xl z-1 text-center">
+          About Us
+        </h1>
       </header>
+
       <Navbar />
+
+      {/* intro */}
       <section className="section-layout">
-        <div className="grid-12">
-          <div className="col-span-7 w-full flex flex-col items-start gap-5">
+        <div className="grid-12 gap-y-10">
+          <div className="col-span-12 lg:col-span-7 w-full flex flex-col items-start gap-5">
             <h3 className="section-headline">
               Berawal dari sebuah rumah, tumbuh menjadi tempat di mana kenangan
               tercipta.
             </h3>
-            <div className="flex flex-col gap-3 w-2xl">
+
+            <div className="flex flex-col gap-3 w-full lg:w-2xl">
               <p className="section-subheadline">
                 Bango Parc lahir dari sebuah ide sederhana — sebuah rumah
                 keluarga dengan halaman yang luas dan penuh kehangatan, yang
                 terlalu sayang untuk dinikmati sendiri.
               </p>
+
               <p className="section-subheadline">
                 Didirikan pada tahun 2018 oleh pasangan Budi dan Rina Santoso,
                 Bango Parc awalnya hanya digunakan untuk acara keluarga besar.
@@ -36,26 +43,30 @@ function page() {
               </p>
             </div>
           </div>
-          <div className="col-span-4 col-start-9 relative">
+
+          <div className="col-span-12 lg:col-span-4 lg:col-start-9 relative min-h-[300px] lg:min-h-0">
             <div
               style={{ backgroundImage: "url(/about-us1.jpg)" }}
-              className="inset-0 absolute bg-cover bg-center"
+              className="absolute inset-0 bg-cover bg-center"
             />
           </div>
         </div>
       </section>
+
+      {/* gallery */}
       <section className="section-layout">
-        <div className="grid-12">
-          <div className="col-span-8">
+        <div className="grid-12 gap-5">
+          <div className="col-span-12 lg:col-span-8">
             <div
               style={{ backgroundImage: "url(/about-us3.jpg)" }}
-              className="w-full h-auto aspect-video bg-center bg-cover"
+              className="w-full aspect-video bg-center bg-cover"
             />
           </div>
-          <div className="col-span-4">
+
+          <div className="col-span-12 lg:col-span-4">
             <div
               style={{ backgroundImage: "url(/about-us2.jpg)" }}
-              className="w-full h-full bg-bottom bg-cover"
+              className="w-full min-h-[260px] lg:h-full bg-bottom bg-cover"
             />
           </div>
         </div>
@@ -67,25 +78,28 @@ function page() {
           <h3 className="section-headline text-center">
             Ratusan momen, satu tempat
           </h3>
-          <p className="section-subheadline text-center w-[50%]">
+
+          <p className="section-subheadline text-center w-full md:w-[70%] lg:w-[50%]">
             Dari satu acara ke acara berikutnya, kami terus bertumbuh bersama
             setiap momen yang dipercayakan kepada Bango Parc.
           </p>
         </div>
 
-        <div className="grid-12 mt-20">
-          <div className="col-span-10 col-start-2 w-full flex flex-row justify-between">
+        <div className="grid-12 mt-12 md:mt-20">
+          <div className="col-span-12 lg:col-span-10 lg:col-start-2 w-full grid grid-cols-2 lg:flex lg:flex-row justify-between gap-y-10">
             {/* acara terselenggara */}
             <div className="flex flex-col items-start gap-2">
-              <span className="font-bold text-6xl">100+</span>
+              <span className="font-bold text-4xl md:text-6xl">100+</span>
               <span>Acara Terselenggara</span>
             </div>
+
             {/* rating google maps */}
             <div className="flex flex-col items-start gap-2">
               <div className="flex items-end gap-2">
-                <span className="font-bold text-6xl">4.6</span>
+                <span className="font-bold text-4xl md:text-6xl">4.6</span>
+
                 <svg
-                  className="mb-2"
+                  className="mb-1 md:mb-2"
                   width="22"
                   height="21"
                   viewBox="0 0 22 21"
@@ -98,16 +112,19 @@ function page() {
                   />
                 </svg>
               </div>
+
               <span>Rating di Google Maps</span>
             </div>
-            {/* acara terselenggara */}
+
+            {/* area venue */}
             <div className="flex flex-col items-start gap-2">
-              <span className="font-bold text-6xl">3</span>
+              <span className="font-bold text-4xl md:text-6xl">3</span>
               <span>Area Venue</span>
             </div>
-            {/* acara terselenggara */}
+
+            {/* pasangan menikah */}
             <div className="flex flex-col items-start gap-2">
-              <span className="font-bold text-6xl">13</span>
+              <span className="font-bold text-4xl md:text-6xl">13</span>
               <span>Pasangan Menikah</span>
             </div>
           </div>
@@ -118,29 +135,34 @@ function page() {
       <section className="section-layout">
         <div className="w-full flex flex-col items-center gap-3">
           <h3 className="section-headline text-center">Areas</h3>
-          <p className="section-subheadline w-[50%] text-center">
+
+          <p className="section-subheadline w-full md:w-[70%] lg:w-[50%] text-center">
             Dari satu acara ke acara berikutnya, kami terus bertumbuh bersama
             setiap momen yang dipercayakan kepada Bango Parc.
           </p>
         </div>
+
         <AreasContent />
       </section>
 
       {/* cta */}
-      <div className="w-full py-20 relative flex flex-col justify-center items-center">
+      <div className="w-full py-16 md:py-20 px-5 relative flex flex-col justify-center items-center">
         <div
           style={{ backgroundImage: "url(/about-cta.jpg)" }}
           className="absolute inset-0 bg-cover bg-center"
         />
+
         <div className="absolute inset-0 bg-black/60" />
 
-        <h3 className="text-white z-10 mb-3 text-4xl font-crimson-pro">
+        <h3 className="text-white z-10 mb-3 text-3xl md:text-4xl font-crimson-pro text-center">
           Siap Bikin Momen Tak Terlupakan di Bango Parc?
         </h3>
-        <p className="z-10 text-white">
+
+        <p className="z-10 text-white text-center max-w-2xl">
           Pilih area favoritmu dan mulai rencanakan acaramu bareng kami
         </p>
-        <div className="flex items-center gap-2 z-10 mt-5 border border-white py-3 px-5">
+
+        <div className="flex items-center gap-2 z-10 mt-5 border border-white py-3 px-5 text-center">
           <svg
             width="24"
             height="24"
@@ -219,6 +241,7 @@ function page() {
               strokeLinejoin="round"
             />
           </svg>
+
           <span className="text-white">Amanakan Tanggalmu Sekarang!</span>
         </div>
       </div>
