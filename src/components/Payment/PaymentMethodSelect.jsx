@@ -14,7 +14,7 @@ const PaymentMethodSelect = ({
         Pilih metode yang paling mudah untuk Anda.
       </p>
 
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {paymentMethods.map((method) => (
           <PaymentMethodButton
             key={method.id}

@@ -79,12 +79,11 @@ export default function PaymentPage() {
 
   return (
     <main className="w-full min-h-screen bg-[#F4F7FA]">
-      {" "}
-      {/* Sedikit lebih cool-toned gray */}
       <HeaderPayment />
-      <section className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-12 gap-8">
+
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         {/* LEFT — Order Summary */}
-        <div className="col-span-4 flex flex-col gap-4">
+        <div className="lg:col-span-4 flex flex-col gap-4 order-1 lg:order-1">
           <OrderCode code={orderData.orderCode} />
           <VenueInfo orderData={orderData} />
           <PriceBreakdown orderData={orderData} />
@@ -92,7 +91,7 @@ export default function PaymentPage() {
         </div>
 
         {/* RIGHT — Payment Detail */}
-        <div className="col-span-8 flex flex-col gap-5">
+        <div className="lg:col-span-8 flex flex-col gap-5 order-2 lg:order-2">
           <PaymentMethodSelect
             selectedMethod={selectedMethod}
             paymentMethods={paymentMethods}
@@ -110,11 +109,12 @@ export default function PaymentPage() {
             />
           )}
 
-          {/* Upload Bukti - Color Updated to 0f131f */}
-          <div className="bg-white border border-[#0f131f]/10 p-6 shadow-sm">
-            <h5 className="font-crimson-pro text-xl text-[#0f131f] mb-1">
+          {/* Upload Bukti */}
+          <div className="bg-white border border-[#0f131f]/10 p-4 sm:p-6 shadow-sm">
+            <h5 className="font-crimson-pro text-lg sm:text-xl text-[#0f131f] mb-1">
               Upload Bukti Pembayaran
             </h5>
+
             <div className="w-full h-px bg-[#0f131f]/10 mb-5" />
 
             <div
@@ -125,7 +125,7 @@ export default function PaymentPage() {
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`w-full border-2 border-dashed flex flex-col items-center justify-center gap-3 py-10 cursor-pointer transition-all ${
+              className={`w-full border-2 border-dashed flex flex-col items-center justify-center gap-3 py-8 sm:py-10 px-4 text-center cursor-pointer transition-all ${
                 isDragging
                   ? "border-[#0f131f] bg-[#0f131f]/5"
                   : uploadedFile
@@ -140,6 +140,7 @@ export default function PaymentPage() {
                 className="hidden"
                 onChange={handleFileChange}
               />
+
               {uploadedFile ? (
                 <>
                   <FileImage
@@ -147,14 +148,17 @@ export default function PaymentPage() {
                     className="text-green-500"
                     strokeWidth={1.5}
                   />
-                  <div className="flex flex-col items-center gap-1">
+
+                  <div className="flex flex-col items-center gap-1 break-all">
                     <span className="text-sm font-medium text-green-700">
                       {uploadedFile.name}
                     </span>
+
                     <span className="text-xs text-black/40">
                       {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
                     </span>
                   </div>
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -172,13 +176,15 @@ export default function PaymentPage() {
                     className="text-[#0f131f]/60"
                     strokeWidth={1.5}
                   />
+
                   <div className="flex flex-col items-center gap-1">
-                    <span className="text-sm text-black/60">
+                    <span className="text-sm text-black/60 leading-relaxed">
                       Klik untuk upload atau{" "}
                       <span className="text-[#0f131f] font-semibold">
                         drag & drop
                       </span>
                     </span>
+
                     <span className="text-xs text-black/30">
                       Format: JPG, PNG, PDF · Maks. 5 MB
                     </span>
@@ -201,7 +207,8 @@ export default function PaymentPage() {
                 <Upload size={16} strokeWidth={1.5} />
                 Kirim Bukti Pembayaran
               </button>
-              <p className="text-[10px] text-center text-black/40">
+
+              <p className="text-[10px] sm:text-xs text-center text-black/40 leading-relaxed">
                 Dengan mengirim, Anda menyetujui{" "}
                 <span className="underline cursor-pointer hover:text-[#0f131f]">
                   syarat & ketentuan

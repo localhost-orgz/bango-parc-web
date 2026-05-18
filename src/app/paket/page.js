@@ -123,7 +123,7 @@ function page() {
       </section> */}
       <Navbar />
 
-      <section className="section-layout grid-12">
+      <section className="mt-10 grid-12">
         <div className="w-full col-span-12 flex justify-center items-center flex-col gap-4">
           <h2 className="text-5xl font-crimson-text tracking-light">
             Pilihan Paket
@@ -135,9 +135,264 @@ function page() {
       <section className="section-layout grid-12">
         <div className="col-span-10 col-start-2 w-full flex justify-between gap-6">
           <div className="col-span-10 w-full grid grid-cols-3 gap-6">
-            <div className="col-span-1 w-full h-1 p-3 bg-black"></div>
-            <div className="col-span-1 w-full h-1 p-3 bg-black"></div>
-            <div className="col-span-1 w-full h-1 p-3 bg-black"></div>
+            <div className="col-span-1 w-full bg-white border border-gray-300">
+              <div className="w-full aspect-16/10 bg-black"></div>
+              <div className="flex flex-col items-start p-4">
+                <span className="text-3xl font-crimson-text text-[#0F131F] tracking-tight">
+                  Semi-Indoor & Outdoor
+                </span>
+                <div className="flex flex-row items-end gap-2 mt-1">
+                  <span className="text-xl font-medium">Rp1.000.000</span>
+                  <span className="line-through text-sm mb-0.5 font-medium text-black/50">
+                    Rp1.600.000
+                  </span>
+                  <span className=" text-sm font-medium mb-0.5 text-[#0F131F]">
+                    / 3 jam
+                  </span>
+                </div>
+                <p className="text-sm mt-3 text-black/60 w-[70%]">
+                  Cocok untuk meeting, ulang tahun, gathering, pengajian, dan
+                  acara lainnya.
+                </p>
+                <div className="w-full mt-6 flex flex-row justify-between gap-2">
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <Users className="text-[#0F131F]" />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">Kapasitas</span>
+                        <span className="text-sm font-medium">
+                          Hingga 250 pax
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <Zap className="text-[#0F131F]" strokeWidth={1.7} />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">Listrik</span>
+                        <span className="text-sm font-medium">300 Watt</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-full mt-4 flex flex-row justify-between gap-2">
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <PartyPopper
+                        className="text-[#0F131F]"
+                        strokeWidth={1.8}
+                      />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">Area</span>
+                        <span className="text-sm font-medium">
+                          Bisa Didekor
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <Armchair className="text-[#0F131F]" />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">
+                          Kursi Variasi
+                        </span>
+                        <span className="text-sm font-medium">
+                          ± 35 Variasi
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* line */}
+                <div className="w-full h-px bg-[#0F131F]/30 my-5"></div>
+
+                {/* btn */}
+                <Link
+                  href={"/paket/detail"}
+                  className="w-full items-center gap-2 flex justify-center py-3 bg-[#0F131F] text-white"
+                >
+                  <span className="text-sm font-medium">
+                    Lihat Detail & Book
+                  </span>
+                  <ArrowRight size={17} strokeWidth={3} />
+                </Link>
+              </div>
+            </div>
+            <div className="col-span-1 w-full bg-white border border-gray-300">
+              <div className="w-full aspect-16/10 bg-black"></div>
+              <div className="flex flex-col items-start p-4">
+                <span className="text-3xl font-crimson-text text-[#0F131F] tracking-tight">
+                  Semi-Indoor & Outdoor
+                </span>
+                <div className="flex flex-row items-end gap-2 mt-1">
+                  <span className="text-xl font-medium">Rp1.000.000</span>
+                  <span className="line-through text-sm mb-0.5 font-medium text-black/50">
+                    Rp1.600.000
+                  </span>
+                  <span className=" text-sm font-medium mb-0.5 text-[#0F131F]">
+                    / 3 jam
+                  </span>
+                </div>
+                <p className="text-sm mt-3 text-black/60 w-[70%]">
+                  Cocok untuk meeting, ulang tahun, gathering, pengajian, dan
+                  acara lainnya.
+                </p>
+                <div className="w-full mt-6 flex flex-row justify-between gap-2">
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <Users className="text-[#0F131F]" />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">Kapasitas</span>
+                        <span className="text-sm font-medium">
+                          Hingga 250 pax
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <Zap className="text-[#0F131F]" strokeWidth={1.7} />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">Listrik</span>
+                        <span className="text-sm font-medium">300 Watt</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-full mt-4 flex flex-row justify-between gap-2">
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <PartyPopper
+                        className="text-[#0F131F]"
+                        strokeWidth={1.8}
+                      />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">Area</span>
+                        <span className="text-sm font-medium">
+                          Bisa Didekor
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <Armchair className="text-[#0F131F]" />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">
+                          Kursi Variasi
+                        </span>
+                        <span className="text-sm font-medium">
+                          ± 35 Variasi
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* line */}
+                <div className="w-full h-px bg-[#0F131F]/30 my-5"></div>
+
+                {/* btn */}
+                <Link
+                  href={"/paket/detail"}
+                  className="w-full items-center gap-2 flex justify-center py-3 bg-[#0F131F] text-white"
+                >
+                  <span className="text-sm font-medium">
+                    Lihat Detail & Book
+                  </span>
+                  <ArrowRight size={17} strokeWidth={3} />
+                </Link>
+              </div>
+            </div>
+            <div className="col-span-1 w-full bg-white border border-gray-300">
+              <div className="w-full aspect-16/10 bg-black"></div>
+              <div className="flex flex-col items-start p-4">
+                <span className="text-3xl font-crimson-text text-[#0F131F] tracking-tight">
+                  Semi-Indoor & Outdoor
+                </span>
+                <div className="flex flex-row items-end gap-2 mt-1">
+                  <span className="text-xl font-medium">Rp1.000.000</span>
+                  <span className="line-through text-sm mb-0.5 font-medium text-black/50">
+                    Rp1.600.000
+                  </span>
+                  <span className=" text-sm font-medium mb-0.5 text-[#0F131F]">
+                    / 3 jam
+                  </span>
+                </div>
+                <p className="text-sm mt-3 text-black/60 w-[70%]">
+                  Cocok untuk meeting, ulang tahun, gathering, pengajian, dan
+                  acara lainnya.
+                </p>
+                <div className="w-full mt-6 flex flex-row justify-between gap-2">
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <Users className="text-[#0F131F]" />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">Kapasitas</span>
+                        <span className="text-sm font-medium">
+                          Hingga 250 pax
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <Zap className="text-[#0F131F]" strokeWidth={1.7} />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">Listrik</span>
+                        <span className="text-sm font-medium">300 Watt</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-full mt-4 flex flex-row justify-between gap-2">
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <PartyPopper
+                        className="text-[#0F131F]"
+                        strokeWidth={1.8}
+                      />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">Area</span>
+                        <span className="text-sm font-medium">
+                          Bisa Didekor
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <div className="flex flex-row gap-3 items-center">
+                      <Armchair className="text-[#0F131F]" />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold">
+                          Kursi Variasi
+                        </span>
+                        <span className="text-sm font-medium">
+                          ± 35 Variasi
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* line */}
+                <div className="w-full h-px bg-[#0F131F]/30 my-5"></div>
+
+                {/* btn */}
+                <Link
+                  href={"/paket/detail"}
+                  className="w-full items-center gap-2 flex justify-center py-3 bg-[#0F131F] text-white"
+                >
+                  <span className="text-sm font-medium">
+                    Lihat Detail & Book
+                  </span>
+                  <ArrowRight size={17} strokeWidth={3} />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
         <div className="col-span-10 col-start-2 w-full flex justify-between gap-6">

@@ -5,7 +5,7 @@ import React from "react";
 function page() {
   return (
     <main className="min-h-screen w-full">
-      <header className="h-[320px] md:h-90 w-full relative flex justify-center items-center px-4">
+      <header className="h-80 md:h-90 w-full relative flex justify-center items-center px-4">
         <div
           style={{ backgroundImage: "url(/about-header.jpg)" }}
           className="absolute inset-0 bg-cover bg-center"
@@ -44,7 +44,7 @@ function page() {
             </div>
           </div>
 
-          <div className="col-span-12 lg:col-span-4 lg:col-start-9 relative min-h-[300px] lg:min-h-0">
+          <div className="col-span-12 lg:col-span-4 lg:col-start-9 relative min-h-75 lg:min-h-0">
             <div
               style={{ backgroundImage: "url(/about-us1.jpg)" }}
               className="absolute inset-0 bg-cover bg-center"
@@ -66,7 +66,7 @@ function page() {
           <div className="col-span-12 lg:col-span-4">
             <div
               style={{ backgroundImage: "url(/about-us2.jpg)" }}
-              className="w-full min-h-[260px] lg:h-full bg-bottom bg-cover"
+              className="w-full min-h-65 lg:h-full bg-bottom bg-cover"
             />
           </div>
         </div>
