@@ -30,11 +30,7 @@ function OccasionRight({ scrollRef }) {
     <div className="lg:col-span-6 col-span-12 overflow-hidden">
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto scroll-smooth pb-3
-                   [&::-webkit-scrollbar]:h-1.5 
-                   [&::-webkit-scrollbar-track]:bg-[#0F131F]/30 
-                   [&::-webkit-scrollbar-thumb]:bg-[#0F131F]
-                   [&::-webkit-scrollbar-thumb]:rounded-full"
+        className="flex gap-4 overflow-x-auto scroll-smooth pb-3 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-[#0F131F]/30 [&::-webkit-scrollbar-thumb]:bg-[#0F131F]/70 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
         {occasion_list.map((occ) => (
           <div
