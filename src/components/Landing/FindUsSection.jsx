@@ -1,5 +1,6 @@
 import React from "react";
 import { ArrowUpRight, Clock3, MapPin, Phone } from "lucide-react";
+import Link from "next/link";
 
 function FindUsSection() {
   return (
@@ -51,7 +52,8 @@ function FindUsSection() {
                   </h6>
 
                   <p className="text-sm leading-relaxed mt-1">
-                    Jl. Bango Raya No.123, Depok, Jawa Barat
+                    Jl. Bango Raya No.33, RT.7/RW.3, Pd. Labu, Kec. Cilandak,
+                    Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12450
                   </p>
                 </div>
               </div>
@@ -82,11 +84,13 @@ function FindUsSection() {
             </div>
           </div>
 
-          <button className="mt-10 border border-black px-5 py-4 flex items-center justify-between hover:bg-black hover:text-white transition-all duration-300">
-            <span className="text-sm tracking-wide">Lihat Rute Lokasi</span>
+          <Link href={"https://maps.app.goo.gl/eju5byd7SyhX84Cn7"}>
+            <div className="mt-10 border border-black px-5 py-4 flex items-center justify-between hover:bg-black hover:text-white transition-all duration-300">
+              <span className="text-sm tracking-wide">Lihat Rute Lokasi</span>
 
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
+              <ArrowUpRight className="w-4 h-4" />
+            </div>
+          </Link>
         </div>
       </div>
     </section>

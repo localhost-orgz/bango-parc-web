@@ -183,7 +183,7 @@ function Footer() {
                   target="_blank"
                   className="group"
                 >
-                  <div className="border border-[#fffaee]/60 hover:border-[#fffaee] p-2 bg-transparent hover:bg-[#fffaee] text-[#fffaee] hover:text-[#896d51] transition-all duration-300 relative">
+                  <div className="border border-white hover:border-white p-2 bg-transparent hover:bg-white text-[#fffaee] hover:text-[#0F131F] transition-all duration-300 relative">
                     {/* TOOLTIP */}
                     <div className="px-3 py-1 opacity-0 group-hover:opacity-100 absolute left-1/2 -translate-x-1/2 top-0 group-hover:-top-8 transition-all duration-200 text-[10px] bg-black/80 text-white whitespace-nowrap">
                       Instagram
@@ -198,7 +198,7 @@ function Footer() {
                       xmlns="http://www.w3.org/2000/svg"
                       className="w-5 h-5 sm:w-6 sm:h-6"
                     >
-                      <g clip-path="url(#clip0_894_87904)">
+                      <g clipPath="url(#clip0_894_87904)">
                         <path
                           d="M4 8C4 6.93913 4.42143 5.92172 5.17157 5.17157C5.92172 4.42143 6.93913 4 8 4H16C17.0609 4 18.0783 4.42143 18.8284 5.17157C19.5786 5.92172 20 6.93913 20 8V16C20 17.0609 19.5786 18.0783 18.8284 18.8284C18.0783 19.5786 17.0609 20 16 20H8C6.93913 20 5.92172 19.5786 5.17157 18.8284C4.42143 18.0783 4 17.0609 4 16V8Z"
                           stroke="currentColor"
@@ -236,7 +236,7 @@ function Footer() {
                   target="_blank"
                   className="group"
                 >
-                  <div className="border border-[#fffaee]/60 hover:border-[#fffaee] p-2 bg-transparent hover:bg-[#fffaee] text-[#fffaee] hover:text-[#896d51] transition-all duration-300 relative">
+                  <div className="border border-white hover:border-white p-2 bg-transparent hover:bg-white text-[#fffaee] hover:text-[#0F131F] transition-all duration-300 relative">
                     {/* TOOLTIP */}
                     <div className="px-3 py-1 opacity-0 group-hover:opacity-100 absolute left-1/2 -translate-x-1/2 top-0 group-hover:-top-8 transition-all duration-200 text-[10px] bg-black/80 text-white whitespace-nowrap">
                       WhatsApp
@@ -251,7 +251,7 @@ function Footer() {
                       xmlns="http://www.w3.org/2000/svg"
                       className="w-5 h-5 sm:w-6 sm:h-6"
                     >
-                      <g clip-path="url(#clip0_894_87979)">
+                      <g clipPath="url(#clip0_894_87979)">
                         <path
                           d="M3 20.9997L4.65 17.1997C3.38766 15.4078 2.82267 13.2168 3.06104 11.0378C3.29942 8.8589 4.32479 6.84186 5.94471 5.36525C7.56463 3.88863 9.66775 3.05394 11.8594 3.01782C14.051 2.98171 16.1805 3.74665 17.8482 5.1691C19.5159 6.59154 20.6071 8.5737 20.9172 10.7436C21.2272 12.9135 20.7347 15.1219 19.5321 16.9545C18.3295 18.7871 16.4994 20.1177 14.3854 20.6968C12.2713 21.2759 10.0186 21.0636 8.05 20.0997L3 20.9997Z"
                           stroke="currentColor"

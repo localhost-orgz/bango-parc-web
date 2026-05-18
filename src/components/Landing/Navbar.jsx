@@ -55,7 +55,7 @@ function Navbar() {
 
           <li>
             <Link
-              href={"/about"}
+              href={"/tentang"}
               className="hover:opacity-70 transition-opacity duration-300"
             >
               Tentang
@@ -73,7 +73,7 @@ function Navbar() {
 
           <li>
             <Link
-              href={"/gallery"}
+              href={"/galeri"}
               className="hover:opacity-70 transition-opacity duration-300"
             >
               Galeri
@@ -126,7 +126,7 @@ function Navbar() {
             </Link>
 
             <Link
-              href={"/about"}
+              href={"/tentang"}
               onClick={() => setOpen(false)}
               className="text-2xl font-light tracking-wide"
             >
@@ -142,16 +142,19 @@ function Navbar() {
             </Link>
 
             <Link
-              href={"/gallery"}
+              href={"/galeri"}
               onClick={() => setOpen(false)}
               className="text-2xl font-light tracking-wide"
             >
               Galeri
             </Link>
 
-            <button className="mt-4 border border-black px-6 py-3 text-sm tracking-[0.2em] uppercase hover:bg-black hover:text-white transition-all duration-300">
+            <Link
+              href={"/login"}
+              className="mt-4 border border-black px-6 py-3 text-sm tracking-[0.2em] uppercase hover:bg-black hover:text-white transition-all duration-300"
+            >
               Login
-            </button>
+            </Link>
           </div>
         </div>
       </nav>

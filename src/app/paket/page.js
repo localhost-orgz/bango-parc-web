@@ -134,6 +134,13 @@ function page() {
 
       <section className="section-layout grid-12">
         <div className="col-span-10 col-start-2 w-full flex justify-between gap-6">
+          <div className="col-span-10 w-full grid grid-cols-3 gap-6">
+            <div className="col-span-1 w-full h-1 p-3 bg-black"></div>
+            <div className="col-span-1 w-full h-1 p-3 bg-black"></div>
+            <div className="col-span-1 w-full h-1 p-3 bg-black"></div>
+          </div>
+        </div>
+        <div className="col-span-10 col-start-2 w-full flex justify-between gap-6">
           <div className="w-full bg-white border border-gray-300 flex flex-col">
             <div className="h-65 bg-black relative">
               <div

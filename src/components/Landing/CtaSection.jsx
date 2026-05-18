@@ -4,7 +4,7 @@ import React from "react";
 
 function CtaSection() {
   return (
-    <section className="w-full h-125 sm:h-150 lg:h-162.5 relative overflow-hidden">
+    <section className="w-full h-100 sm:h-150 lg:h-162.5 relative overflow-hidden">
       {/* Background */}
       <div
         style={{ backgroundImage: "url(/cta.jpg)" }}
