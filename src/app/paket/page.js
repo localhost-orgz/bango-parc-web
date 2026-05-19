@@ -132,10 +132,12 @@ function page() {
 
           <div className="flex gap-6">
             <div className="w-xs p-5 border flex items-start gap-3">
-              <div className="h-6 w-6 border"></div>
+              <Users className="w-6 h-6" />
               <div className="flex flex-col items-start gap-3">
                 <h6 className="font-crimson-pro text-xl">Reguler</h6>
-                <p>Untuk gathering, meeting, ulang tahun, dll</p>
+                <p className="text-sm text-black/60">
+                  Untuk gathering, meeting, ulang tahun, dll
+                </p>
               </div>
             </div>
             <div className="w-xs h-10 border"></div>
@@ -147,7 +149,15 @@ function page() {
         <div className="col-span-10 col-start-2 w-full flex justify-between gap-6">
           <div className="col-span-10 w-full grid grid-cols-3 gap-6">
             <div className="col-span-1 w-full bg-white border border-gray-300">
-              <div className="w-full aspect-16/10 bg-black"></div>
+              <div className="w-full aspect-16/10 relative bg-black">
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: "url(/depan.jpg)",
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/30" />
+              </div>
               <div className="flex flex-col items-start p-4">
                 <span className="text-3xl font-crimson-text text-[#0F131F] tracking-tight">
                   Area Depan
@@ -233,7 +243,15 @@ function page() {
               </div>
             </div>
             <div className="col-span-1 w-full bg-white border border-gray-300">
-              <div className="w-full aspect-16/10 bg-black"></div>
+              <div className="w-full aspect-16/10 relative bg-black">
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: "url(/tengah.jpg)",
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/30" />
+              </div>
               <div className="flex flex-col items-start p-4">
                 <span className="text-3xl font-crimson-text text-[#0F131F] tracking-tight">
                   Ruang Tengah
@@ -319,7 +337,15 @@ function page() {
               </div>
             </div>
             <div className="col-span-1 w-full bg-white border border-gray-300">
-              <div className="w-full aspect-16/10 bg-black"></div>
+              <div className="w-full aspect-16/10 relative bg-black">
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: "url(/belakang.jpg)",
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/30" />
+              </div>
               <div className="flex flex-col items-start p-4">
                 <span className="text-3xl font-crimson-text text-[#0F131F] tracking-tight">
                   Area Belakang
