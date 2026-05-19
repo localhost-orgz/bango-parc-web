@@ -19,7 +19,7 @@ const QrisPayment = ({ orderData }) => {
               height={200}
               width={200}
               alt="QRIS"
-              className="w-44 h-44 sm:w-[200px] sm:h-[200px] object-contain"
+              className="w-44 h-44 sm:w-50 sm:h-50 object-contain"
             />
           </div>
 
@@ -36,7 +36,7 @@ const QrisPayment = ({ orderData }) => {
               Nominal Transfer
             </span>
 
-            <span className="text-xl sm:text-2xl font-semibold text-[#0f131f] break-words">
+            <span className="text-xl sm:text-2xl font-semibold text-[#0f131f] wrap-break-word">
               Rp{orderData.dpAmount.toLocaleString("id-ID")}
             </span>
 
