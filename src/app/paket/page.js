@@ -1,6 +1,6 @@
 "use client";
 import Navbar from "@/components/Landing/Navbar";
-import { wedding_packages } from "@/constants/package";
+import { reguler_packages, wedding_packages } from "@/constants/package";
 import {
   Armchair,
   ArrowRight,
@@ -14,52 +14,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
-
-// ─── Venue data ───────────────────────────────────────────────────────────────
-const regulerVenues = [
-  {
-    id: "depan",
-    name: "Area Depan",
-    img: "/depan.jpg",
-    price: "Rp1.000.000",
-    priceOri: "Rp1.600.000",
-    desc: "Cocok untuk meeting, ulang tahun, gathering, pengajian, dan acara lainnya.",
-    stats: [
-      { icon: Users, label: "Kapasitas", value: "Hingga 250 pax" },
-      { icon: Zap, label: "Listrik", value: "300 Watt" },
-      { icon: PartyPopper, label: "Area", value: "Bisa Didekor" },
-      { icon: Armchair, label: "Kursi Variasi", value: "± 35 Variasi" },
-    ],
-  },
-  {
-    id: "tengah",
-    name: "Ruang Tengah",
-    img: "/tengah.jpg",
-    price: "Rp1.300.000",
-    priceOri: "Rp1.500.000",
-    desc: "Cocok untuk meeting, ulang tahun, gathering, pengajian, dan acara lainnya.",
-    stats: [
-      { icon: Users, label: "Kapasitas", value: "Hingga 250 pax" },
-      { icon: Zap, label: "Listrik", value: "300 Watt" },
-      { icon: PartyPopper, label: "Area", value: "Bisa Didekor" },
-      { icon: Armchair, label: "Kursi Variasi", value: "± 35 Variasi" },
-    ],
-  },
-  {
-    id: "belakang",
-    name: "Area Belakang",
-    img: "/belakang.jpg",
-    price: "Rp1.000.000",
-    priceOri: "Rp2.000.000",
-    desc: "Cocok untuk meeting, ulang tahun, gathering, pengajian, dan acara lainnya.",
-    stats: [
-      { icon: Users, label: "Kapasitas", value: "Hingga 250 pax" },
-      { icon: Zap, label: "Listrik", value: "300 Watt" },
-      { icon: PartyPopper, label: "Area", value: "Bisa Didekor" },
-      { icon: Armchair, label: "Kursi Variasi", value: "± 35 Variasi" },
-    ],
-  },
-];
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 function IconRegular({ color = "currentColor" }) {
@@ -216,13 +170,15 @@ function RegulerCard({ venue }) {
       {/* Body */}
       <div className="flex flex-col items-start p-5 flex-1">
         {/* Price */}
-        <div className="flex items-end gap-2">
+        <div className="flex items-end gap-2 flex-wrap">
           <span className="text-2xl font-semibold text-[#0F131F]">
             {venue.price}
           </span>
-          <span className="line-through text-sm mb-0.5 text-black/30">
-            {venue.priceOri}
-          </span>
+          {venue.priceOri && (
+            <span className="line-through text-sm mb-0.5 text-black/30">
+              {venue.priceOri}
+            </span>
+          )}
           <span className="text-sm mb-0.5 text-black/50">/ 3 jam</span>
         </div>
 
@@ -254,7 +210,7 @@ function RegulerCard({ venue }) {
         <div className="w-full h-px bg-[#0F131F]/10 my-5" />
 
         <Link
-          href="/paket/detail"
+          href={`/paket/detail?id=${venue.id}&type=reguler`}
           className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-white transition-colors duration-200"
           style={{ background: "#0F131F" }}
           onMouseEnter={(e) => (e.currentTarget.style.background = "#896d51")}
@@ -286,22 +242,26 @@ function WeddingCard({ pkg }) {
       </div>
       <div className="flex flex-col items-start p-5 flex-1">
         <div className="flex flex-col gap-1 mb-4">
-          <div className="flex items-end gap-1.5">
+          <div className="flex items-end gap-1.5 flex-wrap">
             <span className="text-lg font-semibold text-[#0F131F]">
               {pkg.three_hours_disc}
             </span>
-            <span className="line-through text-xs mb-0.5 text-black/30">
-              {pkg.current_three_hours}
-            </span>
+            {pkg.current_three_hours && (
+              <span className="line-through text-xs mb-0.5 text-black/30">
+                {pkg.current_three_hours}
+              </span>
+            )}
             <span className="text-xs mb-0.5 text-black/50">/ 3 jam</span>
           </div>
-          <div className="flex items-end gap-1.5">
+          <div className="flex items-end gap-1.5 flex-wrap">
             <span className="text-lg font-semibold text-[#0F131F]">
               {pkg.five_hours_disc}
             </span>
-            <span className="line-through text-xs mb-0.5 text-black/30">
-              {pkg.current_five_hours}
-            </span>
+            {pkg.current_five_hours && (
+              <span className="line-through text-xs mb-0.5 text-black/30">
+                {pkg.current_five_hours}
+              </span>
+            )}
             <span className="text-xs mb-0.5 text-black/50">/ 5 jam</span>
           </div>
         </div>
@@ -322,7 +282,7 @@ function WeddingCard({ pkg }) {
         <div className="w-full h-px bg-[#0F131F]/10 my-5" />
 
         <Link
-          href="/paket/detail"
+          href={`/paket/detail?id=${pkg.id}&type=wedding`}
           className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-white transition-colors duration-200"
           style={{ background: "#0F131F" }}
           onMouseEnter={(e) => (e.currentTarget.style.background = "#896d51")}
@@ -379,7 +339,7 @@ function page() {
         <div className="col-span-10 col-start-2 w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {!isWedding
-              ? regulerVenues.map((v) => <RegulerCard key={v.id} venue={v} />)
+              ? reguler_packages.map((v) => <RegulerCard key={v.id} venue={v} />)
               : wedding_packages.map((p) => <WeddingCard key={p.id} pkg={p} />)}
           </div>
         </div>

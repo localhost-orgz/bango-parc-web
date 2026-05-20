@@ -16,12 +16,13 @@ import {
   Wifi,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
-// ─── Internal Components ──────────────────────────────────────────────────────
+// ─── Internal Components & Data ────────────────────────────────────────────────
 import BookingCalendar from "@/components/BookingCalendar";
-import Footer from "@/components/Footer";
 import Navbar from "@/components/Landing/Navbar";
+import { reguler_packages, wedding_packages } from "@/constants/package";
 
 const TIME_SLOTS = [
   "07:00",
@@ -44,15 +45,6 @@ const TIME_SLOTS = [
 
 const MIN_DURATION = 3;
 
-const FACILITIES = [
-  { icon: Wifi, label: "Wi-Fi Gratis" },
-  { icon: ParkingCircle, label: "Area Parkir" },
-  { icon: UtensilsCrossed, label: "Katering Tersedia" },
-  { icon: Projector, label: "Proyektor & Sound" },
-  { icon: AirVent, label: "Area Ber-AC" },
-  { icon: Users, label: "Kapasitas 200 orang" },
-];
-
 const GALLERY_IMAGES = [
   "https://images.unsplash.com/photo-1524824267900-2fa9cbf7a506?w=800&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&auto=format&fit=crop",
@@ -69,8 +61,6 @@ const BOOKING_TERMS = [
   "Pembatalan kurang dari 3 hari tidak dapat dikembalikan",
   "Jam operasional venue: 07.00 – 22.00 WIB",
 ];
-
-const VENUE_TAGS = ["Semi-Indoor", "Outdoor"];
 
 // ─── Pure Utility Functions ───────────────────────────────────────────────────
 function getBookedHours(events = []) {
@@ -108,7 +98,7 @@ function getEndTimeLabel(time, selectedStart, bookedHours) {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function PageHeader() {
+function PageHeader({ pkg }) {
   return (
     <header className="h-60 w-full relative flex justify-center items-center">
       <div
@@ -122,7 +112,7 @@ function PageHeader() {
           <ChevronRight size={12} />
           <span>Venue</span>
           <ChevronRight size={12} />
-          <span className="text-white">Semi-Indoor &amp; Outdoor</span>
+          <span className="text-white">{pkg.name}</span>
         </nav>
         <h1 className="font-crimson-pro text-white text-5xl">
           Detail Paket &amp; Venue
@@ -132,11 +122,12 @@ function PageHeader() {
   );
 }
 
-function ImageGallery() {
+function ImageGallery({ pkg }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const images = [pkg.img || pkg.thumbnail || GALLERY_IMAGES[0], ...GALLERY_IMAGES.slice(1)];
 
   function goTo(index) {
-    setActiveIndex((index + GALLERY_IMAGES.length) % GALLERY_IMAGES.length);
+    setActiveIndex((index + images.length) % images.length);
   }
 
   return (
@@ -145,11 +136,11 @@ function ImageGallery() {
       <div className="w-full h-auto aspect-video bg-gray-400 relative shadow-xs">
         <div
           className="inset-0 absolute bg-cover bg-center transition-all duration-500"
-          style={{ backgroundImage: `url(${GALLERY_IMAGES[activeIndex]})` }}
+          style={{ backgroundImage: `url(${images[activeIndex]})` }}
         />
         <button
           onClick={() => goTo(activeIndex - 1)}
-          className="rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 bg-[#0F131F] -left-3 shadow-2xl border border-[#0F131F]bg-[#0F131F] group transition-all cursor-pointer hover:scale-105"
+          className="rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 bg-[#0F131F] -left-3 shadow-2xl border border-[#0F131F] group transition-all cursor-pointer hover:scale-105"
         >
           <ChevronLeft
             color="#fff"
@@ -166,7 +157,7 @@ function ImageGallery() {
 
       {/* Thumbnails */}
       <div className="flex gap-2 mt-5">
-        {GALLERY_IMAGES.map((src, i) => (
+        {images.map((src, i) => (
           <button
             key={i}
             onClick={() => goTo(i)}
@@ -183,39 +174,42 @@ function ImageGallery() {
   );
 }
 
-function VenueDescription() {
+function VenueDescription({ pkg }) {
   return (
     <div className="mt-8">
       <h4 className="font-crimson-pro text-3xl text-[#2c2218] mb-3">
         Tentang Paket
       </h4>
       <p className="text-sm text-black/60 leading-relaxed">
+        {pkg.desc}
+      </p>
+      <p className="text-sm text-black/60 leading-relaxed mt-3">
         Venue semi-indoor dan outdoor kami menawarkan suasana yang fleksibel dan
         elegan untuk berbagai jenis acara. Dengan desain terbuka yang menyatu
         dengan alam namun tetap terlindungi, venue ini memberikan pengalaman
         yang tak terlupakan bagi setiap tamu.
       </p>
-      <p className="text-sm text-black/60 leading-relaxed mt-3">
-        Tersedia area parkir luas, tim profesional siap membantu, dan berbagai
-        pilihan konfigurasi ruangan sesuai kebutuhan acara Anda.
-      </p>
     </div>
   );
 }
 
-function FacilitiesGrid() {
+function FacilitiesGrid({ pkg }) {
+  const items = pkg.type === "wedding"
+    ? pkg.features.map((f) => ({ icon: f.icon, label: f.label }))
+    : pkg.stats.map((s) => ({ icon: s.icon, label: `${s.label}: ${s.value}` }));
+
   return (
     <div className="mt-8">
       <h4 className="font-crimson-pro text-3xl text-[#0F131F] mb-4">
-        Fasilitas
+        Fasilitas &amp; Fitur Paket
       </h4>
-      <div className="grid grid-cols-4 gap-3">
-        {FACILITIES.map(({ icon: Icon, label }) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {items.map(({ icon: Icon, label }) => (
           <div
             key={label}
             className="flex items-center gap-2.5 p-3 border border-[#0F131F]/20 bg-white"
           >
-            <Icon size={18} color="#0F131F" strokeWidth={1.5} />
+            <Icon size={18} className="text-[#896d51] shrink-0" strokeWidth={1.5} />
             <span className="text-xs text-[#0F131F]">{label}</span>
           </div>
         ))}
@@ -426,6 +420,7 @@ function DatePickerField({ selectedDate, onOpenCalendar }) {
 }
 
 function BookingCard({
+  pkg,
   selectedDate,
   selectedStart,
   selectedEnd,
@@ -468,7 +463,7 @@ function BookingCard({
         <div className="h-px w-full bg-[#0F131F]/70 mb-1 mt-3" />
 
         <Link
-          href="/paket/checkout"
+          href={`/paket/checkout?id=${pkg.id}&type=${pkg.type}&date=${selectedDate?.key || ""}&start=${selectedStart}&end=${selectedEnd}`}
           className="bg-[#0F131F] flex justify-center items-center py-3 text-sm font-medium text-white hover:bg-[#7a6047] transition-colors"
         >
           Lanjutkan Booking
@@ -482,7 +477,7 @@ function BookingCard({
   );
 }
 
-function CalendarModal({ onClose, onDateSelect }) {
+function CalendarModal({ pkg, onClose, onDateSelect }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
       <div className="relative bg-white w-full max-w-120 border border-[#0F131F]/20 shadow-2xl p-5">
@@ -498,7 +493,7 @@ function CalendarModal({ onClose, onDateSelect }) {
             Cek Ketersediaan
           </h3>
           <p className="text-sm text-black/50 mt-1">
-            Semi Indoor &amp; Outdoor
+            {pkg.name}
           </p>
         </div>
 
@@ -521,6 +516,7 @@ function CalendarModal({ onClose, onDateSelect }) {
 }
 
 function VenueSidebar({
+  pkg,
   selectedDate,
   selectedStart,
   selectedEnd,
@@ -529,14 +525,16 @@ function VenueSidebar({
   onStartChange,
   onEndChange,
 }) {
+  const tags = pkg.type === "wedding" ? ["Wedding", "Eksklusif"] : ["Semi-Indoor", "Outdoor"];
+
   return (
     <div className="w-full px-15 col-span-5">
       <h3 className="text-5xl font-crimson-pro text-[#0F131F]">
-        Semi-Indoor &amp; Outdoor
+        {pkg.name}
       </h3>
 
       <div className="flex flex-wrap gap-2 mt-3">
-        {VENUE_TAGS.map((tag) => (
+        {tags.map((tag) => (
           <span
             key={tag}
             className="text-xs px-2.5 py-1 border-2 border-[#0F131F]/70 text-[#0F131F]"
@@ -547,23 +545,48 @@ function VenueSidebar({
       </div>
 
       <p className="text-sm text-black/50 mt-3 w-[80%]">
-        Cocok untuk meeting, ulang tahun, gathering, pengajian, dan acara
-        lainnya.
+        {pkg.desc}
       </p>
 
-      <div className="flex mt-5 items-end gap-2">
-        <span className="text-3xl font-semibold text-[#0F131F]">
-          Rp2.000.000
-        </span>
-        <span className="line-through text-black/30 mb-0.5">Rp2.500.000</span>
-        <span className="font-semibold text-[#0F131F]">/ 3 jam</span>
-      </div>
+      {pkg.type === "wedding" ? (
+        <div className="flex flex-col gap-1.5 mt-5">
+          <div className="flex items-end gap-2 flex-wrap">
+            <span className="text-2xl font-semibold text-[#0F131F]">
+              {pkg.three_hours_disc}
+            </span>
+            {pkg.current_three_hours && (
+              <span className="line-through text-black/30 mb-0.5 text-sm">{pkg.current_three_hours}</span>
+            )}
+            <span className="font-semibold text-black/50 text-xs">/ 3 jam</span>
+          </div>
+          <div className="flex items-end gap-2 flex-wrap">
+            <span className="text-2xl font-semibold text-[#0F131F]">
+              {pkg.five_hours_disc}
+            </span>
+            {pkg.current_five_hours && (
+              <span className="line-through text-black/30 mb-0.5 text-sm">{pkg.current_five_hours}</span>
+            )}
+            <span className="font-semibold text-black/50 text-xs">/ 5 jam</span>
+          </div>
+        </div>
+      ) : (
+        <div className="flex mt-5 items-end gap-2 flex-wrap">
+          <span className="text-3xl font-semibold text-[#0F131F]">
+            {pkg.price}
+          </span>
+          {pkg.priceOri && (
+            <span className="line-through text-black/30 mb-0.5">{pkg.priceOri}</span>
+          )}
+          <span className="font-semibold text-[#0F131F]">/ 3 jam</span>
+        </div>
+      )}
 
       <p className="text-xs text-black/40 mt-1">
         *Harga belum termasuk katering dan dekorasi
       </p>
 
       <BookingCard
+        pkg={pkg}
         selectedDate={selectedDate}
         selectedStart={selectedStart}
         selectedEnd={selectedEnd}
@@ -576,8 +599,15 @@ function VenueSidebar({
   );
 }
 
-// ─── Page Component ───────────────────────────────────────────────────────────
-export default function DetailPaketPage() {
+// ─── Main Client Logic Wrapper ─────────────────────────────────────────────────
+function DetailPaketContent() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id") || "depan";
+  const type = searchParams.get("type") || "reguler";
+
+  const currentPackages = type === "wedding" ? wedding_packages : reguler_packages;
+  const pkg = currentPackages.find((p) => p.id === id) || currentPackages[0];
+
   const [openCalendar, setOpenCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedStart, setSelectedStart] = useState("");
@@ -599,20 +629,21 @@ export default function DetailPaketPage() {
 
   return (
     <main className="w-full min-h-screen bg-[#f3f4f7]">
-      <PageHeader />
+      <PageHeader pkg={pkg} />
       <Navbar />
 
       <section className="section-layout grid-12">
         {/* Left column — gallery + info */}
         <div className="col-span-7 w-full">
-          <ImageGallery />
-          <VenueDescription />
-          <FacilitiesGrid />
+          <ImageGallery pkg={pkg} />
+          <VenueDescription pkg={pkg} />
+          <FacilitiesGrid pkg={pkg} />
           <BookingTerms />
         </div>
 
         {/* Right column — booking sidebar */}
         <VenueSidebar
+          pkg={pkg}
           selectedDate={selectedDate}
           selectedStart={selectedStart}
           selectedEnd={selectedEnd}
@@ -625,10 +656,24 @@ export default function DetailPaketPage() {
 
       {openCalendar && (
         <CalendarModal
+          pkg={pkg}
           onClose={() => setOpenCalendar(false)}
           onDateSelect={handleDateSelect}
         />
       )}
     </main>
+  );
+}
+
+// ─── Exported Page (wrapped in Suspense) ───────────────────────────────────────
+export default function DetailPaketPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#f3f4f7] text-[#0F131F]">
+        <span className="text-lg font-medium">Memuat detail paket...</span>
+      </div>
+    }>
+      <DetailPaketContent />
+    </Suspense>
   );
 }
