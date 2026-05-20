@@ -18,10 +18,24 @@ function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is active
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   return (
     <header
       className={`w-full fixed top-0 left-0 z-50 transition-all duration-500 ${
-        scrolled
+        open
+          ? "bg-transparent"
+          : scrolled
           ? "bg-white/80 backdrop-blur-xl border-b border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.04)]"
           : "bg-linear-to-b from-black/40 to-transparent"
       }`}
@@ -30,7 +44,7 @@ function Navbar() {
         {/* Logo */}
         <Link href={"/"} className="relative z-50">
           <Image
-            src={scrolled ? "/logo-full-black.png" : "/logo-full.png"}
+            src={scrolled || open ? "/logo-full-black.png" : "/logo-full.png"}
             alt="logo"
             width={90}
             height={90}
@@ -82,7 +96,7 @@ function Navbar() {
         </ul>
 
         {/* Desktop Button */}
-        <div className="hidden md:flex items-center">
+        <Link href={"/login"} className="hidden md:flex items-center">
           <button
             className={`px-5 py-2.5 border text-sm tracking-wide transition-all duration-300 ${
               scrolled
@@ -92,7 +106,7 @@ function Navbar() {
           >
             <span className="font-crimson-pro">Login</span>
           </button>
-        </div>
+        </Link>
 
         {/* Mobile Toggle */}
         <button
