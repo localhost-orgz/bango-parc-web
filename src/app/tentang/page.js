@@ -5,14 +5,14 @@ import React from "react";
 function page() {
   return (
     <main className="min-h-screen w-full">
-      <header className="h-80 md:h-90 w-full relative flex justify-center items-center px-4">
+      <header className="h-56 sm:h-64 w-full relative flex flex-col justify-center items-center pt-20 px-4">
         <div
           style={{ backgroundImage: "url(/about-header.jpg)" }}
           className="absolute inset-0 bg-cover bg-center"
         />
-        <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute inset-0 bg-black/25" />
 
-        <h1 className="font-crimson-pro text-white text-4xl md:text-5xl z-1 text-center">
+        <h1 className="font-crimson-pro text-white text-4xl sm:text-5xl z-10 text-center">
           About Us
         </h1>
       </header>

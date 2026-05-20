@@ -104,24 +104,23 @@ function formatRupiah(amount) {
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
-
 function PageHeader({ pkg }) {
   return (
-    <header className="h-60 w-full relative flex justify-center items-center">
+    <header className="h-64 sm:h-72 w-full relative flex flex-col justify-center items-center pt-20">
       <div
         style={{ backgroundImage: "url(/detail-header.jpg)" }}
         className="absolute inset-0 bg-cover bg-center"
       />
       <div className="absolute inset-0 bg-black/40" />
-      <div className="z-10 flex flex-col items-center gap-2">
-        <nav className="flex items-center gap-1 text-white/70 text-xs mb-1">
+      <div className="z-10 flex flex-col items-center gap-2 text-center px-4">
+        <nav className="flex items-center gap-1 text-white/70 text-xs mb-1 flex-wrap justify-center">
           <span>Beranda</span>
           <ChevronRight size={12} />
           <span>Venue</span>
           <ChevronRight size={12} />
           <span className="text-white">{pkg.name}</span>
         </nav>
-        <h1 className="font-crimson-pro text-white text-5xl">
+        <h1 className="font-crimson-pro text-white text-4xl sm:text-5xl">
           Detail Paket &amp; Venue
         </h1>
       </div>
@@ -140,14 +139,14 @@ function ImageGallery({ pkg }) {
   return (
     <div>
       {/* Main image */}
-      <div className="w-full h-auto aspect-video bg-gray-400 relative shadow-xs">
+      <div className="w-full h-auto aspect-video bg-gray-400 relative shadow-xs overflow-hidden sm:overflow-visible">
         <div
           className="inset-0 absolute bg-cover bg-center transition-all duration-500"
           style={{ backgroundImage: `url(${images[activeIndex]})` }}
         />
         <button
           onClick={() => goTo(activeIndex - 1)}
-          className="rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 bg-[#0F131F] -left-3 shadow-2xl border border-[#0F131F] group transition-all cursor-pointer hover:scale-105"
+          className="rounded-full p-2.5 sm:p-3 z-10 absolute top-1/2 -translate-y-1/2 bg-[#0F131F] left-1 sm:-left-3 shadow-2xl border border-[#0F131F] group transition-all cursor-pointer hover:scale-105"
         >
           <ChevronLeft
             color="#fff"
@@ -156,19 +155,19 @@ function ImageGallery({ pkg }) {
         </button>
         <button
           onClick={() => goTo(activeIndex + 1)}
-          className="rounded-full p-3 z-10 absolute top-1/2 -translate-y-1/2 -right-3 shadow-2xl border border-[#0F131F] bg-[#0F131F] group transition-all hover:scale-105 cursor-pointer"
+          className="rounded-full p-2.5 sm:p-3 z-10 absolute top-1/2 -translate-y-1/2 right-1 sm:-right-3 shadow-2xl border border-[#0F131F] bg-[#0F131F] group transition-all hover:scale-105 cursor-pointer"
         >
           <ChevronRight color="#fff" />
         </button>
       </div>
 
       {/* Thumbnails */}
-      <div className="flex gap-2 mt-5">
+      <div className="flex gap-2 mt-5 overflow-x-auto lg:overflow-x-visible pb-1 lg:pb-0 scrollbar-none">
         {images.map((src, i) => (
           <button
             key={i}
             onClick={() => goTo(i)}
-            className={`w-full h-auto aspect-video bg-gray-400 cursor-pointer transition-opacity bg-cover bg-center ${
+            className={`w-16 sm:w-20 lg:w-full shrink-0 lg:shrink h-auto aspect-video bg-gray-400 cursor-pointer transition-opacity bg-cover bg-center ${
               i === activeIndex
                 ? "ring-2 ring-[#0F131F] opacity-100"
                 : "opacity-60 hover:opacity-100"
@@ -554,8 +553,8 @@ function VenueSidebar({
   const totalPriceOriVal = selectedPackages.reduce((sum, p) => sum + (p.priceOriVal || 0), 0);
 
   return (
-    <div className="w-full px-15 col-span-5">
-      <h3 className="text-5xl font-crimson-pro text-[#0F131F]">
+    <div className="w-full px-4 lg:px-15 col-span-1 lg:col-span-5">
+      <h3 className="text-3xl sm:text-4xl lg:text-5xl font-crimson-pro text-[#0F131F] leading-tight">
         {combinedName}
       </h3>
 
@@ -585,7 +584,7 @@ function VenueSidebar({
         </div>
       </div>
 
-      <p className="text-sm text-black/50 mt-4 w-[80%]">
+      <p className="text-sm text-black/50 mt-4 w-full lg:w-[80%]">
         {pkg.desc}
       </p>
 
@@ -874,9 +873,9 @@ function DetailPaketContent() {
       <PageHeader pkg={{ name: combinedName }} />
       <Navbar />
 
-      <section className="section-layout grid-12">
+      <section className="section-layout grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left column — gallery + info */}
-        <div className="col-span-7 w-full">
+        <div className="col-span-1 lg:col-span-7 w-full">
           <ImageGallery pkg={pkg} />
           <VenueDescription pkg={pkg} />
           <FacilitiesGrid items={combinedFeatures} />

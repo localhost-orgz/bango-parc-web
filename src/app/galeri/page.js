@@ -284,7 +284,7 @@ export default function GalleryPage() {
       <Navbar />
 
       {/* ── Hero Header ── */}
-      <header className="h-72 w-full relative flex flex-col justify-center items-center">
+      <header className="h-56 sm:h-64 w-full relative flex flex-col justify-center items-center pt-20 px-4">
         <div
           style={{
             backgroundImage:
@@ -297,10 +297,10 @@ export default function GalleryPage() {
           <span className="text-[#896d51] text-xs font-semibold uppercase tracking-[0.3em]">
             Galeri
           </span>
-          <h1 className="font-crimson-pro text-white text-5xl md:text-6xl">
+          <h1 className="font-crimson-pro text-white text-4xl sm:text-5xl">
             Momen Berharga
           </h1>
-          <p className="text-white/50 text-sm max-w-md leading-relaxed">
+          <p className="text-white/50 text-xs max-w-md leading-relaxed">
             Setiap foto menyimpan cerita. Lihat bagaimana Bango Parc menjadi
             latar dari momen-momen tak terlupakan.
           </p>

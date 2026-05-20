@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React, { useState, useRef } from "react";
+import Navbar from "@/components/Landing/Navbar";
 
 // Simulasi data tetap sama
 const orderData = {
@@ -80,6 +81,7 @@ export default function PaymentPage() {
   return (
     <main className="w-full min-h-screen bg-[#F4F7FA]">
       <HeaderPayment />
+      <Navbar />
 
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         {/* LEFT — Order Summary */}

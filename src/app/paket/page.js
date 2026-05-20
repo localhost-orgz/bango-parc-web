@@ -66,12 +66,12 @@ function TypeToggle({ isWedding, setIsWedding }) {
   ];
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/40">
+    <div className="flex flex-col items-center gap-3 w-full max-w-sm sm:max-w-none px-4 sm:px-0">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/40 text-center">
         Pilih Jenis Acara
       </p>
       <div
-        className="flex p-1 gap-1"
+        className="flex flex-col sm:flex-row p-1 gap-1 w-full"
         style={{
           background: "#f0ece6",
           border: "1px solid rgba(137,109,81,0.2)",
@@ -83,11 +83,10 @@ function TypeToggle({ isWedding, setIsWedding }) {
             <button
               key={String(opt.value)}
               onClick={() => setIsWedding(opt.value)}
-              className="relative flex items-center gap-3 px-6 py-3.5 transition-all duration-300"
+              className="relative flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-3.5 transition-all duration-300 w-full sm:w-[200px]"
               style={{
                 background: active ? "#0F131F" : "transparent",
                 color: active ? "#fff" : "#896d51",
-                minWidth: 200,
               }}
             >
               {/* Gold left accent bar when active */}
@@ -293,17 +292,17 @@ function page() {
   return (
     <main className="w-full min-h-screen bg-[#f3f4f7]">
       {/* Header */}
-      <header className="h-90 w-full relative flex justify-center items-center">
+      <header className="h-56 sm:h-64 w-full relative flex flex-col justify-center items-center pt-20 px-4">
         <div
           style={{ backgroundImage: "url(/about-header.jpg)" }}
           className="absolute inset-0 bg-cover bg-center"
         />
         <div className="absolute inset-0 bg-black/30" />
-        <div className="z-10 flex flex-col items-center gap-3">
+        <div className="z-10 flex flex-col items-center gap-3 text-center px-4">
           <span className="text-[#896d51] text-xs font-semibold tracking-[0.3em] uppercase">
             Bango Parc
           </span>
-          <h1 className="font-crimson-pro text-white text-5xl">
+          <h1 className="font-crimson-pro text-white text-4xl sm:text-5xl">
             Paket & Venue
           </h1>
         </div>
@@ -325,8 +324,8 @@ function page() {
       </section>
 
       {/* Cards Section */}
-      <section className="section-layout grid-12">
-        <div className="col-span-10 col-start-2 w-full">
+      <section className="section-layout grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="col-span-1 lg:col-span-10 lg:col-start-2 w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {!isWedding
               ? reguler_packages.map((v) => (
@@ -339,8 +338,8 @@ function page() {
 
       {/* Bottom CTA */}
       <section className="w-full py-8 px-4 flex justify-center">
-        <div className="w-full max-w-6xl flex bg-white border border-[#0F131F]/10">
-          <div className="flex flex-1 p-10 flex-col items-start justify-between">
+        <div className="w-full max-w-6xl flex flex-col md:flex-row bg-white border border-[#0F131F]/10">
+          <div className="flex flex-1 p-6 sm:p-10 flex-col items-start justify-between">
             <div className="flex flex-col items-start">
               <h3 className="text-4xl font-crimson-pro text-[#0F131F]">
                 Ketentuan Singkat
