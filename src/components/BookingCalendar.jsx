@@ -81,24 +81,22 @@ export default function BookingCalendar({ onDateSelect }) {
   const [selected, setSelected] = useState(null); // "YYYY-MM-DD"
 
   const prevMonth = useCallback(() => {
-    setMonth((m) => {
-      if (m === 0) {
-        setYear((y) => y - 1);
-        return 11;
-      }
-      return m - 1;
-    });
-  }, []);
+    if (month === 0) {
+      setYear((y) => y - 1);
+      setMonth(11);
+    } else {
+      setMonth((m) => m - 1);
+    }
+  }, [month]);
 
   const nextMonth = useCallback(() => {
-    setMonth((m) => {
-      if (m === 11) {
-        setYear((y) => y + 1);
-        return 0;
-      }
-      return m + 1;
-    });
-  }, []);
+    if (month === 11) {
+      setYear((y) => y + 1);
+      setMonth(0);
+    } else {
+      setMonth((m) => m + 1);
+    }
+  }, [month]);
 
   // Prevent navigating to months before the current one
   const isAtMinMonth =
