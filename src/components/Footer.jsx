@@ -1,9 +1,14 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { Globe, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 function Footer() {
+  const pathname = usePathname();
+  if (pathname === "/login" || pathname?.startsWith("/admin")) return null;
   const footer = {
     link: [
       {

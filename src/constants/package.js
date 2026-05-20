@@ -9,10 +9,19 @@ import {
   PartyPopper,
 } from "lucide-react";
 
-// Helper function to generate a random price in a range
-function getRandomPrice(min, max, step = 100000) {
+// Simple seedable PRNG (Linear Congruential Generator)
+function createRandom(seed) {
+  let s = seed;
+  return function () {
+    s = (s * 1664525 + 1013904223) % 4294967296;
+    return s / 4294967296;
+  };
+}
+
+// Helper function to generate a random price in a range using the seedable PRNG
+function getRandomPrice(min, max, randomFn, step = 100000) {
   const steps = Math.floor((max - min) / step);
-  const randomSteps = Math.floor(Math.random() * (steps + 1));
+  const randomSteps = Math.floor(randomFn() * (steps + 1));
   return min + randomSteps * step;
 }
 
@@ -24,6 +33,8 @@ function formatRupiah(amount) {
 
 // Generate Reguler packages
 const generateRegulerPackages = () => {
+  const rnd = createRandom(888); // fixed seed for regular packages
+
   const areas = [
     {
       id: "depan",
@@ -46,10 +57,10 @@ const generateRegulerPackages = () => {
   ];
 
   return areas.map((area) => {
-    const priceAmount = getRandomPrice(1000000, 2000000);
+    const priceAmount = getRandomPrice(1000000, 2000000, rnd);
     // 70% chance of having a discount
-    const hasDiscount = Math.random() > 0.3;
-    const priceOriAmount = hasDiscount ? priceAmount + getRandomPrice(200000, 800000) : null;
+    const hasDiscount = rnd() > 0.3;
+    const priceOriAmount = hasDiscount ? priceAmount + getRandomPrice(200000, 800000, rnd) : null;
 
     return {
       id: area.id,
@@ -57,6 +68,8 @@ const generateRegulerPackages = () => {
       name: area.name,
       img: area.img,
       desc: area.desc,
+      priceVal: priceAmount,
+      priceOriVal: priceOriAmount,
       price: formatRupiah(priceAmount),
       priceOri: formatRupiah(priceOriAmount),
       stats: [
@@ -71,6 +84,8 @@ const generateRegulerPackages = () => {
 
 // Generate Wedding packages
 const generateWeddingPackages = () => {
+  const rnd = createRandom(999); // fixed seed for wedding packages
+
   const areas = [
     {
       id: "depan",
@@ -118,14 +133,14 @@ const generateWeddingPackages = () => {
 
   return areas.map((area) => {
     // 3 hours prices
-    const threeHoursDiscAmount = getRandomPrice(8000000, 12000000);
-    const hasThreeHoursDisc = Math.random() > 0.3;
-    const currentThreeHoursAmount = hasThreeHoursDisc ? threeHoursDiscAmount + getRandomPrice(1000000, 3000000) : null;
+    const threeHoursDiscAmount = getRandomPrice(8000000, 12000000, rnd);
+    const hasThreeHoursDisc = rnd() > 0.3;
+    const currentThreeHoursAmount = hasThreeHoursDisc ? threeHoursDiscAmount + getRandomPrice(1000000, 3000000, rnd) : null;
 
     // 5 hours prices
-    const fiveHoursDiscAmount = getRandomPrice(13000000, 18000000);
-    const hasFiveHoursDisc = Math.random() > 0.3;
-    const currentFiveHoursAmount = hasFiveHoursDisc ? fiveHoursDiscAmount + getRandomPrice(2000000, 5000000) : null;
+    const fiveHoursDiscAmount = getRandomPrice(13000000, 18000000, rnd);
+    const hasFiveHoursDisc = rnd() > 0.3;
+    const currentFiveHoursAmount = hasFiveHoursDisc ? fiveHoursDiscAmount + getRandomPrice(2000000, 5000000, rnd) : null;
 
     return {
       id: area.id,
@@ -133,6 +148,10 @@ const generateWeddingPackages = () => {
       name: area.name,
       thumbnail: area.img,
       desc: area.desc,
+      three_hours_disc_val: threeHoursDiscAmount,
+      current_three_hours_val: currentThreeHoursAmount,
+      five_hours_disc_val: fiveHoursDiscAmount,
+      current_five_hours_val: currentFiveHoursAmount,
       three_hours_disc: formatRupiah(threeHoursDiscAmount),
       current_three_hours: formatRupiah(currentThreeHoursAmount),
       five_hours_disc: formatRupiah(fiveHoursDiscAmount),

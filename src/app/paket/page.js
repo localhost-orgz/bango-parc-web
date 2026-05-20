@@ -1,17 +1,7 @@
 "use client";
 import Navbar from "@/components/Landing/Navbar";
 import { reguler_packages, wedding_packages } from "@/constants/package";
-import {
-  Armchair,
-  ArrowRight,
-  MoveRight,
-  Package2,
-  PartyPopper,
-  Phone,
-  Speaker,
-  Users,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, MoveRight, Phone } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 
@@ -339,7 +329,9 @@ function page() {
         <div className="col-span-10 col-start-2 w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {!isWedding
-              ? reguler_packages.map((v) => <RegulerCard key={v.id} venue={v} />)
+              ? reguler_packages.map((v) => (
+                  <RegulerCard key={v.id} venue={v} />
+                ))
               : wedding_packages.map((p) => <WeddingCard key={p.id} pkg={p} />)}
           </div>
         </div>

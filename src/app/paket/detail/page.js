@@ -5,6 +5,7 @@ import {
   AirVent,
   ArrowRight,
   CalendarDays,
+  Check,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -17,7 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 // ─── Internal Components & Data ────────────────────────────────────────────────
 import BookingCalendar from "@/components/BookingCalendar";
@@ -94,6 +95,12 @@ function getEndTimeLabel(time, selectedStart, bookedHours) {
   const duration =
     parseInt(time.split(":")[0]) - parseInt(selectedStart.split(":")[0]);
   return ` • ${duration} jam`;
+}
+
+// Helper function to format as Rupiah
+function formatRupiah(amount) {
+  if (amount === null || amount === undefined || amount === 0) return null;
+  return "Rp" + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -193,11 +200,7 @@ function VenueDescription({ pkg }) {
   );
 }
 
-function FacilitiesGrid({ pkg }) {
-  const items = pkg.type === "wedding"
-    ? pkg.features.map((f) => ({ icon: f.icon, label: f.label }))
-    : pkg.stats.map((s) => ({ icon: s.icon, label: `${s.label}: ${s.value}` }));
-
+function FacilitiesGrid({ items }) {
   return (
     <div className="mt-8">
       <h4 className="font-crimson-pro text-3xl text-[#0F131F] mb-4">
@@ -421,6 +424,7 @@ function DatePickerField({ selectedDate, onOpenCalendar }) {
 
 function BookingCard({
   pkg,
+  selectedAreaIds,
   selectedDate,
   selectedStart,
   selectedEnd,
@@ -429,6 +433,9 @@ function BookingCard({
   onStartChange,
   onEndChange,
 }) {
+  const selectedDateKey = selectedDate?.key || "";
+  const areaIdsParam = selectedAreaIds.join(",");
+
   return (
     <div className="w-full p-5 border-2 border-[#0F131F] mt-8 bg-white">
       <h6 className="text-xl font-crimson-text font-semibold mb-1">
@@ -463,7 +470,7 @@ function BookingCard({
         <div className="h-px w-full bg-[#0F131F]/70 mb-1 mt-3" />
 
         <Link
-          href={`/paket/checkout?id=${pkg.id}&type=${pkg.type}&date=${selectedDate?.key || ""}&start=${selectedStart}&end=${selectedEnd}`}
+          href={`/paket/checkout?ids=${areaIdsParam}&type=${pkg.type}&date=${selectedDateKey}&start=${selectedStart}&end=${selectedEnd}`}
           className="bg-[#0F131F] flex justify-center items-center py-3 text-sm font-medium text-white hover:bg-[#7a6047] transition-colors"
         >
           Lanjutkan Booking
@@ -517,6 +524,10 @@ function CalendarModal({ pkg, onClose, onDateSelect }) {
 
 function VenueSidebar({
   pkg,
+  selectedAreaIds,
+  onToggleArea,
+  selectedPackages,
+  combinedName,
   selectedDate,
   selectedStart,
   selectedEnd,
@@ -525,46 +536,76 @@ function VenueSidebar({
   onStartChange,
   onEndChange,
 }) {
-  const tags = pkg.type === "wedding" ? ["Wedding", "Eksklusif"] : ["Semi-Indoor", "Outdoor"];
+  const allAreas = [
+    { id: "depan", label: "Area Depan" },
+    { id: "tengah", label: "Ruang Tengah" },
+    { id: "belakang", label: "Area Belakang" },
+  ];
+
+  const isWedding = pkg.type === "wedding";
+
+  // Calculate dynamic pricing sums
+  const totalThreeHoursDiscVal = selectedPackages.reduce((sum, p) => sum + (p.three_hours_disc_val || 0), 0);
+  const totalCurrentThreeHoursVal = selectedPackages.reduce((sum, p) => sum + (p.current_three_hours_val || 0), 0);
+  const totalFiveHoursDiscVal = selectedPackages.reduce((sum, p) => sum + (p.five_hours_disc_val || 0), 0);
+  const totalCurrentFiveHoursVal = selectedPackages.reduce((sum, p) => sum + (p.current_five_hours_val || 0), 0);
+
+  const totalPriceVal = selectedPackages.reduce((sum, p) => sum + (p.priceVal || 0), 0);
+  const totalPriceOriVal = selectedPackages.reduce((sum, p) => sum + (p.priceOriVal || 0), 0);
 
   return (
     <div className="w-full px-15 col-span-5">
       <h3 className="text-5xl font-crimson-pro text-[#0F131F]">
-        {pkg.name}
+        {combinedName}
       </h3>
 
-      <div className="flex flex-wrap gap-2 mt-3">
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="text-xs px-2.5 py-1 border-2 border-[#0F131F]/70 text-[#0F131F]"
-          >
-            {tag}
-          </span>
-        ))}
+      {/* Chip Select Component */}
+      <div className="flex flex-col gap-2 mt-4">
+        <span className="text-[10px] text-black/40 uppercase tracking-wider font-semibold">
+          Pilih Area Sewa
+        </span>
+        <div className="flex flex-wrap gap-2">
+          {allAreas.map((area) => {
+            const isSelected = selectedAreaIds.includes(area.id);
+            return (
+              <button
+                key={area.id}
+                onClick={() => onToggleArea(area.id)}
+                className={`text-xs px-3.5 py-1.5 border-2 transition-all duration-200 cursor-pointer font-semibold flex items-center gap-1.5 ${
+                  isSelected
+                    ? "border-[#15803D] bg-[#F0FDF4] text-[#15803D]"
+                    : "border-black/15 bg-white text-black/60 hover:border-black/35 hover:text-black"
+                }`}
+              >
+                {isSelected && <Check size={13} strokeWidth={2.5} className="text-[#15803D]" />}
+                {area.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <p className="text-sm text-black/50 mt-3 w-[80%]">
+      <p className="text-sm text-black/50 mt-4 w-[80%]">
         {pkg.desc}
       </p>
 
-      {pkg.type === "wedding" ? (
+      {isWedding ? (
         <div className="flex flex-col gap-1.5 mt-5">
           <div className="flex items-end gap-2 flex-wrap">
             <span className="text-2xl font-semibold text-[#0F131F]">
-              {pkg.three_hours_disc}
+              {formatRupiah(totalThreeHoursDiscVal)}
             </span>
-            {pkg.current_three_hours && (
-              <span className="line-through text-black/30 mb-0.5 text-sm">{pkg.current_three_hours}</span>
+            {totalCurrentThreeHoursVal > 0 && (
+              <span className="line-through text-black/30 mb-0.5 text-sm">{formatRupiah(totalCurrentThreeHoursVal)}</span>
             )}
             <span className="font-semibold text-black/50 text-xs">/ 3 jam</span>
           </div>
           <div className="flex items-end gap-2 flex-wrap">
             <span className="text-2xl font-semibold text-[#0F131F]">
-              {pkg.five_hours_disc}
+              {formatRupiah(totalFiveHoursDiscVal)}
             </span>
-            {pkg.current_five_hours && (
-              <span className="line-through text-black/30 mb-0.5 text-sm">{pkg.current_five_hours}</span>
+            {totalCurrentFiveHoursVal > 0 && (
+              <span className="line-through text-black/30 mb-0.5 text-sm">{formatRupiah(totalCurrentFiveHoursVal)}</span>
             )}
             <span className="font-semibold text-black/50 text-xs">/ 5 jam</span>
           </div>
@@ -572,10 +613,10 @@ function VenueSidebar({
       ) : (
         <div className="flex mt-5 items-end gap-2 flex-wrap">
           <span className="text-3xl font-semibold text-[#0F131F]">
-            {pkg.price}
+            {formatRupiah(totalPriceVal)}
           </span>
-          {pkg.priceOri && (
-            <span className="line-through text-black/30 mb-0.5">{pkg.priceOri}</span>
+          {totalPriceOriVal > 0 && (
+            <span className="line-through text-black/30 mb-0.5">{formatRupiah(totalPriceOriVal)}</span>
           )}
           <span className="font-semibold text-[#0F131F]">/ 3 jam</span>
         </div>
@@ -587,6 +628,7 @@ function VenueSidebar({
 
       <BookingCard
         pkg={pkg}
+        selectedAreaIds={selectedAreaIds}
         selectedDate={selectedDate}
         selectedStart={selectedStart}
         selectedEnd={selectedEnd}
@@ -595,6 +637,153 @@ function VenueSidebar({
         onStartChange={onStartChange}
         onEndChange={onEndChange}
       />
+    </div>
+  );
+}
+
+// ─── Reguler Card (for Recommendations) ───────────────────────────────────────
+function RegulerCard({ venue }) {
+  return (
+    <div className="col-span-1 w-full bg-white border border-[#0F131F]/10 flex flex-col group">
+      {/* Image */}
+      <div className="w-full aspect-video relative bg-black overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+          style={{ backgroundImage: `url(${venue.img})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-3 left-4">
+          <span className="text-white font-crimson-text text-xl leading-none">
+            {venue.name}
+          </span>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="flex flex-col items-start p-5 flex-1">
+        {/* Price */}
+        <div className="flex items-end gap-2 flex-wrap">
+          <span className="text-2xl font-semibold text-[#0F131F]">
+            {venue.price}
+          </span>
+          {venue.priceOri && (
+            <span className="line-through text-sm mb-0.5 text-black/30">
+              {venue.priceOri}
+            </span>
+          )}
+          <span className="text-sm mb-0.5 text-black/50">/ 3 jam</span>
+        </div>
+
+        <p className="text-sm mt-3 text-black/55 leading-relaxed">
+          {venue.desc}
+        </p>
+
+        {/* Stats */}
+        <div className="w-full mt-5 grid grid-cols-2 gap-3">
+          {venue.stats.map(({ icon: Icon, label, value }) => (
+            <div key={label} className="flex items-center gap-2">
+              <Icon
+                size={14}
+                className="text-[#896d51] shrink-0"
+                strokeWidth={1.7}
+              />
+              <div className="flex flex-col">
+                <span className="text-[10px] text-black/40 uppercase tracking-wide leading-none">
+                  {label}
+                </span>
+                <span className="text-xs font-medium text-[#0F131F] mt-0.5">
+                  {value}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="w-full h-px bg-[#0F131F]/10 my-5" />
+
+        <Link
+          href={`/paket/detail?id=${venue.id}&type=reguler`}
+          className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-white transition-colors duration-200"
+          style={{ background: "#0F131F" }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#896d51")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "#0F131F")}
+        >
+          Lihat Detail &amp; Book
+          <ArrowRight size={15} strokeWidth={2.5} />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// ─── Wedding Card (for Recommendations) ───────────────────────────────────────
+function WeddingCard({ pkg }) {
+  return (
+    <div className="col-span-1 w-full bg-white border border-[#0F131F]/10 flex flex-col group">
+      <div className="w-full aspect-video relative bg-black overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+          style={{ backgroundImage: `url(${pkg.thumbnail})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="absolute bottom-3 left-4">
+          <span className="text-white font-crimson-text text-xl leading-none">
+            {pkg.name}
+          </span>
+        </div>
+      </div>
+      <div className="flex flex-col items-start p-5 flex-1">
+        <div className="flex flex-col gap-1 mb-4">
+          <div className="flex items-end gap-1.5 flex-wrap">
+            <span className="text-lg font-semibold text-[#0F131F]">
+              {pkg.three_hours_disc}
+            </span>
+            {pkg.current_three_hours && (
+              <span className="line-through text-xs mb-0.5 text-black/30">
+                {pkg.current_three_hours}
+              </span>
+            )}
+            <span className="text-xs mb-0.5 text-black/50">/ 3 jam</span>
+          </div>
+          <div className="flex items-end gap-1.5 flex-wrap">
+            <span className="text-lg font-semibold text-[#0F131F]">
+              {pkg.five_hours_disc}
+            </span>
+            {pkg.current_five_hours && (
+              <span className="line-through text-xs mb-0.5 text-black/30">
+                {pkg.current_five_hours}
+              </span>
+            )}
+            <span className="text-xs mb-0.5 text-black/50">/ 5 jam</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5 w-full">
+          {pkg.features.map(({ id, icon: Icon, label }) => (
+            <div key={id} className="flex items-center gap-2">
+              <Icon
+                size={13}
+                className="text-[#896d51] shrink-0"
+                strokeWidth={1.7}
+              />
+              <span className="text-xs text-black/60">{label}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="w-full h-px bg-[#0F131F]/10 my-5" />
+
+        <Link
+          href={`/paket/detail?id=${pkg.id}&type=wedding`}
+          className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-white transition-colors duration-200"
+          style={{ background: "#0F131F" }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#896d51")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "#0F131F")}
+        >
+          Lihat Detail &amp; Book
+          <ArrowRight size={15} strokeWidth={2.5} />
+        </Link>
+      </div>
     </div>
   );
 }
@@ -608,12 +797,63 @@ function DetailPaketContent() {
   const currentPackages = type === "wedding" ? wedding_packages : reguler_packages;
   const pkg = currentPackages.find((p) => p.id === id) || currentPackages[0];
 
+  const [selectedAreaIds, setSelectedAreaIds] = useState([id]);
+
+  useEffect(() => {
+    setSelectedAreaIds([id]);
+  }, [id]);
+
   const [openCalendar, setOpenCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedStart, setSelectedStart] = useState("");
   const [selectedEnd, setSelectedEnd] = useState("");
 
   const bookedHours = selectedDate ? getBookedHours(selectedDate.events) : [];
+
+  const toggleArea = (areaId) => {
+    // Keep at least one area selected at all times
+    setSelectedAreaIds((prev) => {
+      if (prev.includes(areaId)) {
+        if (prev.length > 1) {
+          return prev.filter((item) => item !== areaId);
+        }
+        return prev;
+      }
+      return [...prev, areaId];
+    });
+  };
+
+  const selectedPackages = selectedAreaIds
+    .map((areaId) => currentPackages.find((p) => p.id === areaId))
+    .filter(Boolean);
+
+  const getCombinedName = () => {
+    if (selectedPackages.length === 0) return "";
+    const names = selectedPackages.map((p) => p.name.replace("Wedding ", ""));
+    return (pkg.name.startsWith("Wedding") ? "Wedding " : "") + names.join(" & ");
+  };
+
+  const combinedName = getCombinedName();
+
+  const getCombinedFeatures = () => {
+    const allItems = [];
+    const seen = new Set();
+    selectedPackages.forEach((p) => {
+      const items = p.type === "wedding"
+        ? p.features.map((f) => ({ icon: f.icon, label: f.label }))
+        : p.stats.map((s) => ({ icon: s.icon, label: `${s.label}: ${s.value}` }));
+
+      items.forEach((item) => {
+        if (!seen.has(item.label)) {
+          seen.add(item.label);
+          allItems.push(item);
+        }
+      });
+    });
+    return allItems;
+  };
+
+  const combinedFeatures = getCombinedFeatures();
 
   function handleDateSelect(date) {
     setSelectedDate(date);
@@ -627,9 +867,11 @@ function DetailPaketContent() {
     setSelectedEnd(""); // reset end when start changes
   }
 
+  const otherPackages = currentPackages.filter((p) => p.id !== id);
+
   return (
     <main className="w-full min-h-screen bg-[#f3f4f7]">
-      <PageHeader pkg={pkg} />
+      <PageHeader pkg={{ name: combinedName }} />
       <Navbar />
 
       <section className="section-layout grid-12">
@@ -637,13 +879,17 @@ function DetailPaketContent() {
         <div className="col-span-7 w-full">
           <ImageGallery pkg={pkg} />
           <VenueDescription pkg={pkg} />
-          <FacilitiesGrid pkg={pkg} />
+          <FacilitiesGrid items={combinedFeatures} />
           <BookingTerms />
         </div>
 
         {/* Right column — booking sidebar */}
         <VenueSidebar
           pkg={pkg}
+          selectedAreaIds={selectedAreaIds}
+          onToggleArea={toggleArea}
+          selectedPackages={selectedPackages}
+          combinedName={combinedName}
           selectedDate={selectedDate}
           selectedStart={selectedStart}
           selectedEnd={selectedEnd}
@@ -654,9 +900,28 @@ function DetailPaketContent() {
         />
       </section>
 
+      {/* Others Areas Recommendation Section */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-[#0F131F]/15 mt-10">
+        <h3 className="font-crimson-pro text-4xl text-[#0F131F] text-center mb-2">
+          Area Bango Parc Lainnya
+        </h3>
+        <p className="text-sm text-black/50 text-center mb-10 max-w-md mx-auto">
+          Temukan pilihan area dan suasana lainnya untuk melengkapi kebutuhan acara Anda.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {otherPackages.map((otherPkg) =>
+            type === "wedding" ? (
+              <WeddingCard key={otherPkg.id} pkg={otherPkg} />
+            ) : (
+              <RegulerCard key={otherPkg.id} venue={otherPkg} />
+            )
+          )}
+        </div>
+      </section>
+
       {openCalendar && (
         <CalendarModal
-          pkg={pkg}
+          pkg={{ name: combinedName }}
           onClose={() => setOpenCalendar(false)}
           onDateSelect={handleDateSelect}
         />
