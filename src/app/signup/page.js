@@ -1,14 +1,17 @@
 "use client";
 
-import { ArrowLeft, Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, User, Mail, Phone, Lock } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 
-const BG_IMAGE = "https://images.unsplash.com/photo-1519225495810-7517c2965a7d?w=1600&auto=format&fit=crop";
+const BG_IMAGE =
+  "https://images.unsplash.com/photo-1519225495810-7517c2965a7d?w=1600&auto=format&fit=crop";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const [formData, setFormData] = useState({
+    fullName: "",
     email: "",
+    whatsappNumber: "",
     password: "",
   });
 
@@ -25,14 +28,14 @@ export default function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login Request Body:", formData);
+    console.log("Signup Request Body:", formData);
     setSubmittedData(formData);
   };
 
   return (
     <main className="min-h-screen w-full flex flex-col md:flex-row bg-[#f3f4f7]">
       {/* LEFT SECTION: Brand Background Image & Copywriting */}
-      <div 
+      <div
         className="hidden md:flex md:w-1/2 min-h-screen bg-cover bg-center relative p-16 flex-col justify-between text-white"
         style={{ backgroundImage: `url(${BG_IMAGE})` }}
       >
@@ -50,7 +53,9 @@ export default function LoginPage() {
             Wujudkan Momen Spesial Anda Bersama Kami
           </h2>
           <p className="text-white/80 text-sm leading-relaxed font-sans">
-            Dari resepsi pernikahan yang megah hingga seminar bisnis eksklusif, temukan harmoni keindahan alam terbuka dan fasilitas modern premium di Bango Parc.
+            Dari resepsi pernikahan yang megah hingga seminar bisnis eksklusif,
+            temukan harmoni keindahan alam terbuka dan fasilitas modern premium
+            di Bango Parc.
           </p>
           <div className="h-px bg-white/20 w-24 my-2" />
           <span className="text-xs text-white/50 tracking-wider uppercase font-semibold">
@@ -59,37 +64,61 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* RIGHT SECTION: Login Form Container */}
+      {/* RIGHT SECTION: Signup Form Container */}
       <div className="w-full md:w-1/2 min-h-screen bg-white flex flex-col justify-center items-center px-6 py-16 md:px-16 lg:px-24 relative">
         {/* Back Link Button */}
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="absolute top-6 left-6 md:top-10 md:left-10 flex items-center gap-2 text-xs text-black/50 hover:text-black transition-colors font-medium group text-[#0F131F]"
         >
-          <ArrowLeft size={14} strokeWidth={2.5} className="group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowLeft
+            size={14}
+            strokeWidth={2.5}
+            className="group-hover:-translate-x-0.5 transition-transform"
+          />
           Kembali ke Beranda
         </Link>
 
         {/* Content Box */}
         <div className="w-full max-w-md flex flex-col items-start mt-6">
-          {/* Logo brand display */}
-          <div className="mb-10 font-cinzel-deco text-2xl font-bold tracking-widest text-[#0F131F]">
-            BANGO PARC
-          </div>
-
           {/* Greeting text */}
           <h1 className="font-crimson-pro text-4xl text-[#0F131F] font-semibold mb-3">
-            Selamat Datang Kembali
+            Daftar Akun Baru
           </h1>
-          <p className="text-sm text-black/50 mb-8 leading-relaxed">
-            Masuk untuk mengelola reservasi venue Anda, mengecek riwayat pemesanan, dan mengakses penawaran eksklusif.
+          <p className="text-sm text-black/50 mb-6 leading-relaxed">
+            Daftar untuk mulai merencanakan acara Anda dan memesan venue terbaik
+            di Bango Parc.
           </p>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
+            {/* Full Name Field */}
+            <div className="flex flex-col gap-1.5 relative">
+              <label
+                htmlFor="fullName"
+                className="text-xs font-semibold text-[#0F131F]/60 tracking-wide uppercase flex items-center gap-1.5"
+              >
+                <User size={12} />
+                Nama Lengkap
+              </label>
+              <input
+                id="fullName"
+                name="fullName"
+                type="text"
+                required
+                value={formData.fullName}
+                onChange={handleChange}
+                placeholder="Masukkan nama lengkap"
+                className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1"
+              />
+            </div>
+
             {/* Email Field */}
             <div className="flex flex-col gap-1.5 relative">
-              <label htmlFor="email" className="text-xs font-semibold text-[#0F131F]/60 tracking-wide uppercase flex items-center gap-1.5">
+              <label
+                htmlFor="email"
+                className="text-xs font-semibold text-[#0F131F]/60 tracking-wide uppercase flex items-center gap-1.5"
+              >
                 <Mail size={12} />
                 Alamat Email
               </label>
@@ -105,9 +134,33 @@ export default function LoginPage() {
               />
             </div>
 
+            {/* WhatsApp Number Field */}
+            <div className="flex flex-col gap-1.5 relative">
+              <label
+                htmlFor="whatsappNumber"
+                className="text-xs font-semibold text-[#0F131F]/60 tracking-wide uppercase flex items-center gap-1.5"
+              >
+                <Phone size={12} />
+                Nomor WhatsApp
+              </label>
+              <input
+                id="whatsappNumber"
+                name="whatsappNumber"
+                type="tel"
+                required
+                value={formData.whatsappNumber}
+                onChange={handleChange}
+                placeholder="Masukkan nomor WhatsApp"
+                className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1"
+              />
+            </div>
+
             {/* Password Field */}
             <div className="flex flex-col gap-1.5 relative">
-              <label htmlFor="password" className="text-xs font-semibold text-[#0F131F]/60 tracking-wide uppercase flex items-center gap-1.5">
+              <label
+                htmlFor="password"
+                className="text-xs font-semibold text-[#0F131F]/60 tracking-wide uppercase flex items-center gap-1.5"
+              >
                 <Lock size={12} />
                 Kata Sandi
               </label>
@@ -137,7 +190,7 @@ export default function LoginPage() {
               type="submit"
               className="w-full h-13 mt-4 bg-[#0F131F] text-white hover:bg-[#896d51] transition-all duration-300 flex items-center justify-center font-semibold cursor-pointer gap-3 text-sm"
             >
-              Masuk
+              Daftar Sekarang
             </button>
           </form>
 
@@ -146,10 +199,11 @@ export default function LoginPage() {
             <div className="mt-6 w-full p-4 border border-[#34A853]/25 bg-[#34A853]/5 rounded-sm flex flex-col gap-2 transition-all duration-300">
               <div className="flex items-center gap-2 text-sm font-semibold text-[#34A853]">
                 <div className="w-2 h-2 rounded-full bg-[#34A853]" />
-                Masuk Berhasil (Simulasi UI)
+                Registrasi Berhasil (Simulasi UI)
               </div>
               <p className="text-xs text-black/60 leading-relaxed">
-                Berikut adalah format <code>request body</code> yang siap dikirimkan ke endpoint API <code>/auth/login</code>:
+                Berikut adalah format <code>request body</code> yang siap
+                dikirimkan ke endpoint API <code>/auth/signup</code>:
               </p>
               <pre className="p-3 bg-black/5 border border-black/10 rounded text-[11px] font-mono text-[#0F131F] overflow-x-auto w-full">
                 {JSON.stringify(submittedData, null, 2)}
@@ -157,20 +211,23 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Go to signup link */}
+          {/* Already have an account link */}
           <div className="mt-8 text-sm text-black/60 self-center">
-            Belum memiliki akun?{" "}
-            <Link href="/signup" className="underline font-semibold hover:text-[#896d51] text-[#0F131F] transition-colors">
-              Daftar sekarang
+            Sudah memiliki akun?{" "}
+            <Link
+              href="/login"
+              className="underline font-semibold hover:text-[#896d51] text-[#0F131F] transition-colors"
+            >
+              Masuk
             </Link>
           </div>
 
           {/* Help Line */}
-          <div className="mt-16 text-xs text-black/40">
+          <div className="mt-12 text-xs text-black/40">
             Butuh bantuan terkait akun? Hubungi WhatsApp kami di{" "}
-            <Link 
-              href="https://wa.me/6282108962233" 
-              target="_blank" 
+            <Link
+              href="https://wa.me/6282108962233"
+              target="_blank"
               className="underline font-semibold hover:text-[#896d51] transition-colors text-black/60"
             >
               +62 821 0896 2233

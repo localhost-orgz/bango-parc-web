@@ -8,7 +8,7 @@ import React from "react";
 
 function Footer() {
   const pathname = usePathname();
-  if (pathname === "/login" || pathname?.startsWith("/admin")) return null;
+  if (pathname === "/login" || pathname === "/signup" || pathname?.startsWith("/admin")) return null;
   const footer = {
     link: [
       {
