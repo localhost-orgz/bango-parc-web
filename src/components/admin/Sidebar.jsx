@@ -20,7 +20,6 @@ const dataItems = [
   { label: "Gallery", icon: GalleryHorizontal, path: "/admin/gallery" },
   { label: "Addon", icon: Package, path: "/admin/addon" },
   { label: "Facility", icon: Wrench, path: "/admin/facility" },
-  { label: "Area Facility", icon: Wrench, path: "/admin/area-facility" },
 ];
 
 const navItems = [
