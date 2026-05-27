@@ -1,16 +1,28 @@
 "use client";
 
-import Link from "next/link"; // Jangan lupa import Link 🔗
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Package,
+  GalleryHorizontal,
+  Tag,
+  Home,
+  Wrench,
+  LayoutDashboard,
   CalendarDays,
   CreditCard,
-  DollarSign,
-  ImageIcon,
-  LayoutDashboard,
-  Package,
-  Users,
+  Book,
 } from "lucide-react";
+
+const dataItems = [
+  { label: "Reservation Type", icon: Book, path: "/admin/reservation-type" },
+  { label: "Area", icon: Home, path: "/admin/area" },
+  { label: "Gallery", icon: GalleryHorizontal, path: "/admin/gallery" },
+  { label: "Area Price", icon: Tag, path: "/admin/area-price" },
+  { label: "Addon", icon: Package, path: "/admin/addon" },
+  { label: "Facility", icon: Wrench, path: "/admin/facility" },
+  { label: "Area Facility", icon: Wrench, path: "/admin/area-facility" },
+];
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
@@ -21,13 +33,6 @@ const navItems = [
     badge: 3,
   },
   { label: "Data Reservasi", icon: CalendarDays, path: "/admin/reservasi" },
-];
-
-const dataItems = [
-  { label: "Harga & Area", icon: DollarSign, path: "/admin/harga" },
-  { label: "Add-On", icon: Package, path: "/admin/addon" },
-  { label: "Pengguna", icon: Users, path: "/admin/users" },
-  { label: "Gallery", icon: ImageIcon, path: "/admin/gallery" },
 ];
 
 function Sidebar() {

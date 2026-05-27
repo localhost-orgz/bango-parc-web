@@ -19,6 +19,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/sonner";
 
 // 1. Definisikan tiap font ✍️
 const inter = Inter({
@@ -56,6 +57,7 @@ export default function RootLayout({ children }) {
       >
         {children}
         <Footer />
+        <Toaster position="bottom-left" />
       </body>
     </html>
   );
