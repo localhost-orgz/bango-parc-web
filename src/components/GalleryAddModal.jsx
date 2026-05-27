@@ -65,7 +65,7 @@ export default function GalleryAddModal({ isOpen, onOpenChange, onSuccess }) {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success("Berhasil menambahkan foto/galeri!");
+      toast.success("Berhasil menambahkan foto!");
 
       setFile(null);
       setAreaId("");
