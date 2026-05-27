@@ -6,49 +6,49 @@ import DataTable from "@/components/ui/dataTable";
 import PageHeader from "@/components/ui/pageHeader";
 import axiosInstance from "@/lib/axios";
 import { Pencil, Trash, Plus } from "lucide-react";
-import AreaEditModal from "@/components/AreaEditModal";
-import AreaAddModal from "@/components/AreaAddModal";
+import FacilityEditModal from "@/components/FacilityEditModal";
+import FacilityAddModal from "@/components/FacilityAddModal";
 
-export default function AdminAreaPage() {
-  const [areas, setAreas] = useState([]);
+export default function AdminFacilityPage() {
+  const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedArea, setSelectedArea] = useState(null);
+  const [selectedFacility, setSelectedFacility] = useState(null);
 
-  const fetchAreaData = async () => {
+  const fetchPropsData = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get("/area");
-      setAreas(response.data.data);
+      const response = await axiosInstance.get("/facility");
+      setFacilities(response.data.data);
       setError(null);
     } catch (err) {
-      setError("Failed get areas.");
+      setError("Failed get facilities.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAreaData();
+    fetchPropsData();
   }, []);
 
-  const handleEditClick = (area) => {
-    setSelectedArea(area);
+  const handleEditClick = (facility) => {
+    setSelectedFacility(facility);
     setIsEditOpen(true);
   };
 
   const handleDelete = async (id, name) => {
     const confirmDelete = confirm(
-      `Apakah Anda yakin ingin menghapus area "${name}"?`,
+      `Apakah Anda yakin ingin menghapus fasilitas "${name}"?`,
     );
     if (!confirmDelete) return;
 
     try {
-      await axiosInstance.delete(`/area/${id}`);
-      setAreas((prev) => prev.filter((item) => item.id !== id));
+      await axiosInstance.delete(`/facility/${id}`);
+      setFacilities((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
       alert(err.response?.data?.error || "Gagal menghapus data.");
     }
@@ -56,43 +56,30 @@ export default function AdminAreaPage() {
 
   const columns = [
     { header: "Name", key: "name" },
-    { header: "Description", key: "description" },
     {
-      header: "Facility Count",
-      key: "facilityCount",
-      render: (area) => (area.facilityIds ? area.facilityIds.length : 0),
-    },
-    {
-      header: "Area Prices",
-      key: "areaPrices",
-      render: (area) => (
-        <ul className="space-y-1">
-          {area.areaPrices &&
-            area.areaPrices.map((ap) => (
-              <li key={ap.reservationTypeId}>
-                Type #{ap.reservationTypeId}: Rp
-                {ap.price?.toLocaleString("id-ID")}
-              </li>
-            ))}
-        </ul>
+      header: "Icon",
+      key: "icon",
+      render: (facility) => (
+        <span dangerouslySetInnerHTML={{ __html: facility.icon }} />
       ),
     },
+    { header: "Value", key: "value" },
     {
       header: "Action",
       key: "action",
-      render: (area) => (
+      render: (facility) => (
         <div className="flex gap-1">
           <Button
             size="sm"
             variant="outline"
-            onClick={() => handleEditClick(area)}
+            onClick={() => handleEditClick(facility)}
           >
             <Pencil className="w-4 h-4" />
           </Button>
           <Button
             size="sm"
             variant="destructive"
-            onClick={() => handleDelete(area.id, area.name)}
+            onClick={() => handleDelete(facility.id, facility.name)}
           >
             <Trash className="w-4 h-4" />
           </Button>
@@ -107,26 +94,29 @@ export default function AdminAreaPage() {
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <PageHeader title="Area" description="Kelola semua area di sini." />
+        <PageHeader
+          title="Fasilitas"
+          description="Kelola semua fasilitas di sini."
+        />
 
         <Button onClick={() => setIsAddOpen(true)} className="w-full sm:w-auto">
           <Plus /> Create
         </Button>
       </div>
 
-      <DataTable data={areas} columns={columns} />
+      <DataTable data={facilities} columns={columns} />
 
-      <AreaAddModal
+      <FacilityAddModal
         isOpen={isAddOpen}
         onOpenChange={setIsAddOpen}
-        onSuccess={fetchAreaData}
+        onSuccess={fetchPropsData}
       />
 
-      <AreaEditModal
+      <FacilityEditModal
         isOpen={isEditOpen}
         onOpenChange={setIsEditOpen}
-        data={selectedArea}
-        onSuccess={fetchAreaData}
+        data={selectedFacility}
+        onSuccess={fetchPropsData}
       />
     </>
   );
