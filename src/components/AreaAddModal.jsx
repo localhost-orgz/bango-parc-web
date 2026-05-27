@@ -65,7 +65,6 @@ export default function AreaAddModal({ isOpen, onOpenChange, onSuccess }) {
   const handleCreate = async (e) => {
     e.preventDefault();
 
-    // prepare areaPrices, filter out unfinished rows
     const processedAreaPrices = areaPrices
       .filter(
         (ap) =>
@@ -77,7 +76,6 @@ export default function AreaAddModal({ isOpen, onOpenChange, onSuccess }) {
         reservationTypeId: Number(ap.reservationTypeId),
         price: Number(ap.price),
       }));
-
     try {
       setIsSubmitting(true);
 

@@ -60,21 +60,44 @@ export default function AdminAreaPage() {
     {
       header: "Facility Count",
       key: "facilityCount",
-      render: (area) => (area.facilityIds ? area.facilityIds.length : 0),
+      render: (area) => (
+        <div className="flex flex-wrap gap-1">
+          {area.areaFacilities &&
+            area.areaFacilities.map((facility) => (
+              <span
+                key={facility.id || facility.facility.name}
+                className="inline-block rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700"
+              >
+                {facility.facility.name}
+              </span>
+            ))}
+        </div>
+      ),
     },
     {
       header: "Area Prices",
       key: "areaPrices",
       render: (area) => (
-        <ul className="space-y-1">
-          {area.areaPrices &&
+        <div className="flex flex-col gap-1">
+          {area.areaPrices && area.areaPrices.length > 0 ? (
             area.areaPrices.map((ap) => (
-              <li key={ap.reservationTypeId}>
-                Type #{ap.reservationTypeId}: Rp
-                {ap.price?.toLocaleString("id-ID")}
-              </li>
-            ))}
-        </ul>
+              <div
+                key={ap.reservationTypeId}
+                className="flex items-center justify-between rounded bg-gray-50 px-2 py-1 text-xs border"
+              >
+                <span className="font-semibold text-gray-700">
+                  {ap.reservationType?.name || "-"}
+                </span>
+                <span className="font-mono text-[13px] text-primary">
+                  Rp{ap.price?.toLocaleString("id-ID") ?? 0}/
+                  {ap.reservationType.durationIntervalHour} Jam
+                </span>
+              </div>
+            ))
+          ) : (
+            <span className="italic text-gray-400">Tidak ada harga area</span>
+          )}
+        </div>
       ),
     },
     {

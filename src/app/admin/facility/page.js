@@ -35,6 +35,8 @@ export default function AdminFacilityPage() {
     fetchPropsData();
   }, []);
 
+  console.log(facilities);
+
   const handleEditClick = (facility) => {
     setSelectedFacility(facility);
     setIsEditOpen(true);

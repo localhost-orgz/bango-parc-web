@@ -18,7 +18,6 @@ const dataItems = [
   { label: "Reservation Type", icon: Book, path: "/admin/reservation-type" },
   { label: "Area", icon: Home, path: "/admin/area" },
   { label: "Gallery", icon: GalleryHorizontal, path: "/admin/gallery" },
-  { label: "Area Price", icon: Tag, path: "/admin/area-price" },
   { label: "Addon", icon: Package, path: "/admin/addon" },
   { label: "Facility", icon: Wrench, path: "/admin/facility" },
   { label: "Area Facility", icon: Wrench, path: "/admin/area-facility" },

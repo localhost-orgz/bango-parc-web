@@ -30,17 +30,13 @@ export default function AreaEditModal({
   const [allReservationTypes, setAllReservationTypes] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  console.log(data);
+
   useEffect(() => {
     if (isOpen && data) {
       setName(data.name || "");
       setDescription(data.description || "");
-      setFacilityIds(
-        Array.isArray(data.facilities)
-          ? data.facilities.map((f) => f.id)
-          : Array.isArray(data.facilityIds)
-            ? data.facilityIds
-            : [],
-      );
+      setFacilityIds(data.areaFacilities.map((f) => f.facilityId));
       setAreaPrices(
         Array.isArray(data.areaPrices) && data.areaPrices.length > 0
           ? data.areaPrices.map((ap) => ({
@@ -114,7 +110,7 @@ export default function AreaEditModal({
     try {
       setIsSubmitting(true);
 
-      await axiosInstance.patch(`/area/${data?.id}`, {
+      await axiosInstance.put(`/area/${data?.id}`, {
         name,
         description,
         facilityIds,
@@ -171,24 +167,36 @@ export default function AreaEditModal({
             />
           </div>
 
-          {/* Facility Selector */}
+          {/* Facility Selector (Checkbox Version) */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">Facilities</label>
-            <select
-              multiple
-              className="flex min-h-[42px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              value={facilityIds}
-              onChange={handleFacilitySelect}
-              required
-            >
+            <div className="flex flex-col gap-1 max-h-40 overflow-y-auto border border-input rounded-md p-2 bg-background">
               {allFacilities.map((facility) => (
-                <option key={facility.id} value={facility.id}>
+                <label
+                  key={facility.id}
+                  className="inline-flex items-center gap-2 text-sm"
+                >
+                  <input
+                    type="checkbox"
+                    className="accent-primary"
+                    value={facility.id}
+                    checked={facilityIds.includes(facility.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFacilityIds((prev) => [...prev, facility.id]);
+                      } else {
+                        setFacilityIds((prev) =>
+                          prev.filter((id) => id !== facility.id),
+                        );
+                      }
+                    }}
+                  />
                   {facility.name || `Facility #${facility.id}`}
-                </option>
+                </label>
               ))}
-            </select>
+            </div>
             <div className="text-xs text-muted-foreground">
-              Tekan Ctrl (atau Cmd di Mac) untuk memilih lebih dari satu
+              Centang fasilitas yang tersedia untuk area ini.
             </div>
           </div>
 
