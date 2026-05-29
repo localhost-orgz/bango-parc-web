@@ -2,18 +2,22 @@
 
 import { ArrowLeft, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const BG_IMAGE = "https://images.unsplash.com/photo-1519225495810-7517c2965a7d?w=1600&auto=format&fit=crop";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [submittedData, setSubmittedData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,10 +27,53 @@ export default function LoginPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login Request Body:", formData);
-    setSubmittedData(formData);
+    setIsLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    try {
+      const response = await fetch("https://bango-parc-service.vercel.app/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Email atau kata sandi salah. Silakan coba kembali.");
+      }
+
+      setSuccess(true);
+
+      // Save token and user details to localStorage on success
+      if (data.token) {
+        localStorage.setItem("bango_parc_token", data.token);
+      }
+      if (data.user) {
+        localStorage.setItem("bango_parc_user_profile", JSON.stringify(data.user));
+      } else {
+        // Fallback profile object if API doesn't return full user object
+        const defaultProfile = {
+          fullName: "Putra Setyonugroho",
+          email: formData.email,
+          whatsappNumber: "085810894998",
+          password: formData.password,
+        };
+        localStorage.setItem("bango_parc_user_profile", JSON.stringify(defaultProfile));
+      }
+
+      // Redirect to profile page
+      router.push("/profile");
+    } catch (err) {
+      setError(err.message || "Koneksi terputus. Harap periksa jaringan Anda.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -98,10 +145,11 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 required
+                disabled={isLoading || success}
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Masukkan alamat email"
-                className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1"
+                className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1 disabled:opacity-55"
               />
             </div>
 
@@ -117,15 +165,17 @@ export default function LoginPage() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
+                  disabled={isLoading || success}
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Masukkan kata sandi"
-                  className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1 pr-10"
+                  className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1 pr-10 disabled:opacity-55"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-3 text-[#0F131F]/40 hover:text-[#0F131F] transition-colors cursor-pointer"
+                  disabled={isLoading || success}
+                  className="absolute right-2 top-3 text-[#0F131F]/40 hover:text-[#0F131F] transition-colors cursor-pointer disabled:opacity-55"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -135,25 +185,31 @@ export default function LoginPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full h-13 mt-4 bg-[#0F131F] text-white hover:bg-[#896d51] transition-all duration-300 flex items-center justify-center font-semibold cursor-pointer gap-3 text-sm"
+              disabled={isLoading || success}
+              className="w-full h-13 mt-4 bg-[#0F131F] text-white hover:bg-[#896d51] transition-all duration-300 flex items-center justify-center font-semibold cursor-pointer gap-3 text-sm disabled:bg-black/20 disabled:text-black/40 disabled:cursor-not-allowed"
             >
-              Masuk
+              {isLoading ? "Masuk..." : "Masuk"}
             </button>
           </form>
 
-          {/* Success Banner showing Request Body */}
-          {submittedData && (
-            <div className="mt-6 w-full p-4 border border-[#34A853]/25 bg-[#34A853]/5 rounded-sm flex flex-col gap-2 transition-all duration-300">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#34A853]">
-                <div className="w-2 h-2 rounded-full bg-[#34A853]" />
-                Masuk Berhasil (Simulasi UI)
+          {/* Error Message */}
+          {error && (
+            <div className="mt-4 w-full p-4 border border-[#EA4335]/25 bg-[#EA4335]/5 rounded-sm flex items-center gap-3 text-xs text-[#EA4335] transition-all duration-300">
+              <div className="w-2 h-2 shrink-0 rounded-full bg-[#EA4335]" />
+              <span className="font-medium">{error}</span>
+            </div>
+          )}
+
+          {/* Success Message */}
+          {success && (
+            <div className="mt-4 w-full p-4 border border-[#34A853]/25 bg-[#34A853]/5 rounded-sm flex flex-col gap-2 text-xs text-[#34A853] transition-all duration-300">
+              <div className="flex items-center gap-2 font-semibold">
+                <div className="w-2 h-2 shrink-0 rounded-full bg-[#34A853]" />
+                Masuk Berhasil!
               </div>
-              <p className="text-xs text-black/60 leading-relaxed">
-                Berikut adalah format <code>request body</code> yang siap dikirimkan ke endpoint API <code>/auth/login</code>:
+              <p className="text-black/60 leading-relaxed">
+                Mengalihkan Anda ke halaman profil...
               </p>
-              <pre className="p-3 bg-black/5 border border-black/10 rounded text-[11px] font-mono text-[#0F131F] overflow-x-auto w-full">
-                {JSON.stringify(submittedData, null, 2)}
-              </pre>
             </div>
           )}
 
