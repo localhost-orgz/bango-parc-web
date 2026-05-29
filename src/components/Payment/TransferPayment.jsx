@@ -1,6 +1,10 @@
 import { AlertCircle } from "lucide-react";
 
-const TransferPayment = ({ selected, orderData, copied, onCopy }) => {
+const TransferPayment = ({ selected, orderData, copied, onCopy, paymentType }) => {
+  const isFull = paymentType === "full";
+  const amountToPay = isFull ? orderData.total : orderData.dpAmount;
+  const label = isFull ? "Nominal Transfer (Lunas)" : "Nominal Transfer (DP 50%)";
+
   return (
     <>
       <div className="bg-white border border-[#0f131f]/15 p-6">
@@ -13,10 +17,10 @@ const TransferPayment = ({ selected, orderData, copied, onCopy }) => {
           <div className="bg-[#0f131f]/5 border border-[#0f131f]/15 p-4 flex justify-between items-center">
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-black/40 uppercase tracking-wide">
-                Nominal Transfer (DP)
+                {label}
               </span>
               <span className="text-2xl font-semibold text-[#0f131f]">
-                Rp{orderData.dpAmount.toLocaleString("id-ID")}
+                Rp{amountToPay.toLocaleString("id-ID")}
               </span>
             </div>
           </div>

@@ -1,7 +1,13 @@
 import { CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 
-const QrisPayment = ({ orderData }) => {
+const QrisPayment = ({ orderData, paymentType }) => {
+  const isFull = paymentType === "full";
+  const amountToPay = isFull ? orderData.total : orderData.dpAmount;
+  const paymentDesc = isFull 
+    ? "Pembayaran lunas penuh (100%)" 
+    : `DP 50% dari total Rp${orderData.total.toLocaleString("id-ID")}`;
+
   return (
     <div className="bg-white border border-[#0f131f]/15 p-4 sm:p-6">
       <h5 className="font-crimson-pro text-lg sm:text-xl text-[#2c2218] mb-1">
@@ -37,12 +43,11 @@ const QrisPayment = ({ orderData }) => {
             </span>
 
             <span className="text-xl sm:text-2xl font-semibold text-[#0f131f] wrap-break-word">
-              Rp{orderData.dpAmount.toLocaleString("id-ID")}
+              Rp{amountToPay.toLocaleString("id-ID")}
             </span>
 
             <span className="text-[10px] sm:text-xs text-black/30 leading-relaxed">
-              DP 50% dari total Rp
-              {orderData.total.toLocaleString("id-ID")}
+              {paymentDesc}
             </span>
           </div>
 

@@ -19,13 +19,15 @@ export default function SignupPage() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] =
+    useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
   const passwordsMatch = formData.password === formData.passwordConfirmation;
-  const showPasswordError = formData.passwordConfirmation.length > 0 && !passwordsMatch;
+  const showPasswordError =
+    formData.passwordConfirmation.length > 0 && !passwordsMatch;
 
   useEffect(() => {
     if (success) {
@@ -56,18 +58,23 @@ export default function SignupPage() {
     setSuccess(false);
 
     try {
-      const response = await fetch("https://bango-parc-service.vercel.app/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://bango-parc-service.vercel.app/api/auth/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData),
-      });
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Pendaftaran gagal. Silakan coba kembali.");
+        throw new Error(
+          data.message || "Pendaftaran gagal. Silakan coba kembali.",
+        );
       }
 
       setSuccess(true);
@@ -86,7 +93,7 @@ export default function SignupPage() {
         style={{ backgroundImage: `url(${BG_IMAGE})` }}
       >
         {/* Background Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0F131F]/90 via-[#0F131F]/40 to-[#0F131F]/60 z-0" />
+        <div className="absolute inset-0 bg-linear-to-t from-[#0F131F]/90 via-[#0F131F]/40 to-[#0F131F]/60 z-0" />
 
         {/* Top Logo branding */}
         <div className="z-10 font-cinzel-deco text-xl font-bold tracking-widest">
@@ -261,18 +268,24 @@ export default function SignupPage() {
                   onChange={handleChange}
                   placeholder="Masukkan ulang kata sandi"
                   className={`w-full h-11 border-b-2 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none transition-colors px-1 pr-10 disabled:opacity-55 ${
-                    showPasswordError 
-                      ? "border-[#EA4335] focus:border-[#EA4335]" 
+                    showPasswordError
+                      ? "border-[#EA4335] focus:border-[#EA4335]"
                       : "border-[#0F131F]/20 focus:border-[#0F131F]"
                   }`}
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                  onClick={() =>
+                    setShowPasswordConfirmation(!showPasswordConfirmation)
+                  }
                   disabled={isLoading || success}
                   className="absolute right-2 top-3 text-[#0F131F]/40 hover:text-[#0F131F] transition-colors cursor-pointer disabled:opacity-55"
                 >
-                  {showPasswordConfirmation ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPasswordConfirmation ? (
+                    <EyeOff size={16} />
+                  ) : (
+                    <Eye size={16} />
+                  )}
                 </button>
               </div>
               {showPasswordError && (
@@ -308,7 +321,8 @@ export default function SignupPage() {
                 Registrasi Berhasil!
               </div>
               <p className="text-black/60 leading-relaxed">
-                Akun Anda telah didaftarkan. Mengalihkan Anda ke halaman masuk (login)...
+                Akun Anda telah didaftarkan. Mengalihkan Anda ke halaman masuk
+                (login)...
               </p>
             </div>
           )}

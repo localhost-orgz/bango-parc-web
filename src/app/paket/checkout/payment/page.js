@@ -57,7 +57,76 @@ const paymentMethods = [
   },
 ];
 
+// ─── Payment Type Component ──────────────────────────────────────────────────
+function PaymentTypeSelect({ paymentType, onSelectPaymentType, total, dpAmount }) {
+  return (
+    <div className="bg-white border border-[#0f131f]/10 p-4 sm:p-6 shadow-sm">
+      <h5 className="font-crimson-pro text-lg sm:text-xl text-[#0f131f] mb-1">
+        Opsi Pembayaran
+      </h5>
+      <p className="text-xs text-black/45 mb-5">
+        Pilih untuk melakukan pembayaran lunas (100%) atau uang muka (DP) minimal 50%.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Full Payment */}
+        <button
+          type="button"
+          onClick={() => onSelectPaymentType("full")}
+          className={`flex flex-col text-left p-4 border transition-all duration-300 cursor-pointer ${
+            paymentType === "full"
+              ? "border-[#0F131F] bg-[#0F131F]/5"
+              : "border-[#0f131f]/15 bg-white hover:border-[#0f131f]/35"
+          }`}
+        >
+          <div className="flex items-center justify-between w-full">
+            <span className="font-semibold text-xs tracking-wider text-[#0f131f] uppercase">Bayar Lunas</span>
+            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+              paymentType === "full" ? "border-[#0F131F] bg-[#0F131F]" : "border-black/20"
+            }`}>
+              {paymentType === "full" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+            </div>
+          </div>
+          <span className="text-xl font-bold text-[#0F131F] mt-3">
+            Rp{total.toLocaleString("id-ID")}
+          </span>
+          <span className="text-[10px] text-black/40 mt-1.5 leading-relaxed">
+            Pembayaran penuh 100% biaya reservasi venue.
+          </span>
+        </button>
+
+        {/* DP Payment */}
+        <button
+          type="button"
+          onClick={() => onSelectPaymentType("dp")}
+          className={`flex flex-col text-left p-4 border transition-all duration-300 cursor-pointer ${
+            paymentType === "dp"
+              ? "border-[#0F131F] bg-[#0F131F]/5"
+              : "border-[#0f131f]/15 bg-white hover:border-[#0f131f]/35"
+          }`}
+        >
+          <div className="flex items-center justify-between w-full">
+            <span className="font-semibold text-xs tracking-wider text-[#0f131f] uppercase">Uang Muka (DP 50%)</span>
+            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+              paymentType === "dp" ? "border-[#0F131F] bg-[#0F131F]" : "border-black/20"
+            }`}>
+              {paymentType === "dp" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+            </div>
+          </div>
+          <span className="text-xl font-bold text-[#0F131F] mt-3">
+            Rp{dpAmount.toLocaleString("id-ID")}
+          </span>
+          <span className="text-[10px] text-black/40 mt-1.5 leading-relaxed">
+            Biaya awal minimum 50%. Pelunasan H-7.
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function PaymentPage() {
+  const [paymentType, setPaymentType] = useState("full");
   const [selectedMethod, setSelectedMethod] = useState("qris");
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -88,19 +157,28 @@ export default function PaymentPage() {
         <div className="lg:col-span-4 flex flex-col gap-4 order-1 lg:order-1">
           <OrderCode code={orderData.orderCode} />
           <VenueInfo orderData={orderData} />
-          <PriceBreakdown orderData={orderData} />
+          <PriceBreakdown orderData={orderData} paymentType={paymentType} />
           <AlertPayment />
         </div>
 
         {/* RIGHT — Payment Detail */}
         <div className="lg:col-span-8 flex flex-col gap-5 order-2 lg:order-2">
+          <PaymentTypeSelect
+            paymentType={paymentType}
+            onSelectPaymentType={setPaymentType}
+            total={orderData.total}
+            dpAmount={orderData.dpAmount}
+          />
+
           <PaymentMethodSelect
             selectedMethod={selectedMethod}
             paymentMethods={paymentMethods}
             onSelectedMethod={setSelectedMethod}
           />
 
-          {selected.type === "qris" && <QrisPayment orderData={orderData} />}
+          {selected.type === "qris" && (
+            <QrisPayment orderData={orderData} paymentType={paymentType} />
+          )}
 
           {selected.type === "transfer" && (
             <TransferPayment
@@ -108,6 +186,7 @@ export default function PaymentPage() {
               orderData={orderData}
               copied={copied}
               onCopy={setCopied}
+              paymentType={paymentType}
             />
           )}
 
