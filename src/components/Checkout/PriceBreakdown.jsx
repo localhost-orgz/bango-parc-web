@@ -44,7 +44,7 @@ export default function PriceBreakdown({ data }) {
       <div className="h-px w-full bg-[#0F131F]/12 my-5" />
 
       <Link
-        href={"/paket/checkout/payment"}
+        href={"/payment"}
         className="w-full bg-[#0F131F] flex justify-center items-center gap-2 py-3.5 text-sm font-medium text-white hover:bg-[#1e2540] transition-colors"
       >
         Lanjutkan ke Pembayaran

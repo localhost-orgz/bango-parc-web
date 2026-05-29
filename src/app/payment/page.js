@@ -235,7 +235,7 @@ export default function PaymentPage() {
                       {uploadedFile.name}
                     </span>
 
-                    <span className="text-xs text-black/40">
+                    <span className="text-xs text-black/45">
                       {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
                     </span>
                   </div>
@@ -300,7 +300,7 @@ export default function PaymentPage() {
           </div>
 
           <Link
-            href="/checkout"
+            href="/paket/checkout"
             className="flex items-center gap-2 text-sm text-[#0f131f]/70 hover:text-[#0f131f] transition-colors w-fit font-medium"
           >
             ← Kembali ke Checkout

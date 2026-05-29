@@ -4,12 +4,9 @@ import Navbar from "@/components/Landing/Navbar";
 import { 
   User, 
   Calendar, 
-  Lock, 
   Mail, 
   Phone, 
   Save, 
-  Eye, 
-  EyeOff, 
   CheckCircle2, 
   Clock, 
   ExternalLink,
@@ -30,10 +27,8 @@ export default function ProfilePage() {
     fullName: "Putra Setyonugroho",
     email: "me.putrasetyo@gmail.com",
     whatsappNumber: "085810894998",
-    password: "Putra912",
   });
   
-  const [showPassword, setShowPassword] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -257,33 +252,6 @@ export default function ProfilePage() {
                       placeholder="Masukkan nomor WhatsApp"
                       className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1"
                     />
-                  </div>
-
-                  {/* Password */}
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="password" className="text-xs font-semibold text-[#0F131F]/60 tracking-wide uppercase flex items-center gap-1.5">
-                      <Lock size={12} />
-                      Kata Sandi
-                    </label>
-                    <div className="relative w-full">
-                      <input
-                        id="password"
-                        name="password"
-                        type={showPassword ? "text" : "password"}
-                        required
-                        value={profile.password}
-                        onChange={handleProfileChange}
-                        placeholder="Masukkan kata sandi"
-                        className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1 pr-10"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-3 text-[#0F131F]/40 hover:text-[#0F131F] transition-colors cursor-pointer"
-                      >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
                   </div>
 
                   {/* Submit Button */}
