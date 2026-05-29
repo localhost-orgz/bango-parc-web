@@ -2,12 +2,14 @@
 
 import { ArrowLeft, Eye, EyeOff, User, Mail, Phone, Lock } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
 
 const BG_IMAGE =
   "https://images.unsplash.com/photo-1519225495810-7517c2965a7d?w=1600&auto=format&fit=crop";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -16,7 +18,18 @@ export default function SignupPage() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [submittedData, setSubmittedData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        router.push("/login");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success, router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,10 +39,33 @@ export default function SignupPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Signup Request Body:", formData);
-    setSubmittedData(formData);
+    setIsLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    try {
+      const response = await fetch("https://bango-parc-service.vercel.app/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Pendaftaran gagal. Silakan coba kembali.");
+      }
+
+      setSuccess(true);
+    } catch (err) {
+      setError(err.message || "Koneksi terputus. Harap periksa jaringan Anda.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -81,6 +117,11 @@ export default function SignupPage() {
 
         {/* Content Box */}
         <div className="w-full max-w-md flex flex-col items-start mt-6">
+          {/* Logo brand display */}
+          <div className="mb-8 font-cinzel-deco text-2xl font-bold tracking-widest text-[#0F131F]">
+            BANGO PARC
+          </div>
+
           {/* Greeting text */}
           <h1 className="font-crimson-pro text-4xl text-[#0F131F] font-semibold mb-3">
             Daftar Akun Baru
@@ -106,10 +147,11 @@ export default function SignupPage() {
                 name="fullName"
                 type="text"
                 required
+                disabled={isLoading || success}
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="Masukkan nama lengkap"
-                className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1"
+                className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1 disabled:opacity-55"
               />
             </div>
 
@@ -127,10 +169,11 @@ export default function SignupPage() {
                 name="email"
                 type="email"
                 required
+                disabled={isLoading || success}
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Masukkan alamat email"
-                className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1"
+                className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1 disabled:opacity-55"
               />
             </div>
 
@@ -148,10 +191,11 @@ export default function SignupPage() {
                 name="whatsappNumber"
                 type="tel"
                 required
+                disabled={isLoading || success}
                 value={formData.whatsappNumber}
                 onChange={handleChange}
                 placeholder="Masukkan nomor WhatsApp"
-                className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1"
+                className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1 disabled:opacity-55"
               />
             </div>
 
@@ -170,15 +214,17 @@ export default function SignupPage() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
+                  disabled={isLoading || success}
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Masukkan kata sandi"
-                  className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1 pr-10"
+                  className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1 pr-10 disabled:opacity-55"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-3 text-[#0F131F]/40 hover:text-[#0F131F] transition-colors cursor-pointer"
+                  disabled={isLoading || success}
+                  className="absolute right-2 top-3 text-[#0F131F]/40 hover:text-[#0F131F] transition-colors cursor-pointer disabled:opacity-55"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -188,26 +234,31 @@ export default function SignupPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full h-13 mt-4 bg-[#0F131F] text-white hover:bg-[#896d51] transition-all duration-300 flex items-center justify-center font-semibold cursor-pointer gap-3 text-sm"
+              disabled={isLoading || success}
+              className="w-full h-13 mt-4 bg-[#0F131F] text-white hover:bg-[#896d51] transition-all duration-300 flex items-center justify-center font-semibold cursor-pointer gap-3 text-sm disabled:bg-black/20 disabled:text-black/40 disabled:cursor-not-allowed"
             >
-              Daftar Sekarang
+              {isLoading ? "Mendaftar..." : "Daftar Sekarang"}
             </button>
           </form>
 
-          {/* Success Banner showing Request Body */}
-          {submittedData && (
-            <div className="mt-6 w-full p-4 border border-[#34A853]/25 bg-[#34A853]/5 rounded-sm flex flex-col gap-2 transition-all duration-300">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#34A853]">
-                <div className="w-2 h-2 rounded-full bg-[#34A853]" />
-                Registrasi Berhasil (Simulasi UI)
+          {/* Error Message */}
+          {error && (
+            <div className="mt-4 w-full p-4 border border-[#EA4335]/25 bg-[#EA4335]/5 rounded-sm flex items-center gap-3 text-xs text-[#EA4335] transition-all duration-300">
+              <div className="w-2 h-2 shrink-0 rounded-full bg-[#EA4335]" />
+              <span className="font-medium">{error}</span>
+            </div>
+          )}
+
+          {/* Success Message */}
+          {success && (
+            <div className="mt-4 w-full p-4 border border-[#34A853]/25 bg-[#34A853]/5 rounded-sm flex flex-col gap-2 text-xs text-[#34A853] transition-all duration-300">
+              <div className="flex items-center gap-2 font-semibold">
+                <div className="w-2 h-2 shrink-0 rounded-full bg-[#34A853]" />
+                Registrasi Berhasil!
               </div>
-              <p className="text-xs text-black/60 leading-relaxed">
-                Berikut adalah format <code>request body</code> yang siap
-                dikirimkan ke endpoint API <code>/auth/signup</code>:
+              <p className="text-black/60 leading-relaxed">
+                Akun Anda telah berhasil didaftarkan. Halaman akan dialihkan ke formulir masuk (login) dalam beberapa detik...
               </p>
-              <pre className="p-3 bg-black/5 border border-black/10 rounded text-[11px] font-mono text-[#0F131F] overflow-x-auto w-full">
-                {JSON.stringify(submittedData, null, 2)}
-              </pre>
             </div>
           )}
 
