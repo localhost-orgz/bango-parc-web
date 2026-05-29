@@ -13,7 +13,8 @@ import {
   CheckCircle2, 
   Clock, 
   ExternalLink,
-  LogOut
+  LogOut,
+  Ticket
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,6 +23,7 @@ import React, { useState, useEffect } from "react";
 export default function ProfilePage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("account"); // "account" or "reservations"
+  const [activeTicket, setActiveTicket] = useState(null);
   
   // Profile state initialized with mock default user data
   const [profile, setProfile] = useState({
@@ -356,13 +358,23 @@ export default function ProfilePage() {
                           <span className="text-lg font-bold text-[#0F131F]">{res.price}</span>
                         </div>
                         
-                        <Link 
-                          href="/paket" 
-                          className="flex items-center gap-1 text-[11px] font-semibold text-[#896d51] hover:text-[#0F131F] transition-colors uppercase tracking-wider mt-1 group"
-                        >
-                          Detail Acara
-                          <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                        </Link>
+                        {res.status === "Dikonfirmasi" || res.status === "Selesai" ? (
+                          <button
+                            onClick={() => setActiveTicket(res)}
+                            className="flex items-center gap-1.5 text-[11px] font-semibold text-[#15803D] hover:text-[#0F131F] transition-colors uppercase tracking-wider mt-1 group cursor-pointer"
+                          >
+                            Lihat Tiket
+                            <Ticket size={12} className="group-hover:scale-105 transition-transform" />
+                          </button>
+                        ) : (
+                          <Link 
+                            href="/paket" 
+                            className="flex items-center gap-1 text-[11px] font-semibold text-[#896d51] hover:text-[#0F131F] transition-colors uppercase tracking-wider mt-1 group"
+                          >
+                            Detail Acara
+                            <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                          </Link>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -374,6 +386,154 @@ export default function ProfilePage() {
 
         </div>
       </section>
+      {/* Ticket Modal Overlay */}
+      {activeTicket && (
+        <TicketModal 
+          reservation={activeTicket}
+          userName={profile.fullName}
+          onClose={() => setActiveTicket(null)}
+        />
+      )}
     </main>
+  );
+}
+
+// ─── High-Fidelity Ticket Modal Component ─────────────────────────────────────
+function TicketModal({ reservation, userName, onClose }) {
+  if (!reservation) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+      {/* Modal Container */}
+      <div className="relative bg-white w-full max-w-lg shadow-2xl overflow-hidden rounded-xl animate-in fade-in zoom-in duration-300">
+        
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-white/50 hover:text-white z-20 transition-colors cursor-pointer text-lg font-bold"
+        >
+          ✕
+        </button>
+
+        {/* Modal Header */}
+        <div className="p-6 bg-[#0F131F] text-white flex flex-col items-center justify-center text-center relative overflow-hidden">
+          {/* Subtle gold accent circle */}
+          <div className="absolute -right-16 -top-16 w-36 h-36 rounded-full bg-[#896d51]/10 pointer-events-none" />
+          
+          <span className="text-[#896d51] text-[10px] tracking-[0.3em] uppercase font-bold mb-1">
+            Bango Parc Venue & Eatery
+          </span>
+          <h3 className="font-cinzel-deco text-xl font-bold tracking-widest">
+            E-TICKET RESERVASI
+          </h3>
+          <span className="text-[10px] font-mono text-white/50 mt-1 uppercase tracking-wider">
+            ID: {reservation.id}
+          </span>
+        </div>
+
+        {/* Ticket Body */}
+        <div className="p-6 flex flex-col bg-white">
+          {/* Ticket Shape Wrapper */}
+          <div className="border border-[#0F131F]/15 rounded-xl overflow-hidden relative bg-[#f3f4f7]/20 flex flex-col">
+            
+            {/* Left/Right semi-circle notch cutouts for classic ticket look */}
+            <div className="absolute top-[62%] -left-3 w-6 h-6 rounded-full bg-white border-r border-[#0F131F]/15 z-10" />
+            <div className="absolute top-[62%] -right-3 w-6 h-6 rounded-full bg-white border-l border-[#0F131F]/15 z-10" />
+
+            {/* Top Ticket Details */}
+            <div className="p-5 flex flex-col gap-4">
+              {/* Event Name */}
+              <div className="flex flex-col">
+                <span className="text-[10px] text-black/40 uppercase tracking-wider font-semibold">Nama Paket / Acara</span>
+                <span className="font-crimson-pro text-xl font-bold text-[#0F131F] leading-tight mt-0.5">
+                  {reservation.packageName}
+                </span>
+              </div>
+
+              {/* Grid detail */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-black/40 uppercase tracking-wider font-semibold">Pemesan</span>
+                  <span className="text-xs font-semibold text-black/75 mt-0.5">{userName}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-black/40 uppercase tracking-wider font-semibold">Status Tiket</span>
+                  <span className="text-[10px] font-bold text-[#15803D] uppercase tracking-wider mt-0.5">
+                    {reservation.status === "Selesai" ? "Lunas (Selesai)" : "Terkonfirmasi"}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-black/40 uppercase tracking-wider font-semibold">Tanggal Acara</span>
+                  <span className="text-xs font-semibold text-black/75 mt-0.5">{reservation.date}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-black/40 uppercase tracking-wider font-semibold">Jam Sewa (Check-in/out)</span>
+                  <span className="text-xs font-semibold text-black/75 mt-0.5">{reservation.timeSlot.split(" (")[0]}</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col">
+                <span className="text-[10px] text-black/40 uppercase tracking-wider font-semibold">Area Lokasi</span>
+                <span className="text-xs font-semibold text-black/75 mt-0.5">{reservation.area}</span>
+              </div>
+            </div>
+
+            {/* Dotted Tear-off Divider Line */}
+            <div className="relative flex items-center justify-center my-1 px-4">
+              <div className="w-full border-t border-dashed border-[#0F131F]/20" />
+            </div>
+
+            {/* Bottom Tear-off Ticket section (Barcode + QR Code lookalike) */}
+            <div className="p-5 pt-3 flex items-center justify-between gap-4">
+              <div className="flex flex-col">
+                <span className="text-[9px] text-black/35 uppercase tracking-wider font-semibold">Scan QR Kode untuk Verifikasi Masuk</span>
+                <span className="text-[10px] font-mono text-[#0F131F]/60 mt-1">BANGOPARC-SEC-{reservation.id}</span>
+                <div className="flex gap-1.5 mt-2.5">
+                  <span className="text-[10px] font-bold bg-[#15803D]/10 text-[#15803D] px-2 py-0.5 border border-[#15803D]/25 uppercase tracking-wider">
+                    VALID
+                  </span>
+                  <span className="text-[10px] font-bold bg-[#0F131F]/5 text-[#0F131F]/65 px-2 py-0.5 border border-[#0F131F]/15 uppercase tracking-wider">
+                    LUNAS
+                  </span>
+                </div>
+              </div>
+              
+              {/* Custom Simulated QR Code using HTML/CSS */}
+              <div className="w-20 h-20 bg-white border border-[#0F131F]/10 p-1.5 flex items-center justify-center shrink-0">
+                {/* Visual representation of a QR Code grid */}
+                <div className="grid grid-cols-5 gap-0.5 w-full h-full opacity-85">
+                  {[...Array(25)].map((_, i) => {
+                    // Generate a pseudo-random checkerboard pattern
+                    const isDark = (i * 7 + 13) % 3 === 0 || i === 0 || i === 4 || i === 20 || i === 24 || (i > 5 && i < 9) || (i > 15 && i < 19);
+                    return (
+                      <div 
+                        key={i} 
+                        className={`w-full h-full ${isDark ? 'bg-[#0F131F]' : 'bg-white'}`} 
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="p-4 bg-[#f3f4f7] border-t border-[#0F131F]/10 flex items-center justify-between text-xs text-black/55 px-6">
+          <div className="flex items-center gap-1.5">
+            <Clock size={13} className="text-[#896d51]" />
+            <span>Pintu masuk dibuka 30 menit sebelum check-in</span>
+          </div>
+          <button 
+            onClick={() => window.print()}
+            className="text-[#896d51] hover:text-[#0F131F] font-semibold transition-colors cursor-pointer flex items-center gap-1"
+          >
+            Cetak Tiket
+          </button>
+        </div>
+
+      </div>
+    </div>
   );
 }
