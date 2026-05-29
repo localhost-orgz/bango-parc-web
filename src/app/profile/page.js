@@ -361,19 +361,19 @@ export default function ProfilePage() {
                         {res.status === "Dikonfirmasi" || res.status === "Selesai" ? (
                           <button
                             onClick={() => setActiveTicket(res)}
-                            className="flex items-center gap-1.5 text-[11px] font-semibold text-[#15803D] hover:text-[#0F131F] transition-colors uppercase tracking-wider mt-1 group cursor-pointer"
+                            className="flex items-center gap-1.5 px-4 py-2.5 border border-[#15803D] text-[#15803D] hover:bg-[#15803D] hover:text-white transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded"
                           >
                             Lihat Tiket
-                            <Ticket size={12} className="group-hover:scale-105 transition-transform" />
+                            <Ticket size={12} className="group-hover:scale-110 transition-transform" />
                           </button>
                         ) : (
-                          <Link 
-                            href="/paket" 
-                            className="flex items-center gap-1 text-[11px] font-semibold text-[#896d51] hover:text-[#0F131F] transition-colors uppercase tracking-wider mt-1 group"
+                          <button 
+                            onClick={() => router.push("/paket")}
+                            className="flex items-center gap-1.5 px-4 py-2.5 border border-[#896d51] text-[#896d51] hover:bg-[#896d51] hover:text-white transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded"
                           >
                             Detail Acara
                             <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                          </Link>
+                          </button>
                         )}
                       </div>
                     </div>
