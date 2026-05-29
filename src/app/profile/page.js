@@ -334,6 +334,14 @@ export default function ProfilePage() {
                             Lihat Tiket
                             <Ticket size={12} className="group-hover:scale-110 transition-transform" />
                           </button>
+                        ) : res.status === "Menunggu Pembayaran" ? (
+                          <button 
+                            onClick={() => router.push("/payment")}
+                            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#896d51] text-white hover:bg-[#0F131F] transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded border border-[#896d51] hover:border-[#0F131F]"
+                          >
+                            Bayar Sekarang
+                            <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                          </button>
                         ) : (
                           <button 
                             onClick={() => router.push("/paket")}
