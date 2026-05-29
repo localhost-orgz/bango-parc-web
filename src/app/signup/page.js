@@ -15,18 +15,23 @@ export default function SignupPage() {
     email: "",
     whatsappNumber: "",
     password: "",
+    passwordConfirmation: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+
+  const passwordsMatch = formData.password === formData.passwordConfirmation;
+  const showPasswordError = formData.passwordConfirmation.length > 0 && !passwordsMatch;
 
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
         router.push("/login");
-      }, 3000);
+      }, 1000); // Quick 1-second transition to login
       return () => clearTimeout(timer);
     }
   }, [success, router]);
@@ -41,6 +46,11 @@ export default function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!passwordsMatch) {
+      setError("Konfirmasi kata sandi tidak cocok.");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setSuccess(false);
@@ -231,10 +241,51 @@ export default function SignupPage() {
               </div>
             </div>
 
+            {/* Password Confirmation Field */}
+            <div className="flex flex-col gap-1.5 relative">
+              <label
+                htmlFor="passwordConfirmation"
+                className="text-xs font-semibold text-[#0F131F]/60 tracking-wide uppercase flex items-center gap-1.5"
+              >
+                <Lock size={12} />
+                Konfirmasi Kata Sandi
+              </label>
+              <div className="relative w-full">
+                <input
+                  id="passwordConfirmation"
+                  name="passwordConfirmation"
+                  type={showPasswordConfirmation ? "text" : "password"}
+                  required
+                  disabled={isLoading || success}
+                  value={formData.passwordConfirmation}
+                  onChange={handleChange}
+                  placeholder="Masukkan ulang kata sandi"
+                  className={`w-full h-11 border-b-2 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none transition-colors px-1 pr-10 disabled:opacity-55 ${
+                    showPasswordError 
+                      ? "border-[#EA4335] focus:border-[#EA4335]" 
+                      : "border-[#0F131F]/20 focus:border-[#0F131F]"
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                  disabled={isLoading || success}
+                  className="absolute right-2 top-3 text-[#0F131F]/40 hover:text-[#0F131F] transition-colors cursor-pointer disabled:opacity-55"
+                >
+                  {showPasswordConfirmation ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              {showPasswordError && (
+                <span className="text-[11px] text-[#EA4335] mt-1 font-semibold flex items-center gap-1">
+                  Konfirmasi kata sandi tidak cocok.
+                </span>
+              )}
+            </div>
+
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading || success}
+              disabled={isLoading || success || showPasswordError}
               className="w-full h-13 mt-4 bg-[#0F131F] text-white hover:bg-[#896d51] transition-all duration-300 flex items-center justify-center font-semibold cursor-pointer gap-3 text-sm disabled:bg-black/20 disabled:text-black/40 disabled:cursor-not-allowed"
             >
               {isLoading ? "Mendaftar..." : "Daftar Sekarang"}
@@ -257,7 +308,7 @@ export default function SignupPage() {
                 Registrasi Berhasil!
               </div>
               <p className="text-black/60 leading-relaxed">
-                Akun Anda telah berhasil didaftarkan. Halaman akan dialihkan ke formulir masuk (login) dalam beberapa detik...
+                Akun Anda telah didaftarkan. Mengalihkan Anda ke halaman masuk (login)...
               </p>
             </div>
           )}
