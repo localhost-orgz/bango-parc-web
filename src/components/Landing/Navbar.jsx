@@ -3,11 +3,28 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("bango_parc_token");
+    const profile = localStorage.getItem("bango_parc_user_profile");
+    if (token) {
+      setIsLoggedIn(true);
+      if (profile) {
+        try {
+          setUserProfile(JSON.parse(profile));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -96,17 +113,34 @@ function Navbar() {
         </ul>
 
         {/* Desktop Button */}
-        <Link href={"/login"} className="hidden md:flex items-center">
-          <button
-            className={`px-5 py-2.5 border text-sm tracking-wide transition-all duration-300 ${
-              scrolled
-                ? "bg-black text-white border-black hover:bg-neutral-800"
-                : "bg-white/10 backdrop-blur-md text-white border-white/40 hover:bg-white hover:text-black"
-            }`}
-          >
-            <span className="font-crimson-pro">Login</span>
-          </button>
-        </Link>
+        {isLoggedIn ? (
+          <Link href={"/profile"} className="hidden md:flex items-center">
+            <button
+              className={`px-5 py-2.5 border text-sm tracking-wide transition-all duration-300 flex items-center gap-2 ${
+                scrolled
+                  ? "bg-black text-white border-black hover:bg-neutral-800"
+                  : "bg-white/10 backdrop-blur-md text-white border-white/40 hover:bg-white hover:text-black"
+              }`}
+            >
+              <User size={14} />
+              <span className="font-crimson-pro">
+                {userProfile?.fullName ? userProfile.fullName.split(" ")[0] : "Profil"}
+              </span>
+            </button>
+          </Link>
+        ) : (
+          <Link href={"/login"} className="hidden md:flex items-center">
+            <button
+              className={`px-5 py-2.5 border text-sm tracking-wide transition-all duration-300 ${
+                scrolled
+                  ? "bg-black text-white border-black hover:bg-neutral-800"
+                  : "bg-white/10 backdrop-blur-md text-white border-white/40 hover:bg-white hover:text-black"
+              }`}
+            >
+              <span className="font-crimson-pro">Login</span>
+            </button>
+          </Link>
+        )}
 
         {/* Mobile Toggle */}
         <button
@@ -163,12 +197,24 @@ function Navbar() {
               Galeri
             </Link>
 
-            <Link
-              href={"/login"}
-              className="mt-4 border border-black px-6 py-3 text-sm tracking-[0.2em] uppercase hover:bg-black hover:text-white transition-all duration-300"
-            >
-              Login
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href={"/profile"}
+                onClick={() => setOpen(false)}
+                className="mt-4 border border-black px-6 py-3 text-sm tracking-[0.2em] uppercase hover:bg-black hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <User size={16} />
+                <span>{userProfile?.fullName ? userProfile.fullName.split(" ")[0] : "Profil"}</span>
+              </Link>
+            ) : (
+              <Link
+                href={"/login"}
+                onClick={() => setOpen(false)}
+                className="mt-4 border border-black px-6 py-3 text-sm tracking-[0.2em] uppercase hover:bg-black hover:text-white transition-all duration-300"
+              >
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </nav>

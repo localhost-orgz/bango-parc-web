@@ -12,12 +12,15 @@ import {
   EyeOff, 
   CheckCircle2, 
   Clock, 
-  ExternalLink 
+  ExternalLink,
+  LogOut
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("account"); // "account" or "reservations"
   
   // Profile state initialized with mock default user data
@@ -66,6 +69,12 @@ export default function ProfilePage() {
       // Hide success message after 3 seconds
       setTimeout(() => setSaveSuccess(false), 3000);
     }, 800);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("bango_parc_token");
+    localStorage.removeItem("bango_parc_user_profile");
+    router.push("/login");
   };
 
   // Premium mock reservations matching Bango Parc packaging style
@@ -168,6 +177,14 @@ export default function ProfilePage() {
               >
                 <Calendar size={16} className={activeTab === "reservations" ? "text-[#896d51]" : "text-black/40"} />
                 Reservasi Saya
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="flex-1 lg:flex-none flex items-center justify-center lg:justify-start gap-3 px-4 py-3 text-sm font-semibold transition-all duration-300 cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-700 lg:mt-4 border-t lg:border-t-0 border-[#0F131F]/10 pt-3 lg:pt-3"
+              >
+                <LogOut size={16} className="text-red-500" />
+                Keluar
               </button>
             </div>
           </div>
