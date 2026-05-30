@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   CreditCard,
   Image as ImageIcon,
@@ -17,12 +17,14 @@ import {
   ArrowRight,
   Download,
   Building2,
+  Loader2,
 } from "lucide-react";
 import TypeBadge from "@/components/admin/verification/TypeBadge";
 import PayTypeBadge from "@/components/admin/verification/PayTypeBadge";
 import StatusBadge from "@/components/admin/verification/StatusBadge";
 import DetailPanel from "@/components/admin/verification/DetailPanel";
 import SortHeader from "@/components/admin/verification/SortHeader";
+import axiosInstance from "@/lib/axios";
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
@@ -157,17 +159,144 @@ const payments = [
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
+// ─── Format Helpers ──────────────────────────────────────────────────────────
+
+const formatSubmittedAt = (dateStr) => {
+  if (!dateStr) return "-";
+  try {
+    const date = new Date(dateStr);
+    const datePart = date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const pad = (n) => n.toString().padStart(2, "0");
+    const timePart = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    return `${datePart}, ${timePart}`;
+  } catch {
+    return dateStr;
+  }
+};
+
+const mapApiPaymentToUi = (apiItem) => {
+  const orderer = {
+    name: apiItem.reservation?.customer?.fullName || apiItem.customer?.fullName || apiItem.orderer?.name || "Guest",
+    email: apiItem.reservation?.customer?.email || apiItem.customer?.email || apiItem.orderer?.email || "-",
+    phone: apiItem.reservation?.customer?.whatsappNumber || apiItem.customer?.whatsappNumber || apiItem.orderer?.phone || "-",
+    avatar: (apiItem.reservation?.customer?.fullName || apiItem.customer?.fullName || apiItem.orderer?.name || "G")[0].toUpperCase()
+  };
+
+  const areas = apiItem.reservation?.areaReservations?.map(ar => ar.area?.name) || [];
+  const areaName = areas.length > 0 ? areas.join(", ") : (apiItem.area || "Semi-Indoor & Outdoor");
+
+  const reservationType = apiItem.reservation?.reservationType?.name || apiItem.type || "Reguler";
+
+  const startDt = apiItem.reservation?.startDateTime || apiItem.startDateTime;
+  const endDt = apiItem.reservation?.endDateTime || apiItem.endDateTime;
+  
+  let formattedDate = apiItem.date || "-";
+  let formattedTime = apiItem.time || "-";
+  let duration = apiItem.duration || 0;
+
+  if (startDt) {
+    try {
+      const dateObj = new Date(startDt);
+      formattedDate = dateObj.toLocaleDateString("id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+      if (endDt) {
+        const endDateObj = new Date(endDt);
+        const pad = (n) => n.toString().padStart(2, "0");
+        const sh = pad(dateObj.getHours());
+        const sm = pad(dateObj.getMinutes());
+        const eh = pad(endDateObj.getHours());
+        const em = pad(endDateObj.getMinutes());
+        formattedTime = `${sh}:${sm} – ${eh}:${em}`;
+        
+        duration = Math.round((endDateObj - dateObj) / (1000 * 60 * 60));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  let payType = apiItem.paymentType || "DP";
+  if (payType === "FULL" || payType === "Lunas" || payType === "full") {
+    payType = "Pelunasan";
+  } else if (payType === "DP" || payType === "dp" || payType === "PARTIAL") {
+    payType = "DP";
+  }
+
+  let status = "Pending";
+  const rawStatus = (apiItem.status || "PENDING").toUpperCase();
+  if (rawStatus === "APPROVED" || rawStatus === "VERIFIED") {
+    status = "Approved";
+  } else if (rawStatus === "REJECTED" || rawStatus === "DENIED" || rawStatus === "TOLAK") {
+    status = "Rejected";
+  }
+
+  return {
+    id: apiItem.bookingCode || apiItem.reservation?.bookingCode || apiItem.id?.toString() || "B-2026-000",
+    apiId: apiItem.id,
+    orderer,
+    area: areaName,
+    type: reservationType,
+    date: formattedDate,
+    time: formattedTime,
+    duration,
+    paymentAmount: Number(apiItem.amount || apiItem.paymentAmount || apiItem.reservation?.paidAmount || 0),
+    paymentType: payType,
+    totalAmount: Number(apiItem.totalAmount || apiItem.reservation?.totalPrice || 0),
+    status,
+    submittedAt: apiItem.createdAt ? formatSubmittedAt(apiItem.createdAt) : (apiItem.submittedAt || "-"),
+    evidenceUrl: apiItem.evidenceUrl || apiItem.proofImageUrl || apiItem.imageUrl || "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&auto=format&fit=crop"
+  };
+};
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
+
 export default function PaymentVerificationPage() {
-  const [activeFilter, setActiveFilter] = useState("Semua");
+  const [activeFilter, setActiveFilter] = useState("Pending");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("Semua Tipe");
   const [payTypeFilter, setPayTypeFilter] = useState("Semua Pembayaran");
   const [sortField, setSortField] = useState("submittedAt");
   const [sortDir, setSortDir] = useState("desc");
-  const [selectedId, setSelectedId] = useState("B-2026-001");
-  const [data, setData] = useState(payments);
+  const [selectedId, setSelectedId] = useState("");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [typeOpen, setTypeOpen] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/payment");
+        const apiData = res.data?.result || res.data?.data || [];
+        if (apiData.length > 0) {
+          const mapped = apiData.map(mapApiPaymentToUi);
+          setData(mapped);
+          setSelectedId(mapped[0]?.id || "");
+        } else {
+          setData(payments);
+          setSelectedId(payments[0]?.id || "");
+        }
+        setError(null);
+      } catch (err) {
+        console.error("Gagal mengambil data pembayaran:", err);
+        setData(payments);
+        setSelectedId(payments[0]?.id || "");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPayments();
+  }, []);
 
   const statusFilters = ["Semua", "Pending", "Approved", "Rejected"];
   const typeOptions = ["Semua Tipe", "Reguler", "Wedding"];
@@ -231,15 +360,36 @@ export default function PaymentVerificationPage() {
 
   const selectedItem = data.find((p) => p.id === selectedId) || null;
 
-  const handleApprove = (id) => {
+  const handleApprove = async (id) => {
+    const item = data.find(p => p.id === id);
+    const targetId = item?.apiId || id;
+    
+    // Optimistic/local UI update
     setData((prev) =>
       prev.map((p) => (p.id === id ? { ...p, status: "Approved" } : p)),
     );
+
+    try {
+      await axiosInstance.put(`https://bango-parc-service.vercel.app/api/payment/${targetId}`, { status: "APPROVED" });
+    } catch (err) {
+      console.error("Gagal memperbarui status di server:", err);
+    }
   };
-  const handleReject = (id) => {
+
+  const handleReject = async (id) => {
+    const item = data.find(p => p.id === id);
+    const targetId = item?.apiId || id;
+    
+    // Optimistic/local UI update
     setData((prev) =>
       prev.map((p) => (p.id === id ? { ...p, status: "Rejected" } : p)),
     );
+
+    try {
+      await axiosInstance.put(`https://bango-parc-service.vercel.app/api/payment/${targetId}`, { status: "REJECTED" });
+    } catch (err) {
+      console.error("Gagal memperbarui status di server:", err);
+    }
   };
 
   const pendingCount = data.filter((p) => p.status === "Pending").length;
@@ -428,7 +578,19 @@ export default function PaymentVerificationPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.length === 0 && (
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="text-center py-16 text-sm text-[#0F131F]/50"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-[#896d51]" />
+                        <span>Memuat data verifikasi...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filtered.length === 0 ? (
                   <tr>
                     <td
                       colSpan={5}
@@ -437,73 +599,74 @@ export default function PaymentVerificationPage() {
                       Tidak ada data yang cocok
                     </td>
                   </tr>
-                )}
-                {filtered.map((p) => {
-                  const isSelected = selectedId === p.id;
-                  return (
-                    <tr
-                      key={p.id}
-                      onClick={() => setSelectedId(p.id)}
-                      className={`border-b border-[#0F131F]/5 cursor-pointer transition-colors last:border-0 ${
-                        isSelected
-                          ? "bg-[#896d51]/6 border-l-2 border-l-[#896d51]"
-                          : "hover:bg-[#f9f8f6] border-l-2 border-l-transparent"
-                      }`}
-                    >
-                      {/* Order Code */}
-                      <td className="px-4 py-3.5">
-                        <p className="font-mono text-xs font-semibold text-[#0F131F]">
-                          {p.id}
-                        </p>
-                        <p className="text-[10px] text-black/35 mt-0.5">
-                          {p.submittedAt}
-                        </p>
-                      </td>
+                ) : (
+                  filtered.map((p) => {
+                    const isSelected = selectedId === p.id;
+                    return (
+                      <tr
+                        key={p.id}
+                        onClick={() => setSelectedId(p.id)}
+                        className={`border-b border-[#0F131F]/5 cursor-pointer transition-colors last:border-0 ${
+                          isSelected
+                            ? "bg-[#896d51]/6 border-l-2 border-l-[#896d51]"
+                            : "hover:bg-[#f9f8f6] border-l-2 border-l-transparent"
+                        }`}
+                      >
+                        {/* Order Code */}
+                        <td className="px-4 py-3.5">
+                          <p className="font-mono text-xs font-semibold text-[#0F131F]">
+                            {p.id}
+                          </p>
+                          <p className="text-[10px] text-black/35 mt-0.5">
+                            {p.submittedAt}
+                          </p>
+                        </td>
 
-                      {/* Orderer */}
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 bg-[#0F131F] flex items-center justify-center shrink-0">
-                            <span className="text-white text-[10px] font-bold">
-                              {p.orderer.avatar}
+                        {/* Orderer */}
+                        <td className="px-4 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 bg-[#0F131F] flex items-center justify-center shrink-0">
+                              <span className="text-white text-[10px] font-bold">
+                                {p.orderer.avatar}
+                              </span>
+                            </div>
+                            <p className="text-sm font-medium text-[#0F131F]">
+                              {p.orderer.name}
+                            </p>
+                          </div>
+                        </td>
+
+                        {/* Detail */}
+                        <td className="px-4 py-3.5">
+                          <p className="text-sm text-[#0F131F] font-medium">
+                            {p.area}
+                          </p>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <TypeBadge type={p.type} />
+                            <span className="text-[10px] text-black/35">
+                              {p.date.split(",")[0]}
                             </span>
                           </div>
-                          <p className="text-sm font-medium text-[#0F131F]">
-                            {p.orderer.name}
+                        </td>
+
+                        {/* Payment */}
+                        <td className="px-4 py-3.5">
+                          <p className="text-sm font-bold text-[#0F131F]">
+                            Rp{p.paymentAmount.toLocaleString("id-ID")}
                           </p>
-                        </div>
-                      </td>
+                          <div className="mt-1">
+                            <PayTypeBadge type={p.paymentType} />
+                          </div>
+                        </td>
 
-                      {/* Detail */}
-                      <td className="px-4 py-3.5">
-                        <p className="text-sm text-[#0F131F] font-medium">
-                          {p.area}
-                        </p>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <TypeBadge type={p.type} />
-                          <span className="text-[10px] text-black/35">
-                            {p.date.split(",")[0]}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Payment */}
-                      <td className="px-4 py-3.5">
-                        <p className="text-sm font-bold text-[#0F131F]">
-                          Rp{p.paymentAmount.toLocaleString("id-ID")}
-                        </p>
-                        <div className="mt-1">
-                          <PayTypeBadge type={p.paymentType} />
-                        </div>
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-4 py-3.5">
-                        <StatusBadge status={p.status} />
-                      </td>
-                    </tr>
-                  );
-                })}
+                        {/* Status */}
+                        <td className="px-4 py-3.5">
+                          <StatusBadge status={p.status} />
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
