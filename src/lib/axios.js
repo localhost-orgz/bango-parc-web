@@ -11,7 +11,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("bango_parc_token") || localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,6 +30,7 @@ axiosInstance.interceptors.response.use(
 
       if (status === 401) {
         console.error("Unauthorized!");
+        localStorage.removeItem("bango_parc_token");
         localStorage.removeItem("token");
       }
 
