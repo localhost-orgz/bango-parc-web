@@ -18,6 +18,7 @@ import {
   Cinzel_Decorative,
 } from "next/font/google";
 import "./globals.css";
+import "lenis/dist/lenis.css";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 

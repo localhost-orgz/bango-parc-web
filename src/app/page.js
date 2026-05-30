@@ -9,34 +9,37 @@ import AreasSection from "@/components/Landing/AreasSection";
 import AboutSection from "@/components/Landing/AboutSection";
 import OccasionSection from "@/components/Landing/OccasionSection";
 import Image from "next/image";
+import LenisProvider from "@/components/Landing/LenisProvider";
 
 export default function Home() {
   return (
-    <main className="min-h-screen relative w-full overflow-x-hidden">
-      {/* hero section */}
-      <section className="w-full h-screen relative flex justify-center items-center">
-        <Image
-          src="/hero.jpg"
-          alt="Hero Background"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-[#0F131F]/50" />
+    <LenisProvider>
+      <main className="min-h-screen relative w-full overflow-x-hidden">
+        {/* hero section */}
+        <section className="w-full h-screen relative flex justify-center items-center">
+          <Image
+            src="/hero.jpg"
+            alt="Hero Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-[#0F131F]/50" />
 
-        {/* konten */}
-        <Navbar />
-        <HeroContent />
-      </section>
-      <AboutSection />
-      <AreasSection />
-      <TestimonialsSection />
-      <OccasionSection />
-      <GallerySection />
-      <FaqSection />
-      <CtaSection />
-      <FindUsSection />
-    </main>
+          {/* konten */}
+          <Navbar />
+          <HeroContent />
+        </section>
+        <AboutSection />
+        <AreasSection />
+        <TestimonialsSection />
+        <OccasionSection />
+        <GallerySection />
+        <FaqSection />
+        <CtaSection />
+        <FindUsSection />
+      </main>
+    </LenisProvider>
   );
 }
