@@ -55,70 +55,89 @@ export default function AdminAreaPage() {
   };
 
   const columns = [
-    { header: "Name", key: "name" },
-    { header: "Description", key: "description" },
     {
-      header: "Facility Count",
-      key: "facilityCount",
+      header: "Name",
+      key: "name",
       render: (area) => (
-        <div className="flex flex-wrap gap-1">
-          {area.areaFacilities &&
-            area.areaFacilities.map((facility) => (
-              <span
-                key={facility.id || facility.facility.name}
-                className="inline-block rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700"
-              >
-                {facility.facility.name}
-              </span>
-            ))}
-        </div>
+        <span className="font-semibold text-[#0F131F] text-sm">
+          {area.name}
+        </span>
       ),
     },
     {
-      header: "Area Prices",
-      key: "areaPrices",
+      header: "Description",
+      key: "description",
       render: (area) => (
-        <div className="flex flex-col gap-1">
-          {area.areaPrices && area.areaPrices.length > 0 ? (
-            area.areaPrices.map((ap) => (
-              <div
-                key={ap.reservationTypeId}
-                className="flex items-center justify-between rounded bg-gray-50 px-2 py-1 text-xs border"
+        <span className="text-black/60 text-sm max-w-xs block truncate" title={area.description}>
+          {area.description}
+        </span>
+      ),
+    },
+    {
+      header: "Fasilitas",
+      key: "facilityCount",
+      render: (area) => (
+        <div className="flex flex-wrap gap-1.5">
+          {area.areaFacilities && area.areaFacilities.length > 0 ? (
+            area.areaFacilities.map((facility) => (
+              <span
+                key={facility.id || facility.facility.name}
+                className="inline-flex items-center px-2 py-0.5 border border-[#0F131F]/15 text-[#0F131F]/60 bg-[#0F131F]/3 text-[10px] font-bold uppercase tracking-wide"
               >
-                <span className="font-semibold text-gray-700">
-                  {ap.reservationType?.name || "-"}
-                </span>
-                <span className="font-mono text-[13px] text-primary">
-                  Rp{ap.price?.toLocaleString("id-ID") ?? 0}/
-                  {ap.reservationType.durationIntervalHour} Jam
-                </span>
-              </div>
+                {facility.facility.name}
+              </span>
             ))
           ) : (
-            <span className="italic text-gray-400">Tidak ada harga area</span>
+            <span className="text-black/30 italic text-xs">—</span>
           )}
         </div>
       ),
     },
     {
-      header: "Action",
+      header: "Harga Area",
+      key: "areaPrices",
+      render: (area) => (
+        <div className="flex flex-col gap-1 max-w-[240px]">
+          {area.areaPrices && area.areaPrices.length > 0 ? (
+            area.areaPrices.map((ap) => (
+              <div
+                key={ap.reservationTypeId}
+                className="flex items-center justify-between bg-[#0F131F]/2 border border-[#0F131F]/10 px-2 py-1 text-xs gap-3"
+              >
+                <span className="font-semibold text-[#0F131F]/70">
+                  {ap.reservationType?.name || "-"}
+                </span>
+                <span className="font-mono text-[11px] font-bold text-[#896d51]">
+                  Rp{ap.price?.toLocaleString("id-ID") ?? 0}/
+                  {ap.reservationType?.durationIntervalHour} Jam
+                </span>
+              </div>
+            ))
+          ) : (
+            <span className="italic text-black/30 text-xs">Tidak ada harga area</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      header: "Aksi",
       key: "action",
       render: (area) => (
-        <div className="flex gap-1">
-          <Button
-            size="sm"
-            variant="outline"
+        <div className="flex gap-1.5">
+          <button
             onClick={() => handleEditClick(area)}
+            className="flex items-center justify-center w-8 h-8 border border-[#0F131F]/15 text-[#0F131F]/60 hover:border-[#0F131F] hover:text-[#0F131F] bg-white transition-colors"
+            title="Edit"
           >
-            <Pencil className="w-4 h-4" />
-          </Button>
-          <Button
-            size="sm"
-            variant="destructive"
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+          <button
             onClick={() => handleDelete(area.id, area.name)}
+            className="flex items-center justify-center w-8 h-8 border border-red-200 text-red-600 hover:border-red-600 hover:bg-red-50 bg-white transition-colors"
+            title="Hapus"
           >
-            <Trash className="w-4 h-4" />
-          </Button>
+            <Trash className="w-3.5 h-3.5" />
+          </button>
         </div>
       ),
     },

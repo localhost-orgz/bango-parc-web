@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import IconPicker from "@/components/ui/IconPicker";
 import {
   Dialog,
   DialogContent,
@@ -100,16 +101,10 @@ export default function FacilityEditModal({
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Icon (HTML)</label>
-            <input
-              type="text"
-              placeholder="Contoh: &lt;i class='example'&gt;&lt;/i&gt;"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            <label className="text-sm font-medium">Icon</label>
+            <IconPicker
               value={formData.icon}
-              onChange={(e) =>
-                setFormData({ ...formData, icon: e.target.value })
-              }
-              required
+              onChange={(newIcon) => setFormData((prev) => ({ ...prev, icon: newIcon }))}
             />
           </div>
           <div className="flex flex-col gap-2">
