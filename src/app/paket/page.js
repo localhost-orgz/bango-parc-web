@@ -1,9 +1,10 @@
 "use client";
 import Navbar from "@/components/Landing/Navbar";
 import { reguler_packages, wedding_packages } from "@/constants/package";
-import { ArrowRight, MoveRight, Phone, Calendar, Heart } from "lucide-react";
+import { ArrowRight, MoveRight, Phone, Calendar, Heart, Loader2 } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "@/lib/axios";
 
 // ─── Type Toggle ──────────────────────────────────────────────────────────────
 function TypeToggle({ isWedding, setIsWedding }) {
@@ -83,7 +84,7 @@ function RegulerCard({ venue }) {
         {/* Price */}
         <div className="flex items-end gap-2 flex-wrap">
           <span className="text-2xl font-semibold text-[#0F131F]">
-            {venue.price}
+            {venue.price || "Rp0"}
           </span>
           {venue.priceOri && (
             <span className="line-through text-sm mb-0.5 text-black/30">
@@ -99,21 +100,15 @@ function RegulerCard({ venue }) {
 
         {/* Stats */}
         <div className="w-full mt-5 grid grid-cols-2 gap-3">
-          {venue.stats.map(({ icon: Icon, label, value }) => (
-            <div key={label} className="flex items-center gap-2">
-              <Icon
-                size={14}
-                className="text-[#896d51] shrink-0"
-                strokeWidth={1.7}
+          {venue.stats?.map((stat) => (
+            <div key={stat.id || stat.name} className="flex items-center gap-2 text-[#0F131F]/80">
+              <span
+                className="text-[#896d51] shrink-0 w-3.5 h-3.5 flex items-center justify-center [&>svg]:w-3.5 [&>svg]:h-3.5"
+                dangerouslySetInnerHTML={{ __html: stat.icon }}
               />
-              <div className="flex flex-col">
-                <span className="text-[10px] text-black/40 uppercase tracking-wide leading-none">
-                  {label}
-                </span>
-                <span className="text-xs font-medium text-[#0F131F] mt-0.5">
-                  {value}
-                </span>
-              </div>
+              <span className="text-xs font-medium leading-none">
+                {stat.value && stat.value !== "-" ? stat.value : stat.name}
+              </span>
             </div>
           ))}
         </div>
@@ -152,40 +147,34 @@ function WeddingCard({ pkg }) {
         </div>
       </div>
       <div className="flex flex-col items-start p-5 flex-1">
-        <div className="flex flex-col gap-1 mb-4">
-          <div className="flex items-end gap-1.5 flex-wrap">
-            <span className="text-lg font-semibold text-[#0F131F]">
-              {pkg.three_hours_disc}
+        {/* Price */}
+        <div className="flex items-end gap-2 flex-wrap">
+          <span className="text-2xl font-semibold text-[#0F131F]">
+            {pkg.price || "Rp0"}
+          </span>
+          {pkg.priceOri && (
+            <span className="line-through text-sm mb-0.5 text-black/30">
+              {pkg.priceOri}
             </span>
-            {pkg.current_three_hours && (
-              <span className="line-through text-xs mb-0.5 text-black/30">
-                {pkg.current_three_hours}
-              </span>
-            )}
-            <span className="text-xs mb-0.5 text-black/50">/ 3 jam</span>
-          </div>
-          <div className="flex items-end gap-1.5 flex-wrap">
-            <span className="text-lg font-semibold text-[#0F131F]">
-              {pkg.five_hours_disc}
-            </span>
-            {pkg.current_five_hours && (
-              <span className="line-through text-xs mb-0.5 text-black/30">
-                {pkg.current_five_hours}
-              </span>
-            )}
-            <span className="text-xs mb-0.5 text-black/50">/ 5 jam</span>
-          </div>
+          )}
+          <span className="text-sm mb-0.5 text-black/50">/ 5 jam</span>
         </div>
 
-        <div className="flex flex-col gap-1.5 w-full">
-          {pkg.features.map(({ id, icon: Icon, label }) => (
-            <div key={id} className="flex items-center gap-2">
-              <Icon
-                size={13}
-                className="text-[#896d51] shrink-0"
-                strokeWidth={1.7}
+        <p className="text-sm mt-3 text-black/55 leading-relaxed">
+          {pkg.desc}
+        </p>
+
+        {/* Stats */}
+        <div className="w-full mt-5 grid grid-cols-2 gap-3">
+          {pkg.stats?.map((stat) => (
+            <div key={stat.id || stat.name} className="flex items-center gap-2 text-[#0F131F]/80">
+              <span
+                className="text-[#896d51] shrink-0 w-3.5 h-3.5 flex items-center justify-center [&>svg]:w-3.5 [&>svg]:h-3.5"
+                dangerouslySetInnerHTML={{ __html: stat.icon }}
               />
-              <span className="text-xs text-black/60">{label}</span>
+              <span className="text-xs font-medium leading-none">
+                {stat.value && stat.value !== "-" ? stat.value : stat.name}
+              </span>
             </div>
           ))}
         </div>
@@ -208,8 +197,87 @@ function WeddingCard({ pkg }) {
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
+const formatRupiah = (amount) => {
+  if (amount === null || amount === undefined || amount === 0) return null;
+  return "Rp" + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+const getAreaImage = (name) => {
+  const lowercaseName = (name || "").toLowerCase();
+  if (lowercaseName.includes("depan")) return "/depan.jpg";
+  if (lowercaseName.includes("tengah")) return "/tengah.jpg";
+  if (lowercaseName.includes("belakang")) return "/belakang.jpg";
+  return "/depan.jpg";
+};
+
 function page() {
   const [isWedding, setIsWedding] = useState(false);
+  const [areas, setAreas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAreas = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/area");
+        setAreas(res.data.data || []);
+      } catch (err) {
+        console.error("Gagal mengambil data area:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAreas();
+  }, []);
+
+  const reguler_cards_data = areas.map((area) => {
+    const priceObj = area.areaPrices?.find(
+      (ap) => ap.reservationType?.name?.toLowerCase() === "reguler"
+    );
+    const price = Number(priceObj?.price) || 0;
+    const stats = area.areaFacilities
+      ?.map((af) => af.facility)
+      ?.filter((f) => f && f.isDisplay) || [];
+
+    return {
+      id: area.id,
+      name: area.name,
+      img: getAreaImage(area.name),
+      desc: area.description,
+      price: formatRupiah(price),
+      stats,
+    };
+  });
+
+  const wedding_cards_data = areas.map((area) => {
+    const priceObj = area.areaPrices?.find(
+      (ap) => ap.reservationType?.name?.toLowerCase() === "wedding"
+    );
+    const price = Number(priceObj?.price) || 0;
+    const stats = area.areaFacilities
+      ?.map((af) => af.facility)
+      ?.filter((f) => f && f.isDisplay) || [];
+
+    return {
+      id: area.id,
+      name: "Wedding " + area.name,
+      thumbnail: getAreaImage(area.name),
+      desc: area.description,
+      price: formatRupiah(price),
+      stats,
+    };
+  });
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen bg-[#f3f4f7] flex items-center justify-center">
+        <div className="flex items-center gap-2 text-black/50 text-sm">
+          <Loader2 className="w-5 h-5 animate-spin text-[#896d51]" />
+          <span>Memuat paket &amp; area...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="w-full min-h-screen bg-[#f3f4f7]">
@@ -229,9 +297,9 @@ function page() {
           </h1>
         </div>
       </header>
-
+ 
       <Navbar />
-
+ 
       {/* Toggle Section */}
       <section className="w-full flex flex-col items-center py-14 gap-3 px-4">
         <h2 className="font-crimson-text text-4xl text-[#0F131F] text-center">
@@ -244,16 +312,16 @@ function page() {
           <TypeToggle isWedding={isWedding} setIsWedding={setIsWedding} />
         </div>
       </section>
-
+ 
       {/* Cards Section */}
       <section className="section-layout grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="col-span-1 lg:col-span-10 lg:col-start-2 w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {!isWedding
-              ? reguler_packages.map((v) => (
+              ? reguler_cards_data.map((v) => (
                   <RegulerCard key={v.id} venue={v} />
                 ))
-              : wedding_packages.map((p) => <WeddingCard key={p.id} pkg={p} />)}
+              : wedding_cards_data.map((p) => <WeddingCard key={p.id} pkg={p} />)}
           </div>
         </div>
       </section>
