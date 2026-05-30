@@ -61,8 +61,34 @@ function TypeToggle({ isWedding, setIsWedding }) {
   );
 }
 
+// ─── Facility Ordering & Label Helpers ──────────────────────────────────────────
+
+const getFacilityWeight = (fac) => {
+  const name = (fac.name || "").toLowerCase();
+  const icon = (fac.icon || "").toLowerCase();
+  if (name.includes("kapasitas") || icon.includes("users")) return 1;
+  if (name.includes("listrik") || icon.includes("zap")) return 2;
+  if (name.includes("area") || icon.includes("sparkles")) return 3;
+  if (name.includes("kursi") || icon.includes("armchair")) return 4;
+  return 99;
+};
+
+const getFacilityLabel = (fac) => {
+  const name = (fac.name || "").toLowerCase();
+  const icon = (fac.icon || "").toLowerCase();
+  if (name.includes("kapasitas") || icon.includes("users")) return "Kapasitas";
+  if (name.includes("listrik") || icon.includes("zap")) return "Listrik";
+  if (name.includes("area") || icon.includes("sparkles")) return "Area";
+  if (name.includes("kursi") || icon.includes("armchair")) return "Kursi Variasi";
+  return fac.name;
+};
+
 // ─── Reguler Card ─────────────────────────────────────────────────────────────
 function RegulerCard({ venue }) {
+  const sortedStats = [...(venue.stats || [])].sort(
+    (a, b) => getFacilityWeight(a) - getFacilityWeight(b)
+  );
+
   return (
     <div className="col-span-1 w-full bg-white border border-[#0F131F]/10 flex flex-col group">
       {/* Image */}
@@ -80,7 +106,7 @@ function RegulerCard({ venue }) {
       </div>
 
       {/* Body */}
-      <div className="flex flex-col items-start p-5 flex-1">
+      <div className="flex flex-col items-start p-5 flex-1 w-full">
         {/* Price */}
         <div className="flex items-end gap-2 flex-wrap">
           <span className="text-2xl font-semibold text-[#0F131F]">
@@ -94,21 +120,26 @@ function RegulerCard({ venue }) {
           <span className="text-sm mb-0.5 text-black/50">/ 3 jam</span>
         </div>
 
-        <p className="text-sm mt-3 text-black/55 leading-relaxed">
+        <p className="text-sm mt-3 text-black/55 leading-relaxed line-clamp-2 min-h-10">
           {venue.desc}
         </p>
 
         {/* Stats */}
-        <div className="w-full mt-5 grid grid-cols-2 gap-3">
-          {venue.stats?.map((stat) => (
-            <div key={stat.id || stat.name} className="flex items-center gap-2 text-[#0F131F]/80">
+        <div className="w-full mt-6 grid grid-cols-2 gap-x-4 gap-y-5">
+          {sortedStats.map((stat) => (
+            <div key={stat.id || stat.name} className="flex items-center gap-3 text-[#0F131F]">
               <span
-                className="text-[#896d51] shrink-0 w-3.5 h-3.5 flex items-center justify-center [&>svg]:w-3.5 [&>svg]:h-3.5"
+                className="text-[#896d51] shrink-0 w-6 h-6 flex items-center justify-center [&>svg]:w-5 [&>svg]:h-5"
                 dangerouslySetInnerHTML={{ __html: stat.icon }}
               />
-              <span className="text-xs font-medium leading-none">
-                {stat.value && stat.value !== "-" ? stat.value : stat.name}
-              </span>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] text-black/45 uppercase tracking-wider font-bold leading-none">
+                  {getFacilityLabel(stat)}
+                </span>
+                <span className="text-xs font-semibold text-[#0F131F] mt-1 break-words leading-tight">
+                  {stat.value && stat.value !== "-" ? stat.value : stat.name}
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -132,6 +163,10 @@ function RegulerCard({ venue }) {
 
 // ─── Wedding Card ─────────────────────────────────────────────────────────────
 function WeddingCard({ pkg }) {
+  const sortedStats = [...(pkg.stats || [])].sort(
+    (a, b) => getFacilityWeight(a) - getFacilityWeight(b)
+  );
+
   return (
     <div className="col-span-1 w-full bg-white border border-[#0F131F]/10 flex flex-col group">
       <div className="w-full aspect-video relative bg-black overflow-hidden">
@@ -146,7 +181,7 @@ function WeddingCard({ pkg }) {
           </span>
         </div>
       </div>
-      <div className="flex flex-col items-start p-5 flex-1">
+      <div className="flex flex-col items-start p-5 flex-1 w-full">
         {/* Price */}
         <div className="flex items-end gap-2 flex-wrap">
           <span className="text-2xl font-semibold text-[#0F131F]">
@@ -160,21 +195,26 @@ function WeddingCard({ pkg }) {
           <span className="text-sm mb-0.5 text-black/50">/ 5 jam</span>
         </div>
 
-        <p className="text-sm mt-3 text-black/55 leading-relaxed">
+        <p className="text-sm mt-3 text-black/55 leading-relaxed line-clamp-2 min-h-10">
           {pkg.desc}
         </p>
 
         {/* Stats */}
-        <div className="w-full mt-5 grid grid-cols-2 gap-3">
-          {pkg.stats?.map((stat) => (
-            <div key={stat.id || stat.name} className="flex items-center gap-2 text-[#0F131F]/80">
+        <div className="w-full mt-6 grid grid-cols-2 gap-x-4 gap-y-5">
+          {sortedStats.map((stat) => (
+            <div key={stat.id || stat.name} className="flex items-center gap-3 text-[#0F131F]">
               <span
-                className="text-[#896d51] shrink-0 w-3.5 h-3.5 flex items-center justify-center [&>svg]:w-3.5 [&>svg]:h-3.5"
+                className="text-[#896d51] shrink-0 w-6 h-6 flex items-center justify-center [&>svg]:w-5 [&>svg]:h-5"
                 dangerouslySetInnerHTML={{ __html: stat.icon }}
               />
-              <span className="text-xs font-medium leading-none">
-                {stat.value && stat.value !== "-" ? stat.value : stat.name}
-              </span>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] text-black/45 uppercase tracking-wider font-bold leading-none">
+                  {getFacilityLabel(stat)}
+                </span>
+                <span className="text-xs font-semibold text-[#0F131F] mt-1 break-words leading-tight">
+                  {stat.value && stat.value !== "-" ? stat.value : stat.name}
+                </span>
+              </div>
             </div>
           ))}
         </div>
