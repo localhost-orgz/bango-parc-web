@@ -2,6 +2,7 @@
 import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Modal } from "react-aria-components";
+import Image from "next/image";
 
 function AreasContent() {
   const [activeArea, setActiveArea] = useState(null);
@@ -35,11 +36,14 @@ function AreasContent() {
         {areas_list.map((area) => (
           <div
             key={area.id}
-            className="relative lg:col-span-4 col-span-12 w-full h-auto aspect-video bg-slate-200"
+            className="relative lg:col-span-4 col-span-12 w-full h-auto aspect-video bg-slate-200 overflow-hidden"
           >
-            <div
-              style={{ backgroundImage: `url('${area.src}')` }}
-              className="absolute inset-0 top-0 left-0 bg-cover bg-center"
+            <Image
+              src={area.src}
+              alt={area.text}
+              fill
+              sizes="(max-width: 1024px) 100vw, 33vw"
+              className="object-cover"
             />
             <div className="bg-black/40 absolute inset-0 flex justify-center items-center">
               <span className="font-crimson-text text-white text-2xl">

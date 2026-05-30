@@ -4,7 +4,8 @@ import {
   Flower2, Dumbbell, Waves, Key, Shield, Sparkles, Heart, Music, MapPin, 
   Info, Star, Flame, Refrigerator, Cigarette, Volume2, VolumeX, Plug, 
   Mic, Monitor, Gamepad2, Tent, Compass, Map, Bike, Calendar, Lock,
-  Unlock, HelpCircle, Phone, Mail, Globe, Search
+  Unlock, HelpCircle, Phone, Mail, Globe, Search,
+  House, Zap, Package2, Armchair, MirrorRound, Speaker
 } from "lucide-react";
 
 const ICONS_MAP = {
@@ -12,7 +13,8 @@ const ICONS_MAP = {
   Flower2, Dumbbell, Waves, Key, Shield, Sparkles, Heart, Music, MapPin, 
   Info, Star, Flame, Refrigerator, Cigarette, Volume2, VolumeX, Plug, 
   Mic, Monitor, Gamepad2, Tent, Compass, Map, Bike, Calendar, Lock,
-  Unlock, HelpCircle, Phone, Mail, Globe
+  Unlock, HelpCircle, Phone, Mail, Globe,
+  House, Zap, Package2, Armchair, MirrorRound, Speaker
 };
 
 export function getIconNameFromSvg(svgHtml) {

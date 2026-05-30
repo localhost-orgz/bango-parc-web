@@ -1,3 +1,5 @@
+"use client";
+
 import { faq_list } from "@/constants/faq";
 import React, { useState } from "react";
 import FaqItem from "./FaqItem";
