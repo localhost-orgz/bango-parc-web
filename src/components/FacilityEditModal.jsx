@@ -25,6 +25,7 @@ export default function FacilityEditModal({
     name: "",
     icon: "",
     value: "",
+    isDisplay: true,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,6 +35,7 @@ export default function FacilityEditModal({
         name: data.name ?? "",
         icon: data.icon ?? "",
         value: data.value ?? "",
+        isDisplay: data.isDisplay ?? true,
         id: data.id,
       });
     }
@@ -42,6 +44,7 @@ export default function FacilityEditModal({
         name: "",
         icon: "",
         value: "",
+        isDisplay: true,
       });
     }
   }, [isOpen, data]);
@@ -55,13 +58,14 @@ export default function FacilityEditModal({
         name: formData.name,
         icon: formData.icon,
         value: formData.value,
+        isDisplay: formData.isDisplay,
       });
 
       toast.success("Berhasil!", {
         description: `Fasilitas "${formData.name}" telah diperbarui.`,
       });
 
-      setFormData({ name: "", icon: "", value: "" });
+      setFormData({ name: "", icon: "", value: "", isDisplay: true });
       onOpenChange(false);
       onSuccess();
     } catch (err) {
@@ -119,6 +123,21 @@ export default function FacilityEditModal({
               }
               required
             />
+          </div>
+
+          <div className="flex items-center gap-2 py-1">
+            <input
+              type="checkbox"
+              id="editIsDisplay"
+              className="w-4 h-4 cursor-pointer text-[#0F131F] border-[#0F131F]/15 rounded focus:ring-0"
+              checked={!!formData.isDisplay}
+              onChange={(e) =>
+                setFormData({ ...formData, isDisplay: e.target.checked })
+              }
+            />
+            <label htmlFor="editIsDisplay" className="text-sm font-medium cursor-pointer">
+              Tampilkan di Paket
+            </label>
           </div>
           <DialogFooter className="pt-4">
             <Button

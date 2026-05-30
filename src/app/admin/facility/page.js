@@ -8,6 +8,7 @@ import axiosInstance from "@/lib/axios";
 import { Pencil, Trash, Plus } from "lucide-react";
 import FacilityEditModal from "@/components/FacilityEditModal";
 import FacilityAddModal from "@/components/FacilityAddModal";
+import { toast } from "sonner";
 
 export default function AdminFacilityPage() {
   const [facilities, setFacilities] = useState([]);
@@ -56,6 +57,29 @@ export default function AdminFacilityPage() {
     }
   };
 
+  const handleToggleDisplay = async (facility) => {
+    try {
+      await axiosInstance.put(`/facility/${facility.id}`, {
+        name: facility.name,
+        icon: facility.icon,
+        value: facility.value,
+        isDisplay: !facility.isDisplay,
+      });
+      setFacilities((prev) =>
+        prev.map((f) =>
+          f.id === facility.id ? { ...f, isDisplay: !f.isDisplay } : f
+        )
+      );
+      toast.success("Berhasil!", {
+        description: `Tampilan fasilitas "${facility.name}" diperbarui.`,
+      });
+    } catch (err) {
+      toast.error("Gagal!", {
+        description: err.response?.data?.error || "Gagal memperbarui data.",
+      });
+    }
+  };
+
   const columns = [
     { header: "Name", key: "name" },
     {
@@ -66,6 +90,18 @@ export default function AdminFacilityPage() {
       ),
     },
     { header: "Value", key: "value" },
+    {
+      header: "Tampilkan di Paket",
+      key: "isDisplay",
+      render: (facility) => (
+        <input
+          type="checkbox"
+          checked={!!facility.isDisplay}
+          onChange={() => handleToggleDisplay(facility)}
+          className="w-4 h-4 cursor-pointer text-[#0F131F] border-[#0F131F]/15 rounded focus:ring-0"
+        />
+      ),
+    },
     {
       header: "Action",
       key: "action",

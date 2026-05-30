@@ -19,6 +19,7 @@ export default function FacilityAddModal({ isOpen, onOpenChange, onSuccess }) {
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("");
   const [value, setValue] = useState("");
+  const [isDisplay, setIsDisplay] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreate = async (e) => {
@@ -30,6 +31,7 @@ export default function FacilityAddModal({ isOpen, onOpenChange, onSuccess }) {
         name,
         icon,
         value,
+        isDisplay,
       });
 
       toast.success("Berhasil!", {
@@ -39,6 +41,7 @@ export default function FacilityAddModal({ isOpen, onOpenChange, onSuccess }) {
       setName("");
       setIcon("");
       setValue("");
+      setIsDisplay(true);
       onOpenChange(false);
       onSuccess();
     } catch (err) {
@@ -87,6 +90,19 @@ export default function FacilityAddModal({ isOpen, onOpenChange, onSuccess }) {
               onChange={(e) => setValue(e.target.value)}
               required
             />
+          </div>
+
+          <div className="flex items-center gap-2 py-1">
+            <input
+              type="checkbox"
+              id="isDisplay"
+              className="w-4 h-4 cursor-pointer text-[#0F131F] border-[#0F131F]/15 rounded focus:ring-0"
+              checked={isDisplay}
+              onChange={(e) => setIsDisplay(e.target.checked)}
+            />
+            <label htmlFor="isDisplay" className="text-sm font-medium cursor-pointer">
+              Tampilkan di Paket
+            </label>
           </div>
 
           <DialogFooter className="pt-4">
