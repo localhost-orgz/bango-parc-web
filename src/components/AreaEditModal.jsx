@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
+import { formatMoney } from "@/utils/format";
 
 export default function AreaEditModal({
   isOpen,
@@ -29,8 +30,6 @@ export default function AreaEditModal({
   const [allFacilities, setAllFacilities] = useState([]);
   const [allReservationTypes, setAllReservationTypes] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  console.log(data);
 
   useEffect(() => {
     if (isOpen && data) {
@@ -70,13 +69,6 @@ export default function AreaEditModal({
         .catch(() => setAllReservationTypes([]));
     }
   }, [isOpen]);
-
-  const handleFacilitySelect = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions).map((opt) =>
-      Number(opt.value),
-    );
-    setFacilityIds(selectedOptions);
-  };
 
   const handleAreaPriceChange = (idx, key, value) => {
     setAreaPrices((prev) =>
@@ -133,22 +125,26 @@ export default function AreaEditModal({
     }
   };
 
+  if (!isOpen) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Edit Area</DialogTitle>
-          <DialogDescription>Ubah rincian area di bawah ini.</DialogDescription>
+      <DialogContent className="sm:max-w-[500px] rounded-none border border-[#0F131F]/15 bg-white p-0 gap-0">
+        <DialogHeader className="p-6 border-b border-[#0F131F]/10">
+          <DialogTitle className="font-crimson-pro text-2xl text-[#0F131F]">Edit Area</DialogTitle>
+          <DialogDescription className="text-sm text-black/40 mt-1">
+            Ubah rincian area di bawah ini.
+          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleEdit} className="space-y-4 py-4">
+        <form onSubmit={handleEdit} className="space-y-4 p-6 overflow-y-auto max-h-[60vh]">
           {/* Input Name */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Name</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[#0F131F]/60">Name</label>
             <input
               type="text"
               placeholder="Contoh: Tengah"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex h-10 w-full border border-[#0F131F]/15 bg-white px-3 py-2 text-sm outline-none focus:border-[#0F131F]/40 transition-colors"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -157,57 +153,63 @@ export default function AreaEditModal({
 
           {/* Input Description */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Description</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[#0F131F]/60">Description</label>
             <textarea
               placeholder="Contoh: Cocok untuk ulang tahun"
-              className="flex h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex h-20 w-full border border-[#0F131F]/15 bg-white px-3 py-2 text-sm resize-none outline-none focus:border-[#0F131F]/40 transition-colors"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
             />
           </div>
 
-          {/* Facility Selector (Checkbox Version) */}
+          {/* Facility Selector */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Facilities</label>
-            <div className="flex flex-col gap-1 max-h-40 overflow-y-auto border border-input rounded-md p-2 bg-background">
-              {allFacilities.map((facility) => (
-                <label
-                  key={facility.id}
-                  className="inline-flex items-center gap-2 text-sm"
-                >
-                  <input
-                    type="checkbox"
-                    className="accent-primary"
-                    value={facility.id}
-                    checked={facilityIds.includes(facility.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFacilityIds((prev) => [...prev, facility.id]);
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[#0F131F]/60">Facilities</label>
+            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-[#0F131F]/15 p-2 bg-white">
+              {allFacilities.map((facility) => {
+                const isSelected = facilityIds.includes(facility.id);
+                return (
+                  <button
+                    key={facility.id}
+                    type="button"
+                    onClick={() => {
+                      if (isSelected) {
+                        setFacilityIds((prev) => prev.filter((id) => id !== facility.id));
                       } else {
-                        setFacilityIds((prev) =>
-                          prev.filter((id) => id !== facility.id),
-                        );
+                        setFacilityIds((prev) => [...prev, facility.id]);
                       }
                     }}
-                  />
-                  {facility.name || `Facility #${facility.id}`}
-                </label>
-              ))}
+                    className={`flex items-center gap-2.5 px-3 py-2 border transition-all text-left ${
+                      isSelected
+                        ? "border-[#0F131F] bg-[#0F131F]/5 font-semibold text-[#0F131F]"
+                        : "border-[#0F131F]/10 hover:border-[#0F131F]/20 text-black/60 bg-white"
+                    }`}
+                  >
+                    {facility.icon && (
+                      <span 
+                        className={`w-4 h-4 flex items-center justify-center shrink-0 ${isSelected ? "text-[#0F131F]" : "text-black/45"}`}
+                        dangerouslySetInnerHTML={{ __html: facility.icon }} 
+                      />
+                    )}
+                    <span className="text-xs truncate">{facility.name}</span>
+                  </button>
+                );
+              })}
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-black/40">
               Centang fasilitas yang tersedia untuk area ini.
             </div>
           </div>
 
           {/* Area Prices */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Area Prices</label>
-            <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[#0F131F]/60">Area Prices</label>
+            <div className="flex flex-col gap-3">
               {areaPrices.map((ap, idx) => (
-                <div className="flex gap-2 items-center" key={idx}>
+                <div className="flex gap-2 items-start" key={idx}>
                   <select
-                    className="w-[55%] rounded-md border border-input bg-background px-2 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    className="w-[55%] border border-[#0F131F]/15 bg-white px-2 py-2 text-sm outline-none focus:border-[#0F131F]/40 transition-colors"
                     value={ap.reservationTypeId}
                     onChange={(e) =>
                       handleAreaPriceChange(
@@ -225,20 +227,29 @@ export default function AreaEditModal({
                       </option>
                     ))}
                   </select>
-                  <input
-                    className="w-[35%] rounded-md border border-input bg-background px-2 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    type="number"
-                    min={0}
-                    placeholder="Harga (Rp)"
-                    value={ap.price}
-                    onChange={(e) =>
-                      handleAreaPriceChange(idx, "price", e.target.value)
-                    }
-                    required
-                  />
+
+                  <div className="flex flex-col w-[35%] gap-0.5">
+                    <input
+                      className="w-full border border-[#0F131F]/15 bg-white px-2 py-2 text-sm outline-none focus:border-[#0F131F]/40 transition-colors"
+                      type="number"
+                      min={0}
+                      placeholder="Harga (Rp)"
+                      value={ap.price}
+                      onChange={(e) =>
+                        handleAreaPriceChange(idx, "price", e.target.value)
+                      }
+                      required
+                    />
+                    {ap.price && !isNaN(Number(ap.price)) && (
+                      <span className="text-[10px] font-bold text-[#896d51] block text-right mt-0.5">
+                        {formatMoney(ap.price)}
+                      </span>
+                    )}
+                  </div>
+
                   <button
                     type="button"
-                    className="inline-flex items-center text-xs px-2 py-1 rounded hover:bg-red-100 text-red-500"
+                    className="inline-flex items-center justify-center text-xs w-8 h-8 hover:bg-red-50 text-red-500 border border-transparent hover:border-red-200 transition-colors"
                     onClick={() => removeAreaPrice(idx)}
                     disabled={areaPrices.length === 1}
                     title="Hapus harga ini"
@@ -248,39 +259,45 @@ export default function AreaEditModal({
                   </button>
                 </div>
               ))}
+
               <Button
                 type="button"
-                variant="secondary"
+                variant="outline"
                 size="sm"
                 onClick={addAreaPrice}
-                className="w-fit mt-1"
+                className="w-fit mt-1 border-[#0F131F]/20 text-[#0F131F]/70 hover:border-[#0F131F] hover:text-[#0F131F] bg-white rounded-none transition-colors h-8"
               >
                 <Plus className="mr-1 w-4 h-4" />
                 Tambah Area Price
               </Button>
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-black/40 mt-1">
               Tambahkan harga area per tipe reservasi
             </div>
           </div>
-
-          <DialogFooter className="pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              Batal
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Simpan Perubahan
-            </Button>
-          </DialogFooter>
         </form>
+
+        <DialogFooter className="rounded-none border-t border-[#0F131F]/10 bg-white p-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="flex items-center justify-center h-10 px-6 border border-[#0F131F]/20 text-[#0F131F]/70 hover:border-[#0F131F] hover:text-[#0F131F] bg-white text-sm font-semibold transition-colors"
+            disabled={isSubmitting}
+          >
+            Batal
+          </button>
+          <button
+            type="submit"
+            onClick={handleEdit}
+            className="flex items-center justify-center gap-2 h-10 px-6 border border-[#0F131F] bg-[#0F131F] text-white hover:bg-white hover:text-[#0F131F] text-sm font-semibold transition-colors"
+            disabled={isSubmitting}
+          >
+            {isSubmitting && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Simpan Perubahan
+          </button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

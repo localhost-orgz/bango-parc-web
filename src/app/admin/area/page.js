@@ -8,6 +8,7 @@ import axiosInstance from "@/lib/axios";
 import { Pencil, Trash, Plus } from "lucide-react";
 import AreaEditModal from "@/components/AreaEditModal";
 import AreaAddModal from "@/components/AreaAddModal";
+import { formatMoney } from "@/utils/format";
 
 export default function AdminAreaPage() {
   const [areas, setAreas] = useState([]);
@@ -108,7 +109,7 @@ export default function AdminAreaPage() {
                   {ap.reservationType?.name || "-"}
                 </span>
                 <span className="font-mono text-[11px] font-bold text-[#896d51]">
-                  Rp{ap.price?.toLocaleString("id-ID") ?? 0}/
+                  {formatMoney(ap.price ?? 0)}/
                   {ap.reservationType?.durationIntervalHour} Jam
                 </span>
               </div>
