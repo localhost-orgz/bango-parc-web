@@ -969,7 +969,7 @@ function DetailPaketContent() {
         // Real API data
         const facilities = p.areaFacilities
           ?.map((af) => af.facility)
-          ?.filter((f) => f && f.isDisplay) || [];
+          ?.filter((f) => f) || [];
 
         facilities.forEach((f) => {
           const label = getFacilityLabel(f);
