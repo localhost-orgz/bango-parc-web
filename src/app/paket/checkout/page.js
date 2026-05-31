@@ -11,6 +11,39 @@ import { reguler_packages, wedding_packages } from "@/constants/package";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 
+const FALLBACK_ADDONS = [
+  {
+    id: 1,
+    name: "Dokumentasi Tambahan (Foto & Video)",
+    price: 3500000,
+    description: "Sesi liputan foto & video sepanjang acara oleh fotografer & videografer profesional.",
+  },
+  {
+    id: 2,
+    name: "Sound System & Lighting Premium",
+    price: 5000000,
+    description: "Sistem suara konser & tata lampu panggung profesional untuk kemeriahan acara.",
+  },
+  {
+    id: 3,
+    name: "Catering Buffet Premium (per 50 pax)",
+    price: 7500000,
+    description: "Menu prasmanan mewah khas Bango Parc untuk 50 pax tamu undangan.",
+  },
+  {
+    id: 4,
+    name: "Live Band & Music Performance",
+    price: 4000000,
+    description: "Pemusik dan penyanyi profesional untuk menghibur tamu undangan sepanjang acara.",
+  },
+  {
+    id: 5,
+    name: "Dekorasi Bunga Segar (Premium Florist)",
+    price: 8000000,
+    description: "Dekorasi bunga hidup segar eksklusif di area panggung utama dan meja VIP.",
+  },
+];
+
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function formatIndonesianDate(dateStr) {
   if (!dateStr) return "";
@@ -42,6 +75,8 @@ const getAreaImage = (name) => {
 // ─── Content Component ─────────────────────────────────────────────────────────
 function CheckoutContent() {
   const [areas, setAreas] = useState([]);
+  const [addonsList, setAddonsList] = useState([]);
+  const [selectedAddonIds, setSelectedAddonIds] = useState([]);
   const [bookingSession, setBookingSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -57,19 +92,40 @@ function CheckoutContent() {
       }
     }
 
-    // 2. Fetch areas list
-    const fetchAreas = async () => {
+    // 2. Fetch areas & addons list
+    const fetchData = async () => {
       try {
-        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/area");
-        setAreas(res.data.data || []);
+        const [areasRes, addonsRes] = await Promise.allSettled([
+          axiosInstance.get("https://bango-parc-service.vercel.app/api/area"),
+          axiosInstance.get("https://bango-parc-service.vercel.app/api/addon")
+        ]);
+
+        if (areasRes.status === "fulfilled") {
+          setAreas(areasRes.value.data.data || []);
+        }
+
+        if (addonsRes.status === "fulfilled" && addonsRes.value.data?.data?.length > 0) {
+          setAddonsList(addonsRes.value.data.data);
+        } else {
+          setAddonsList(FALLBACK_ADDONS);
+        }
       } catch (err) {
-        console.error("Gagal mengambil data area:", err);
+        console.error("Gagal mengambil data checkout:", err);
+        setAddonsList(FALLBACK_ADDONS);
       } finally {
         setLoading(false);
       }
     };
-    fetchAreas();
+    fetchData();
   }, []);
+
+  const handleToggleAddon = (addonId) => {
+    setSelectedAddonIds((prev) =>
+      prev.includes(addonId)
+        ? prev.filter((id) => id !== addonId)
+        : [...prev, addonId]
+    );
+  };
 
   if (loading) {
     return (
@@ -205,6 +261,9 @@ function CheckoutContent() {
   const venueName = (type === "wedding" ? "Wedding " : "") + resolvedAreaNames.join(" & ");
   const formattedDate = formatIndonesianDate(dateStr);
 
+  const selectedAddons = addonsList.filter((a) => selectedAddonIds.includes(a.id));
+  const addonsTotalPrice = selectedAddons.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+
   const bookingData = {
     venueName: venueName || "Semi-Indoor & Outdoor",
     venueLocation: "Bango Parc, Depok",
@@ -216,8 +275,9 @@ function CheckoutContent() {
     originalPrice: totalDiscountedPrice,
     discount: 0,
     tax: 0,
-    total: totalDiscountedPrice,
+    total: totalDiscountedPrice + addonsTotalPrice,
     image: firstAreaImage,
+    selectedAddons: selectedAddons,
   };
 
   const handlePaymentProceed = async () => {
@@ -251,7 +311,9 @@ function CheckoutContent() {
       startDateTime,
       endDateTime,
       areas: areasPayload,
-      addons: [],
+      addons: selectedAddonIds.map((id) => ({
+        addonId: Number(id) || id,
+      })),
     };
 
     try {
@@ -259,7 +321,8 @@ function CheckoutContent() {
       const responseData = res.data.data || res.data;
 
       // Save order details to localStorage for /payment page display
-      const dpAmount = totalDiscountedPrice > 2000000 ? 1000000 : totalDiscountedPrice * 0.5;
+      const totalAmount = totalDiscountedPrice + addonsTotalPrice;
+      const dpAmount = totalAmount > 2000000 ? 1000000 : totalAmount * 0.5;
       const createdOrder = {
         venueName: bookingData.venueName,
         venueLocation: bookingData.venueLocation,
@@ -267,15 +330,16 @@ function CheckoutContent() {
         startTime: bookingData.startTime,
         endTime: bookingData.endTime,
         duration: bookingData.duration,
-        subtotal: totalDiscountedPrice,
+        subtotal: totalAmount,
         discount: 0,
         tax: 0,
-        total: totalDiscountedPrice,
+        total: totalAmount,
         dpAmount: dpAmount,
         orderCode: responseData.bookingCode || responseData.code || `BGP-${Date.now()}`,
         reservationId: responseData.id,
       };
       localStorage.setItem("bango_parc_payment_order", JSON.stringify(createdOrder));
+      localStorage.removeItem("bango_parc_payment_timer_start");
 
       router.push("/payment");
     } catch (err) {
@@ -290,7 +354,12 @@ function CheckoutContent() {
       <PageHeader />
       <Navbar />
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10 grid grid-cols-12 gap-6 sm:gap-8">
-        <LeftColumn data={bookingData} />
+        <LeftColumn
+          data={bookingData}
+          addonsList={addonsList}
+          selectedAddonIds={selectedAddonIds}
+          onToggleAddon={handleToggleAddon}
+        />
         <RightColumn data={bookingData} onPaymentProceed={handlePaymentProceed} />
       </section>
     </main>

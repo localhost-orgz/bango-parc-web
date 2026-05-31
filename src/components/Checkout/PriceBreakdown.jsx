@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function PriceBreakdown({ data, onPaymentProceed }) {
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
   const rentPrice = data.pricePerSession || 0;
   const dpMinimum = rentPrice > 2000000 ? 1000000 : rentPrice * 0.5;
   const dpLabel = rentPrice > 2000000 ? "DP minimum" : "DP minimum (50%)";
@@ -11,13 +11,13 @@ export default function PriceBreakdown({ data, onPaymentProceed }) {
   const handleProceed = async (e) => {
     e.preventDefault();
     if (onPaymentProceed) {
-      setSubmitting(true);
+      setLoading(true);
       try {
         await onPaymentProceed();
       } catch (err) {
-        console.error("Booking error:", err);
+        console.error(err);
       } finally {
-        setSubmitting(false);
+        setLoading(false);
       }
     }
   };
@@ -30,18 +30,53 @@ export default function PriceBreakdown({ data, onPaymentProceed }) {
       <div className="flex flex-col gap-3">
         <div className="flex justify-between text-sm text-black/55">
           <span>Sewa venue ({data.duration} jam)</span>
-          <span>Rp{rentPrice.toLocaleString("id-ID")}</span>
+          <span>Rp{data.pricePerSession.toLocaleString("id-ID")}</span>
         </div>
+        <div className="flex justify-between text-sm">
+          <span className="line-through text-black/25">Harga normal</span>
+          <span className="line-through text-black/25">
+            Rp{data.originalPrice.toLocaleString("id-ID")}
+          </span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-emerald-600">Diskon</span>
+          <span className="text-emerald-600">
+            -Rp{data.discount.toLocaleString("id-ID")}
+          </span>
+        </div>
+        <div className="flex justify-between text-sm text-black/55">
+          <span>Pajak & Biaya (10%)</span>
+          <span>Rp{data.tax.toLocaleString("id-ID")}</span>
+        </div>
+
+        {/* Selected Add-ons List */}
+        {data.selectedAddons && data.selectedAddons.length > 0 && (
+          <>
+            <div className="h-px w-full bg-[#0F131F]/10 my-1" />
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-bold text-[#0F131F]/60 uppercase tracking-widest">
+                Layanan Tambahan (Add-on)
+              </span>
+              {data.selectedAddons.map((addon) => (
+                <div key={addon.id} className="flex justify-between text-sm text-black/55 pl-2">
+                  <span>+ {addon.name}</span>
+                  <span>Rp{addon.price?.toLocaleString("id-ID")}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
         <div className="h-px w-full bg-[#0F131F]/12 my-1" />
         <div className="flex justify-between">
           <span className="font-semibold text-[#0F131F]">Total</span>
           <span className="font-semibold text-xl text-[#0F131F]">
-            Rp{rentPrice.toLocaleString("id-ID")}
+            Rp{data.total.toLocaleString("id-ID")}
           </span>
         </div>
         <div className="flex justify-between text-xs text-black/35 -mt-1">
-          <span>{dpLabel}</span>
-          <span>Rp{dpMinimum.toLocaleString("id-ID")}</span>
+          <span>DP minimum (50%)</span>
+          <span>Rp{(data.total / 2).toLocaleString("id-ID")}</span>
         </div>
       </div>
 
@@ -50,13 +85,13 @@ export default function PriceBreakdown({ data, onPaymentProceed }) {
       {onPaymentProceed ? (
         <button
           onClick={handleProceed}
-          disabled={submitting}
-          className="w-full bg-[#0F131F] flex justify-center items-center gap-2 py-3.5 text-sm font-medium text-white hover:bg-[#1e2540] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading}
+          className="w-full bg-[#0F131F] flex justify-center items-center gap-2 py-3.5 text-sm font-medium text-white hover:bg-[#1e2540] transition-colors cursor-pointer disabled:bg-black/40 disabled:cursor-not-allowed"
         >
-          {submitting ? (
+          {loading ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Memproses Booking...</span>
+              <span>Memproses...</span>
+              <Loader2 size={16} className="animate-spin animate-infinite" />
             </>
           ) : (
             <>

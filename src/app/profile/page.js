@@ -277,6 +277,7 @@ export default function ProfilePage() {
 
     if (createdOrder) {
       localStorage.setItem("bango_parc_payment_order", JSON.stringify(createdOrder));
+      localStorage.removeItem("bango_parc_payment_timer_start");
     }
     router.push("/payment");
   };

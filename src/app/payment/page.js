@@ -305,7 +305,7 @@ export default function PaymentPage() {
           <OrderCode code={dynamicOrderData.orderCode} />
           <VenueInfo orderData={dynamicOrderData} />
           <PriceBreakdown orderData={dynamicOrderData} paymentType={paymentType} />
-          <AlertPayment />
+          <AlertPayment reservation={reservation} />
         </div>
 
         {/* RIGHT — Payment Detail */}
