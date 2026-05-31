@@ -1,6 +1,11 @@
 const PriceBreakdown = ({ orderData, paymentType }) => {
   const isFull = paymentType === "full";
-  const amountToPay = isFull ? orderData.total : orderData.dpAmount;
+  const subtotal = orderData.subtotal || 0;
+  const tax = orderData.tax || 0;
+  const discount = orderData.discount || 0;
+  const total = orderData.total || 0;
+  const dpAmount = orderData.dpAmount || 0;
+  const amountToPay = isFull ? total : dpAmount;
 
   return (
     <div className="bg-white border border-[#0f131f]/15 p-5 flex flex-col gap-3">
@@ -10,21 +15,21 @@ const PriceBreakdown = ({ orderData, paymentType }) => {
       <div className="flex flex-col gap-2.5">
         <div className="flex justify-between text-sm text-black/55">
           <span>Subtotal</span>
-          <span>Rp{orderData.subtotal.toLocaleString("id-ID")}</span>
+          <span>Rp{subtotal.toLocaleString("id-ID")}</span>
         </div>
         <div className="flex justify-between text-sm text-black/55">
           <span>Pajak & Biaya (10%)</span>
-          <span>Rp{orderData.tax.toLocaleString("id-ID")}</span>
+          <span>Rp{tax.toLocaleString("id-ID")}</span>
         </div>
         <div className="flex justify-between text-sm text-green-700">
           <span>Diskon</span>
-          <span>-Rp{orderData.discount.toLocaleString("id-ID")}</span>
+          <span>-Rp{discount.toLocaleString("id-ID")}</span>
         </div>
         <div className="h-px bg-[#0f131f]/15" />
         <div className="flex justify-between">
           <span className="font-semibold text-[#2c2218]">Total Biaya</span>
           <span className="font-semibold text-[#0f131f]">
-            Rp{orderData.total.toLocaleString("id-ID")}
+            Rp{total.toLocaleString("id-ID")}
           </span>
         </div>
         <div className="flex justify-between items-center text-xs bg-[#0f131f]/5 border border-[#0f131f]/20 px-3 py-2.5">

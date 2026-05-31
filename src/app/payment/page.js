@@ -19,6 +19,7 @@ import {
   User,
   CreditCard,
   Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -149,7 +150,7 @@ export default function PaymentPage() {
   // Sync amount when payment option or order data changes
   const amountToPay = paymentType === "full" ? dynamicOrderData.total : dynamicOrderData.dpAmount;
   useEffect(() => {
-    if (amountToPay) {
+    if (amountToPay !== undefined && amountToPay !== null) {
       setPaymentAmount(amountToPay);
     }
   }, [amountToPay]);
@@ -338,164 +339,193 @@ export default function PaymentPage() {
           )}
 
           {/* Upload Bukti */}
-          <div className="bg-white border border-[#0f131f]/10 p-4 sm:p-6 shadow-sm">
-            <h5 className="font-crimson-pro text-lg sm:text-xl text-[#0f131f] mb-1">
-              Upload Bukti Pembayaran
-            </h5>
-
-            <div className="w-full h-px bg-[#0f131f]/10 mb-5" />
-
-            {/* Form Inputs for Sender and Amount */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
-              <div className="flex flex-col gap-1.5 text-left">
-                <label htmlFor="senderName" className="text-xs font-semibold text-[#0f131f]/60 tracking-wide uppercase flex items-center gap-1.5">
-                  <User size={12} className="text-[#896d51]" />
-                  Nama Pengirim
-                </label>
-                <input
-                  id="senderName"
-                  type="text"
-                  required
-                  value={senderName}
-                  onChange={(e) => setSenderName(e.target.value)}
-                  placeholder="Nama pengirim transfer"
-                  className="w-full h-10 border-b border-[#0f131f]/20 bg-transparent text-sm text-[#0f131f] placeholder:text-black/25 outline-none focus:border-[#0f131f] transition-colors px-1"
-                />
+          {dynamicOrderData.total === 0 ? (
+            <div className="bg-white border border-emerald-100 p-6 sm:p-8 shadow-sm flex flex-col items-center text-center gap-4 rounded">
+              <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 border border-emerald-100 mb-2">
+                <CheckCircle2 size={32} />
               </div>
-
-              <div className="flex flex-col gap-1.5 text-left">
-                <label htmlFor="paymentAmount" className="text-xs font-semibold text-[#0f131f]/60 tracking-wide uppercase flex items-center gap-1.5">
-                  <CreditCard size={12} className="text-[#896d51]" />
-                  Nominal Transfer (Rp)
-                </label>
-                <input
-                  id="paymentAmount"
-                  type="number"
-                  required
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)}
-                  placeholder="Nominal transfer"
-                  className="w-full h-10 border-b border-[#0f131f]/20 bg-transparent text-sm text-[#0f131f] placeholder:text-black/25 outline-none focus:border-[#0f131f] transition-colors px-1"
-                />
+              <h5 className="font-crimson-pro text-2xl text-[#0f131f] font-bold">
+                Pembayaran Selesai (Lunas)
+              </h5>
+              <p className="text-xs text-black/55 max-w-md leading-relaxed">
+                Reservasi ini telah dibayar lunas dengan tagihan tersisa Rp0. Anda tidak perlu mengunggah bukti pembayaran baru.
+              </p>
+              <div className="w-full h-px bg-[#0f131f]/10 my-2" />
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <Link
+                  href="/profile"
+                  className="px-6 py-2.5 bg-[#0f131f] text-white hover:bg-[#896d51] transition-all font-semibold text-[11px] uppercase tracking-wider rounded text-center"
+                >
+                  Riwayat Reservasi
+                </Link>
+                <Link
+                  href="/"
+                  className="px-6 py-2.5 border border-[#0f131f]/20 text-[#0f131f]/70 hover:border-[#0f131f] hover:text-[#0f131f] transition-all font-semibold text-[11px] uppercase tracking-wider rounded text-center"
+                >
+                  Kembali ke Beranda
+                </Link>
               </div>
             </div>
+          ) : (
+            <div className="bg-white border border-[#0f131f]/10 p-4 sm:p-6 shadow-sm">
+              <h5 className="font-crimson-pro text-lg sm:text-xl text-[#0f131f] mb-1">
+                Upload Bukti Pembayaran
+              </h5>
 
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`w-full border-2 border-dashed flex flex-col items-center justify-center gap-3 py-8 sm:py-10 px-4 text-center cursor-pointer transition-all mb-4 ${
-                isDragging
-                  ? "border-[#0f131f] bg-[#0f131f]/5"
-                  : uploadedFile
-                    ? "border-green-400 bg-green-50"
-                    : "border-[#0f131f]/20 hover:border-[#0f131f] hover:bg-[#0f131f]/5"
-              }`}
-            >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".jpg,.jpeg,.png,.pdf"
-                className="hidden"
-                onChange={handleFileChange}
-              />
+              <div className="w-full h-px bg-[#0f131f]/10 mb-5" />
 
-              {uploadedFile ? (
-                <>
-                  <FileImage
-                    size={36}
-                    className="text-green-500"
-                    strokeWidth={1.5}
+              {/* Form Inputs for Sender and Amount */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+                <div className="flex flex-col gap-1.5 text-left">
+                  <label htmlFor="senderName" className="text-xs font-semibold text-[#0f131f]/60 tracking-wide uppercase flex items-center gap-1.5">
+                    <User size={12} className="text-[#896d51]" />
+                    Nama Pengirim
+                  </label>
+                  <input
+                    id="senderName"
+                    type="text"
+                    required
+                    value={senderName}
+                    onChange={(e) => setSenderName(e.target.value)}
+                    placeholder="Nama pengirim transfer"
+                    className="w-full h-10 border-b border-[#0f131f]/20 bg-transparent text-sm text-[#0f131f] placeholder:text-black/25 outline-none focus:border-[#0f131f] transition-colors px-1"
                   />
+                </div>
 
-                  <div className="flex flex-col items-center gap-1 break-all">
-                    <span className="text-sm font-medium text-green-700">
-                      {uploadedFile.name}
-                    </span>
-
-                    <span className="text-xs text-black/45">
-                      {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setUploadedFile(null);
-                    }}
-                    className="flex items-center gap-1.5 text-xs text-red-500 border border-red-100 px-3 py-1 hover:bg-red-50 transition-colors"
-                  >
-                    <X size={12} /> Hapus file
-                  </button>
-                </>
-              ) : (
-                <>
-                  <CloudUpload
-                    size={36}
-                    className="text-[#0f131f]/60"
-                    strokeWidth={1.5}
+                <div className="flex flex-col gap-1.5 text-left">
+                  <label htmlFor="paymentAmount" className="text-xs font-semibold text-[#0f131f]/60 tracking-wide uppercase flex items-center gap-1.5">
+                    <CreditCard size={12} className="text-[#896d51]" />
+                    Nominal Transfer (Rp)
+                  </label>
+                  <input
+                    id="paymentAmount"
+                    type="number"
+                    required
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
+                    placeholder="Nominal transfer"
+                    className="w-full h-10 border-b border-[#0f131f]/20 bg-transparent text-sm text-[#0f131f] placeholder:text-black/25 outline-none focus:border-[#0f131f] transition-colors px-1"
                   />
+                </div>
+              </div>
 
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-sm text-black/60 leading-relaxed">
-                      Klik untuk upload atau{" "}
-                      <span className="text-[#0f131f] font-semibold">
-                        drag & drop
-                      </span>
-                    </span>
-
-                    <span className="text-xs text-black/30">
-                      Format: JPG, PNG, PDF · Maks. 5 MB
-                    </span>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <InfoBukti />
-
-            <div className="mt-5 flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={handleSubmitPayment}
-                disabled={!uploadedFile || !senderName || !paymentAmount || isSubmitting || loadingReservation}
-                className={`w-full flex justify-center items-center gap-2 py-3.5 text-sm font-medium transition-all ${
-                  (uploadedFile && senderName && paymentAmount && !isSubmitting && !loadingReservation)
-                    ? "bg-[#0f131f] text-white hover:bg-[#1a2135] active:scale-[0.98] cursor-pointer"
-                    : "bg-[#0f131f]/20 text-[#0f131f]/40 cursor-not-allowed"
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`w-full border-2 border-dashed flex flex-col items-center justify-center gap-3 py-8 sm:py-10 px-4 text-center cursor-pointer transition-all mb-4 ${
+                  isDragging
+                    ? "border-[#0f131f] bg-[#0f131f]/5"
+                    : uploadedFile
+                      ? "border-green-400 bg-green-50"
+                      : "border-[#0f131f]/20 hover:border-[#0f131f] hover:bg-[#0f131f]/5"
                 }`}
               >
-                {isSubmitting ? (
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.pdf"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+
+                {uploadedFile ? (
                   <>
-                    <Loader2 size={16} className="animate-spin text-white" />
-                    Mengirim Bukti...
-                  </>
-                ) : loadingReservation ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin text-[#0f131f]/40" />
-                    Menghubungkan Server...
+                    <FileImage
+                      size={36}
+                      className="text-green-500"
+                      strokeWidth={1.5}
+                    />
+
+                    <div className="flex flex-col items-center gap-1 break-all">
+                      <span className="text-sm font-medium text-green-700">
+                        {uploadedFile.name}
+                      </span>
+
+                      <span className="text-xs text-black/45">
+                        {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setUploadedFile(null);
+                      }}
+                      className="flex items-center gap-1.5 text-xs text-red-500 border border-red-100 px-3 py-1 hover:bg-red-50 transition-colors"
+                    >
+                      <X size={12} /> Hapus file
+                    </button>
                   </>
                 ) : (
                   <>
-                    <Upload size={16} strokeWidth={1.5} />
-                    Kirim Bukti Pembayaran
+                    <CloudUpload
+                      size={36}
+                      className="text-[#0f131f]/60"
+                      strokeWidth={1.5}
+                    />
+
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-sm text-black/60 leading-relaxed">
+                        Klik untuk upload atau{" "}
+                        <span className="text-[#0f131f] font-semibold">
+                          drag & drop
+                        </span>
+                      </span>
+
+                      <span className="text-xs text-black/30">
+                        Format: JPG, PNG, PDF · Maks. 5 MB
+                      </span>
+                    </div>
                   </>
                 )}
-              </button>
+              </div>
 
-              <p className="text-[10px] sm:text-xs text-center text-black/40 leading-relaxed">
-                Dengan mengirim, Anda menyetujui{" "}
-                <span className="underline cursor-pointer hover:text-[#0f131f]">
-                  syarat & ketentuan
-                </span>{" "}
-                kami.
-              </p>
+              <InfoBukti />
+
+              <div className="mt-5 flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={handleSubmitPayment}
+                  disabled={!uploadedFile || !senderName || !paymentAmount || isSubmitting || loadingReservation}
+                  className={`w-full flex justify-center items-center gap-2 py-3.5 text-sm font-medium transition-all ${
+                    (uploadedFile && senderName && paymentAmount && !isSubmitting && !loadingReservation)
+                      ? "bg-[#0f131f] text-white hover:bg-[#1a2135] active:scale-[0.98] cursor-pointer"
+                      : "bg-[#0f131f]/20 text-[#0f131f]/40 cursor-not-allowed"
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin text-white" />
+                      Mengirim Bukti...
+                    </>
+                  ) : loadingReservation ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin text-[#0f131f]/40" />
+                      Menghubungkan Server...
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={16} strokeWidth={1.5} />
+                      Kirim Bukti Pembayaran
+                    </>
+                  )}
+                </button>
+
+                <p className="text-[10px] sm:text-xs text-center text-black/40 leading-relaxed">
+                  Dengan mengirim, Anda menyetujui{" "}
+                  <span className="underline cursor-pointer hover:text-[#0f131f]">
+                    syarat & ketentuan
+                  </span>{" "}
+                  kami.
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
           <Link
             href="/paket/checkout"

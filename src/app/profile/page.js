@@ -110,6 +110,8 @@ const DUMMY_RESERVATIONS = [
     price: "Rp 65.000.000",
     status: "Dikonfirmasi",
     badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    paymentStatus: "PAID",
+    rejectionReason: null,
   },
   {
     id: "BP-2026-0925",
@@ -120,6 +122,8 @@ const DUMMY_RESERVATIONS = [
     price: "Rp 28.000.000",
     status: "Menunggu Pembayaran",
     badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+    paymentStatus: "PARTIAL",
+    rejectionReason: "Bukti transfer tidak terbaca / buram. Silakan unggah kembali bukti pembayaran yang jelas.",
   },
   {
     id: "BP-2025-1110",
@@ -130,6 +134,8 @@ const DUMMY_RESERVATIONS = [
     price: "Rp 18.000.000",
     status: "Selesai",
     badgeColor: "bg-gray-100 text-gray-700 border-gray-200",
+    paymentStatus: "PAID",
+    rejectionReason: null,
   }
 ];
 
@@ -149,6 +155,7 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const [realReservations, setRealReservations] = useState([]);
+  const [paymentsList, setPaymentsList] = useState([]);
   const [loadingReal, setLoadingReal] = useState(false);
 
   // Load from local storage if exists
@@ -164,18 +171,25 @@ export default function ProfilePage() {
   }, []);
 
   useEffect(() => {
-    const fetchRealReservations = async () => {
+    const fetchData = async () => {
       try {
         setLoadingReal(true);
-        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/reservation/me");
-        setRealReservations(res.data.data || []);
+        const [resvRes, payRes] = await Promise.all([
+          axiosInstance.get("https://bango-parc-service.vercel.app/api/reservation/me"),
+          axiosInstance.get("https://bango-parc-service.vercel.app/api/payment").catch(e => {
+            console.error("Gagal mengambil data pembayaran:", e);
+            return { data: { result: [] } };
+          })
+        ]);
+        setRealReservations(resvRes.data.data || []);
+        setPaymentsList(payRes.data?.result || payRes.data?.data || []);
       } catch (err) {
-        console.error("Gagal mengambil data reservasi me:", err);
+        console.error("Gagal mengambil data profil:", err);
       } finally {
         setLoadingReal(false);
       }
     };
-    fetchRealReservations();
+    fetchData();
   }, []);
 
   const handleProfileChange = (e) => {
@@ -216,7 +230,18 @@ export default function ProfilePage() {
       const areaNames = r.areas?.map((a) => a.area?.name).filter(Boolean) || [];
       const areaStr = areaNames.length > 0 ? areaNames.join(" & ") : "Venue Bango Parc";
       const totalPrice = Number(r.totalPrice) || 0;
-      const dpAmount = totalPrice > 2000000 ? 1000000 : totalPrice * 0.5;
+      const remainingBalance = Number(r.remainingBalance) || 0;
+
+      let subtotal = totalPrice;
+      let dpAmount = totalPrice > 2000000 ? 1000000 : totalPrice * 0.5;
+
+      if (r.paymentStatus === "PARTIAL") {
+        subtotal = remainingBalance;
+        dpAmount = remainingBalance;
+      } else if (r.paymentStatus === "PAID") {
+        subtotal = 0;
+        dpAmount = 0;
+      }
       
       const s = new Date(r.startDateTime);
       const e = new Date(r.endDateTime);
@@ -232,10 +257,10 @@ export default function ProfilePage() {
         startTime: `${startH}:${startM}`,
         endTime: `${endH}:${endM}`,
         duration: getDurationHours(r.startDateTime, r.endDateTime),
-        subtotal: totalPrice,
+        subtotal: subtotal,
         discount: 0,
         tax: 0,
-        total: totalPrice,
+        total: subtotal,
         dpAmount: dpAmount,
         orderCode: r.code || r.bookingCode || `BP-${r.id}`,
         reservationId: r.id,
@@ -243,7 +268,15 @@ export default function ProfilePage() {
     } else {
       // Dummy reservation fallback
       const totalPrice = Number(res.price.replace(/[^0-9]/g, "")) || 0;
-      const dpAmount = totalPrice > 2000000 ? 1000000 : totalPrice * 0.5;
+      const isPaid = res.paymentStatus === "PAID";
+      
+      let subtotal = totalPrice;
+      let dpAmount = totalPrice > 2000000 ? 1000000 : totalPrice * 0.5;
+
+      if (isPaid) {
+        subtotal = 0;
+        dpAmount = 0;
+      }
 
       let startTime = "00:00";
       let endTime = "00:00";
@@ -265,10 +298,10 @@ export default function ProfilePage() {
         startTime,
         endTime,
         duration,
-        subtotal: totalPrice,
+        subtotal: subtotal,
         discount: 0,
         tax: 0,
-        total: totalPrice,
+        total: subtotal,
         dpAmount,
         orderCode: res.id,
         reservationId: null,
@@ -290,6 +323,15 @@ export default function ProfilePage() {
     const packageName = isWedding 
       ? "Wedding Venue Exclusive Package" 
       : "Reguler Venue Rental Package";
+
+    // Find rejection reason from payment proofs in paymentsList
+    const relevantPayments = paymentsList.filter(
+      (p) => p.paymentSchedule?.reservationId === r.id || p.reservationId === r.id
+    );
+    const rejectedPayment = relevantPayments.find(
+      (p) => (p.approvalStatus || p.status || "").toUpperCase() === "REJECTED"
+    );
+    const rejectionReason = rejectedPayment?.rejectionReason || null;
       
     return {
       id: r.code || r.bookingCode || `BP-${r.id}`,
@@ -300,6 +342,8 @@ export default function ProfilePage() {
       price: formatRupiah(Number(r.totalPrice) || 0),
       status: getReservationStatusText(r.status),
       badgeColor: getReservationBadgeColor(r.status),
+      paymentStatus: r.paymentStatus || "UNPAID",
+      rejectionReason,
       raw: r,
     };
   };
@@ -308,8 +352,7 @@ export default function ProfilePage() {
   const reservations = [...mappedReal, ...DUMMY_RESERVATIONS];
 
   return (
-    <main className="w-full min-h-screen bg-[#f3f4f7]">
-      {/* Header */}
+    <main className="w-full min-h-screen bg-[#F4F7FA]">
       <header className="h-48 sm:h-56 w-full relative flex flex-col justify-center items-center pt-20 px-4">
         <div
           style={{ backgroundImage: "url(/about-header.jpg)" }}
@@ -494,72 +537,133 @@ export default function ProfilePage() {
 
                 {/* Reservation List */}
                 <div className="flex flex-col gap-6">
-                  {reservations.map((res) => (
-                    <div 
-                      key={res.id} 
-                      className="border border-[#0F131F]/10 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#f3f4f7]/30 hover:bg-[#f3f4f7]/75 transition-colors"
-                    >
-                      <div className="flex flex-col gap-2">
-                        {/* ID & Status */}
-                        <div className="flex items-center gap-3">
-                          <span className="text-[11px] font-mono font-bold text-[#0F131F] bg-[#0F131F]/5 px-2 py-0.5 border border-[#0F131F]/10">
-                            {res.id}
-                          </span>
-                          <span className={`text-[10px] font-semibold border px-2 py-0.5 uppercase tracking-wider ${res.badgeColor}`}>
-                            {res.status}
-                          </span>
-                        </div>
+                  {reservations.map((res) => {
+                    const isTicketType = res.paymentStatus === "PAID" || res.paymentStatus === "PARTIAL";
+                    const isCancelledOrExpired = res.status === "Dibatalkan" || res.status === "Kedaluwarsa";
 
-                        {/* Package Name */}
-                        <span className="font-crimson-pro text-lg font-semibold text-[#0F131F] leading-tight">
-                          {res.packageName}
-                        </span>
-
-                        {/* Details */}
-                        <div className="flex flex-col gap-1 mt-1 text-xs text-black/55">
-                          <div className="flex items-center gap-1.5">
-                            <Clock size={12} className="text-[#896d51]" />
-                            <span>{res.date} · {res.timeSlot}</span>
-                          </div>
-                          <span>Area: {res.area}</span>
-                        </div>
-                      </div>
-
-                      {/* Right Panel: Price & Action */}
-                      <div className="flex md:flex-col items-start md:items-end justify-between md:justify-center gap-2 pt-4 md:pt-0 border-t md:border-t-0 border-[#0F131F]/5">
-                        <div className="flex flex-col md:items-end">
-                          <span className="text-[10px] uppercase text-black/40 font-semibold tracking-wider">Total Pembayaran</span>
-                          <span className="text-lg font-bold text-[#0F131F]">{res.price}</span>
-                        </div>
-                        
-                        {res.status === "Dikonfirmasi" || res.status === "Selesai" ? (
-                          <button
-                            onClick={() => setActiveTicket(res)}
-                            className="flex items-center gap-1.5 px-4 py-2.5 border border-[#15803D] text-[#15803D] hover:bg-[#15803D] hover:text-white transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded"
-                          >
-                            Lihat Tiket
-                            <Ticket size={12} className="group-hover:scale-110 transition-transform" />
-                          </button>
-                        ) : res.status === "Menunggu Pembayaran" ? (
-                          <button 
-                            onClick={() => handlePayNow(res)}
-                            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#896d51] text-white hover:bg-[#0F131F] transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded border border-[#896d51] hover:border-[#0F131F]"
-                          >
-                            Bayar Sekarang
-                            <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                          </button>
-                        ) : (
-                          <button 
-                            onClick={() => router.push("/paket")}
-                            className="flex items-center gap-1.5 px-4 py-2.5 border border-[#896d51] text-[#896d51] hover:bg-[#896d51] hover:text-white transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded"
-                          >
-                            Detail Acara
-                            <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                          </button>
+                    return (
+                      <div 
+                        key={res.id} 
+                        className={`relative border border-[#0F131F]/10 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors ${
+                          isTicketType 
+                            ? "bg-[#896d51]/5 hover:bg-[#896d51]/10 border-[#896d51]/20 overflow-hidden" 
+                            : "bg-[#f3f4f7]/30 hover:bg-[#f3f4f7]/75"
+                        }`}
+                      >
+                        {/* Ticket Notches (masked over list container background) */}
+                        {isTicketType && (
+                          <>
+                            <div className="absolute top-1/2 -left-3.5 w-7 h-7 rounded-full bg-white border-r border-[#0F131F]/10 z-10 -translate-y-1/2 hidden md:block" />
+                            <div className="absolute top-1/2 -right-3.5 w-7 h-7 rounded-full bg-white border-l border-[#0F131F]/10 z-10 -translate-y-1/2 hidden md:block" />
+                          </>
                         )}
+
+                        <div className="flex-1 flex flex-col gap-2">
+                          {/* ID & Status */}
+                          <div className="flex items-center gap-3">
+                            <span className="text-[11px] font-mono font-bold text-[#0F131F] bg-[#0F131F]/5 px-2 py-0.5 border border-[#0F131F]/10">
+                              {res.id}
+                            </span>
+                            <span className={`text-[10px] font-semibold border px-2 py-0.5 uppercase tracking-wider ${res.badgeColor}`}>
+                              {res.status}
+                            </span>
+                            {res.paymentStatus === "PARTIAL" && !isCancelledOrExpired && (
+                              <span className="text-[10px] font-bold border border-amber-500 bg-amber-50 text-amber-700 px-2 py-0.5 uppercase tracking-wider">
+                                DP Dibayar
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Package Name */}
+                          <span className="font-crimson-pro text-lg font-semibold text-[#0F131F] leading-tight">
+                            {res.packageName}
+                          </span>
+
+                          {/* Details */}
+                          <div className="flex flex-col gap-1 mt-1 text-xs text-black/55">
+                            <div className="flex items-center gap-1.5">
+                              <Clock size={12} className="text-[#896d51]" />
+                              <span>{res.date} · {res.timeSlot}</span>
+                            </div>
+                            <span>Area: {res.area}</span>
+                          </div>
+
+                          {/* Rejection Reason Display */}
+                          {res.rejectionReason && (
+                            <div className="mt-2.5 p-3 bg-red-50 border border-red-200 text-red-800 text-xs rounded flex flex-col gap-1 max-w-xl">
+                              <div className="flex items-center gap-1.5 font-bold">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                                Pembayaran Ditolak Admin
+                              </div>
+                              <p className="text-red-700/90 font-medium pl-3">
+                                Alasan: {res.rejectionReason}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Ticket Divider Line for Desktop */}
+                        {isTicketType && (
+                          <div className="hidden md:block w-px border-l border-dashed border-[#0F131F]/20 self-stretch my-2 mx-1" />
+                        )}
+
+                        {/* Right Panel: Price & Action */}
+                        <div className={`flex md:flex-col items-start md:items-end justify-between md:justify-center gap-2 pt-4 md:pt-0 border-t md:border-t-0 ${
+                          isTicketType ? "border-dashed border-[#0F131F]/20" : "border-solid border-[#0F131F]/5"
+                        }`}>
+                          <div className="flex flex-col md:items-end">
+                            <span className="text-[10px] uppercase text-black/40 font-semibold tracking-wider">Total Pembayaran</span>
+                            <span className="text-lg font-bold text-[#0F131F]">{res.price}</span>
+                          </div>
+                          
+                          <div className="flex flex-wrap md:flex-col gap-2 md:items-end w-full md:w-auto">
+                            {isCancelledOrExpired ? (
+                              <button 
+                                onClick={() => router.push("/paket")}
+                                className="flex items-center gap-1.5 px-4 py-2.5 border border-[#896d51] text-[#896d51] hover:bg-[#896d51] hover:text-white transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded"
+                              >
+                                Detail Acara
+                                <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                              </button>
+                            ) : res.paymentStatus === "PAID" ? (
+                              <>
+                                <button
+                                  onClick={() => setActiveTicket(res)}
+                                  className="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 text-white hover:bg-emerald-700 transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded border border-emerald-600 shadow-sm"
+                                >
+                                  Lihat Tiket
+                                  <Ticket size={12} className="group-hover:scale-110 transition-transform" />
+                                </button>
+                                <button 
+                                  onClick={() => handlePayNow(res)}
+                                  className="flex items-center gap-1.5 px-4 py-2.5 border border-[#896d51] text-[#896d51] hover:bg-[#896d51] hover:text-white transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded"
+                                >
+                                  Detail Bayar (Lunas)
+                                  <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                                </button>
+                              </>
+                            ) : res.paymentStatus === "PARTIAL" ? (
+                              <button 
+                                onClick={() => handlePayNow(res)}
+                                className="flex items-center gap-1.5 px-4 py-2.5 bg-[#896d51] text-white hover:bg-[#0F131F] transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded border border-[#896d51] hover:border-[#0F131F] shadow-sm animate-pulse"
+                              >
+                                Bayar Sisa
+                                <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                              </button>
+                            ) : (
+                              <button 
+                                onClick={() => handlePayNow(res)}
+                                className="flex items-center gap-1.5 px-4 py-2.5 bg-[#896d51] text-white hover:bg-[#0F131F] transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded border border-[#896d51] hover:border-[#0F131F] shadow-sm"
+                              >
+                                Bayar Sekarang
+                                <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
