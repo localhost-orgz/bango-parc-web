@@ -157,7 +157,7 @@ export default function ReservasiPage() {
   }
 
   return (
-    <div className="p-6 bg-white min-h-screen">
+    <div className="-m-4 md:-m-6 p-4 md:p-6 bg-white min-h-screen">
       {/* Header Section */}
       <div className="flex justify-between items-center mb-8">
         <div>

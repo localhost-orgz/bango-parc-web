@@ -15,6 +15,7 @@ import {
   CreditCard,
   Book,
   Users,
+  X,
 } from "lucide-react";
 
 const dataItems = [
@@ -26,9 +27,14 @@ const dataItems = [
   { label: "Pengguna", icon: Users, path: "/admin/users" },
 ];
 
-function Sidebar() {
+function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
   const [pendingCount, setPendingCount] = useState(0);
+
+  // Auto-close sidebar on mobile when navigating pages
+  useEffect(() => {
+    onClose?.();
+  }, [pathname]);
 
   useEffect(() => {
     const fetchPendingCount = async () => {
@@ -65,13 +71,35 @@ function Sidebar() {
   };
 
   return (
-    <aside className="w-60 min-h-screen bg-[#0F131F] flex flex-col shrink-0">
-      <div className="px-6 py-6 border-b border-white/10">
-        <p className="font-crimson-pro text-white text-xl leading-tight">
-          Bango Parc
-        </p>
-        <p className="text-white/40 text-xs mt-0.5">Admin Panel</p>
-      </div>
+    <>
+      {/* Backdrop overlay on mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/55 z-45 md:hidden backdrop-blur-xs"
+          onClick={onClose}
+        />
+      )}
+
+      <aside
+        className={`fixed inset-y-0 left-0 w-60 bg-[#0F131F] flex flex-col shrink-0 z-50 transform md:static md:translate-x-0 transition-transform duration-300 ease-in-out md:h-auto md:min-h-screen ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="px-6 py-6 border-b border-white/10 relative">
+          <p className="font-crimson-pro text-white text-xl leading-tight">
+            Bango Parc
+          </p>
+          <p className="text-white/40 text-xs mt-0.5">Admin Panel</p>
+          
+          {/* Close button for mobile viewports */}
+          <button
+            onClick={onClose}
+            className="absolute top-6 right-4 text-white/55 hover:text-white md:hidden p-1.5 cursor-pointer"
+            aria-label="Tutup Sidebar"
+          >
+            <X size={18} />
+          </button>
+        </div>
 
       <nav className="flex-1 px-3 py-5 flex flex-col gap-6">
         {/* Main Section */}
@@ -123,7 +151,8 @@ function Sidebar() {
           ))}
         </div>
       </nav>
-    </aside>
+      </aside>
+    </>
   );
 }
 

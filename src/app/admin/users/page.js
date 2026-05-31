@@ -204,7 +204,7 @@ export default function UsersPage() {
   const selectedUser = usersData.find((u) => u.id === selectedId) || null;
 
   return (
-    <div className="bg-white font-sans -m-6 min-h-screen p-6 flex flex-col">
+    <div className="bg-white font-sans -m-4 md:-m-6 min-h-screen p-4 md:p-6 flex flex-col">
       {/* Header Section */}
         <div className="flex justify-between items-center mb-6">
           <div>

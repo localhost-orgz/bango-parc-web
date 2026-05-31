@@ -316,11 +316,11 @@ export default function PaymentVerificationPage() {
   const pendingCount = data.filter((p) => p.status === "Pending").length;
 
   return (
-    <div className="flex min-h-screen bg-[#f3f4f7] font-sans">
+    <div className="flex min-h-screen bg-[#f3f4f7] font-sans -m-4 md:-m-6">
       {/* Center — Table */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar */}
-        <header className="h-16 bg-white border-b border-[#0F131F]/10 px-8 flex items-center justify-between shrink-0">
+        <header className="h-16 bg-white border-b border-[#0F131F]/10 px-4 md:px-8 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <h1 className="font-crimson-pro text-2xl text-[#0F131F]">
               Verifikasi Pembayaran
@@ -332,13 +332,13 @@ export default function PaymentVerificationPage() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#0F131F] rounded-full flex items-center justify-center">
+            <div className="w-9 h-9 bg-[#0F131F] rounded-full flex items-center justify-center hidden sm:flex">
               <span className="text-white text-xs font-semibold">A</span>
             </div>
           </div>
         </header>
 
-        <div className="flex-1 p-6 flex flex-col gap-4 overflow-hidden">
+        <div className="flex-1 p-4 md:p-6 flex flex-col gap-4 overflow-hidden">
           {/* Description */}
           <p className="text-sm text-black/40">
             Kelola dan verifikasi pembayaran manual reservasi Bango Parc.
@@ -367,7 +367,7 @@ export default function PaymentVerificationPage() {
           </div>
 
           {/* Search + Filters */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-3">
             {/* Search */}
             <div className="flex-1 relative">
               <Search
@@ -384,69 +384,72 @@ export default function PaymentVerificationPage() {
               />
             </div>
 
-            {/* Type Filter */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setTypeOpen((o) => !o);
-                  setPayOpen(false);
-                }}
-                className="flex items-center gap-2 h-10 px-3 border border-[#0F131F]/15 bg-white text-sm text-black/60 hover:border-[#0F131F]/30 transition-colors"
-              >
-                <span>{typeFilter}</span>
-                <ChevronDown size={13} />
-              </button>
-              {typeOpen && (
-                <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-[#0F131F]/15 min-w-full shadow-sm">
-                  {typeOptions.map((o) => (
-                    <button
-                      key={o}
-                      onClick={() => {
-                        setTypeFilter(o);
-                        setTypeOpen(false);
-                      }}
-                      className={`block w-full text-left px-3 py-2 text-sm hover:bg-[#f3f4f7] transition-colors ${typeFilter === o ? "font-semibold text-[#0F131F]" : "text-black/60"}`}
-                    >
-                      {o}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Filters Row */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Type Filter */}
+              <div className="relative flex-1 sm:flex-initial">
+                <button
+                  onClick={() => {
+                    setTypeOpen((o) => !o);
+                    setPayOpen(false);
+                  }}
+                  className="flex items-center justify-between sm:justify-start gap-2 h-10 w-full sm:w-auto px-3 border border-[#0F131F]/15 bg-white text-sm text-black/60 hover:border-[#0F131F]/30 transition-colors"
+                >
+                  <span>{typeFilter}</span>
+                  <ChevronDown size={13} />
+                </button>
+                {typeOpen && (
+                  <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-[#0F131F]/15 min-w-full shadow-sm">
+                    {typeOptions.map((o) => (
+                      <button
+                        key={o}
+                        onClick={() => {
+                          setTypeFilter(o);
+                          setTypeOpen(false);
+                        }}
+                        className={`block w-full text-left px-3 py-2 text-sm hover:bg-[#f3f4f7] transition-colors ${typeFilter === o ? "font-semibold text-[#0F131F]" : "text-black/60"}`}
+                      >
+                        {o}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-            {/* Payment Type Filter */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setPayOpen((o) => !o);
-                  setTypeOpen(false);
-                }}
-                className="flex items-center gap-2 h-10 px-3 border border-[#0F131F]/15 bg-white text-sm text-black/60 hover:border-[#0F131F]/30 transition-colors"
-              >
-                <span>{payTypeFilter}</span>
-                <ChevronDown size={13} />
-              </button>
-              {payOpen && (
-                <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-[#0F131F]/15 min-w-full shadow-sm">
-                  {payOptions.map((o) => (
-                    <button
-                      key={o}
-                      onClick={() => {
-                        setPayTypeFilter(o);
-                        setPayOpen(false);
-                      }}
-                      className={`block w-full text-left px-3 py-2 text-sm hover:bg-[#f3f4f7] transition-colors ${payTypeFilter === o ? "font-semibold text-[#0F131F]" : "text-black/60"}`}
-                    >
-                      {o}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+              {/* Payment Type Filter */}
+              <div className="relative flex-1 sm:flex-initial">
+                <button
+                  onClick={() => {
+                    setPayOpen((o) => !o);
+                    setTypeOpen(false);
+                  }}
+                  className="flex items-center justify-between sm:justify-start gap-2 h-10 w-full sm:w-auto px-3 border border-[#0F131F]/15 bg-white text-sm text-black/60 hover:border-[#0F131F]/30 transition-colors"
+                >
+                  <span>{payTypeFilter}</span>
+                  <ChevronDown size={13} />
+                </button>
+                {payOpen && (
+                  <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-[#0F131F]/15 min-w-full shadow-sm">
+                    {payOptions.map((o) => (
+                      <button
+                        key={o}
+                        onClick={() => {
+                          setPayTypeFilter(o);
+                          setPayOpen(false);
+                        }}
+                        className={`block w-full text-left px-3 py-2 text-sm hover:bg-[#f3f4f7] transition-colors ${payTypeFilter === o ? "font-semibold text-[#0F131F]" : "text-black/60"}`}
+                      >
+                        {o}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-            <div className="flex items-center gap-1 text-xs text-black/35 ml-auto shrink-0">
-              <SlidersHorizontal size={13} strokeWidth={1.5} />
-              <span>{filtered.length} hasil</span>
+              <div className="flex items-center gap-1 text-xs text-black/35 sm:ml-auto shrink-0">
+                <SlidersHorizontal size={13} strokeWidth={1.5} />
+                <span>{filtered.length} hasil</span>
+              </div>
             </div>
           </div>
 
