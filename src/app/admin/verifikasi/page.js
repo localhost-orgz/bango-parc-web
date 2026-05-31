@@ -243,9 +243,12 @@ export default function PaymentVerificationPage() {
     );
 
     try {
-      await axiosInstance.put(`https://bango-parc-service.vercel.app/api/payment/${targetId}`, { status: "APPROVED" });
+      await axiosInstance.patch("https://bango-parc-service.vercel.app/api/payment/approve", {
+        paymentProofId: Number(targetId)
+      });
     } catch (err) {
       console.error("Gagal memperbarui status di server:", err);
+      alert("Gagal memverifikasi pembayaran: " + (err.response?.data?.error || err.message));
     }
   };
 
@@ -253,15 +256,26 @@ export default function PaymentVerificationPage() {
     const item = data.find(p => p.id === id);
     const targetId = item?.apiId || id;
     
+    const reason = prompt("Masukkan alasan penolakan pembayaran:");
+    if (reason === null) return; // Cancelled
+    if (!reason.trim()) {
+      alert("Alasan penolakan wajib diisi!");
+      return;
+    }
+
     // Optimistic/local UI update
     setData((prev) =>
       prev.map((p) => (p.id === id ? { ...p, status: "Rejected" } : p)),
     );
 
     try {
-      await axiosInstance.put(`https://bango-parc-service.vercel.app/api/payment/${targetId}`, { status: "REJECTED" });
+      await axiosInstance.patch("https://bango-parc-service.vercel.app/api/payment/reject", {
+        paymentProofId: Number(targetId),
+        rejectionReason: reason
+      });
     } catch (err) {
       console.error("Gagal memperbarui status di server:", err);
+      alert("Gagal menolak pembayaran: " + (err.response?.data?.error || err.message));
     }
   };
 
