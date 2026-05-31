@@ -143,7 +143,6 @@ export default function AdminAddonPage() {
     },
   ];
 
-  if (loading) return <div className="p-8">Memuat data...</div>;
   if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
@@ -156,7 +155,7 @@ export default function AdminAddonPage() {
         </Button>
       </div>
 
-      <DataTable data={addons} columns={columns} />
+      <DataTable data={addons} columns={columns} loading={loading} />
 
       <AddonAddModal
         isOpen={isAddOpen}

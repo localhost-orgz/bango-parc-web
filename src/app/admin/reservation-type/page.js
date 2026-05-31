@@ -81,7 +81,6 @@ export default function ReservationTypePage() {
     },
   ];
 
-  if (loading) return <div className="p-8">Memuat data...</div>;
   if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
@@ -97,7 +96,7 @@ export default function ReservationTypePage() {
         </Button>
       </div>
 
-      <DataTable data={reservationTypes} columns={columns} />
+      <DataTable data={reservationTypes} columns={columns} loading={loading} />
 
       <ReservationTypeAddModal
         isOpen={isAddOpen}

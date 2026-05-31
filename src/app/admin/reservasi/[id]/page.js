@@ -141,9 +141,43 @@ export default function ReservationDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-8 flex flex-col items-center justify-center min-h-screen text-black/50 text-sm gap-3 bg-[#f3f4f7]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#0F131F]" />
-        Memuat detail reservasi...
+      <div className="p-6 bg-[#f3f4f7] min-h-screen font-sans">
+        {/* Top Navbar Skeleton */}
+        <div className="mb-6 flex items-center justify-between">
+          <div className="h-5 w-20 bg-black/5 animate-pulse rounded" />
+          <div className="h-5 w-24 bg-black/5 animate-pulse rounded" />
+        </div>
+
+        {/* Header Info Skeleton */}
+        <div className="bg-white border border-[#0F131F]/10 p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col gap-2">
+            <div className="h-8 w-64 bg-black/5 animate-pulse rounded" />
+            <div className="h-4 w-40 bg-black/5 animate-pulse rounded" />
+          </div>
+          <div className="flex gap-2">
+            <div className="h-6 w-20 bg-black/5 animate-pulse rounded" />
+            <div className="h-6 w-20 bg-black/5 animate-pulse rounded" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, idx) => (
+            <div key={idx} className="bg-white border border-[#0F131F]/10 p-6 flex flex-col gap-4">
+              <div className="h-4 w-28 bg-black/5 animate-pulse rounded" />
+              <div className="flex flex-col gap-4 mt-2">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded bg-black/5 animate-pulse shrink-0" />
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <div className="h-3 w-16 bg-black/5 animate-pulse rounded" />
+                      <div className="h-4 w-32 bg-black/5 animate-pulse rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

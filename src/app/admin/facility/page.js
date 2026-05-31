@@ -126,7 +126,6 @@ export default function AdminFacilityPage() {
     },
   ];
 
-  if (loading) return <div className="p-8">Memuat data...</div>;
   if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
@@ -142,7 +141,7 @@ export default function AdminFacilityPage() {
         </Button>
       </div>
 
-      <DataTable data={facilities} columns={columns} />
+      <DataTable data={facilities} columns={columns} loading={loading} />
 
       <FacilityAddModal
         isOpen={isAddOpen}

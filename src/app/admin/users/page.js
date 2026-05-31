@@ -386,17 +386,40 @@ export default function UsersPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="text-center py-16 text-sm text-[#0F131F]/50"
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin text-[#896d51]" />
-                        <span>Memuat data pengguna...</span>
-                      </div>
-                    </td>
-                  </tr>
+                  [...Array(5)].map((_, i) => (
+                    <tr key={i} className="border-b border-[#0F131F]/5 last:border-0">
+                      {/* Name */}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-black/5 animate-pulse shrink-0" />
+                          <div className="flex flex-col gap-1.5">
+                            <div className="h-4 w-24 bg-black/5 animate-pulse rounded" />
+                            <div className="h-3 w-16 bg-black/5 animate-pulse rounded" />
+                          </div>
+                        </div>
+                      </td>
+                      {/* Email */}
+                      <td className="px-5 py-4">
+                        <div className="h-4 w-36 bg-black/5 animate-pulse rounded" />
+                      </td>
+                      {/* Role */}
+                      <td className="px-5 py-4">
+                        <div className="h-4 w-12 bg-black/5 animate-pulse rounded" />
+                      </td>
+                      {/* Joined Since */}
+                      <td className="px-5 py-4">
+                        <div className="h-4 w-20 bg-black/5 animate-pulse rounded" />
+                      </td>
+                      {/* Status */}
+                      <td className="px-5 py-4">
+                        <div className="h-6 w-16 bg-black/5 animate-pulse rounded" />
+                      </td>
+                      {/* Action */}
+                      <td className="px-4 py-3">
+                        <div className="h-8 w-20 bg-black/5 animate-pulse rounded" />
+                      </td>
+                    </tr>
+                  ))
                 ) : filtered.length === 0 ? (
                   <tr>
                     <td

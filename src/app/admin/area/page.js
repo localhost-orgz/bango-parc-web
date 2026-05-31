@@ -144,7 +144,6 @@ export default function AdminAreaPage() {
     },
   ];
 
-  if (loading) return <div className="p-8">Memuat data...</div>;
   if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
@@ -157,7 +156,7 @@ export default function AdminAreaPage() {
         </Button>
       </div>
 
-      <DataTable data={areas} columns={columns} />
+      <DataTable data={areas} columns={columns} loading={loading} />
 
       <AreaAddModal
         isOpen={isAddOpen}

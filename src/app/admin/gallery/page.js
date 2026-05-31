@@ -45,7 +45,14 @@ export default function AdminGalleryPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-10 text-muted-foreground">Memuat...</div>
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {[...Array(10)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-black/5 animate-pulse rounded-lg aspect-square"
+            />
+          ))}
+        </div>
       ) : error ? (
         <div className="text-center py-10 text-red-500">{error}</div>
       ) : (

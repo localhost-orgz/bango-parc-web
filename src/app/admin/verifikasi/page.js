@@ -480,17 +480,39 @@ export default function PaymentVerificationPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="text-center py-16 text-sm text-[#0F131F]/50"
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin text-[#896d51]" />
-                        <span>Memuat data verifikasi...</span>
-                      </div>
-                    </td>
-                  </tr>
+                  [...Array(5)].map((_, i) => (
+                    <tr key={i} className="border-b border-[#0F131F]/5 last:border-0">
+                      {/* Order Code */}
+                      <td className="px-4 py-3.5">
+                        <div className="h-4 w-12 bg-black/5 animate-pulse rounded" />
+                      </td>
+                      {/* Pemesan */}
+                      <td className="px-4 py-3.5">
+                        <div className="flex flex-col gap-1">
+                          <div className="h-4 w-24 bg-black/5 animate-pulse rounded" />
+                          <div className="h-3 w-16 bg-black/5 animate-pulse rounded" />
+                        </div>
+                      </td>
+                      {/* Detail Order */}
+                      <td className="px-4 py-3.5">
+                        <div className="flex flex-col gap-1">
+                          <div className="h-4 w-32 bg-black/5 animate-pulse rounded" />
+                          <div className="h-3 w-24 bg-black/5 animate-pulse rounded" />
+                        </div>
+                      </td>
+                      {/* Pembayaran */}
+                      <td className="px-4 py-3.5">
+                        <div className="flex flex-col gap-1">
+                          <div className="h-4 w-20 bg-black/5 animate-pulse rounded" />
+                          <div className="h-3 w-12 bg-black/5 animate-pulse rounded" />
+                        </div>
+                      </td>
+                      {/* Status */}
+                      <td className="px-4 py-3.5">
+                        <div className="h-6 w-16 bg-black/5 animate-pulse rounded" />
+                      </td>
+                    </tr>
+                  ))
                 ) : filtered.length === 0 ? (
                   <tr>
                     <td

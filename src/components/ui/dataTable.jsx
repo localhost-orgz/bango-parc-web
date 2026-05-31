@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function DataTable({ data = [], columns = [] }) {
+export default function DataTable({ data = [], columns = [], loading = false }) {
   return (
     <div className="overflow-x-auto border border-[#0F131F]/10 bg-white">
       <table className="w-full text-sm text-left">
@@ -18,7 +18,17 @@ export default function DataTable({ data = [], columns = [] }) {
         </thead>
 
         <tbody className="bg-white">
-          {data.length === 0 ? (
+          {loading ? (
+            [...Array(5)].map((_, rowIndex) => (
+              <tr key={rowIndex} className="border-b border-[#0F131F]/5 last:border-0">
+                {columns.map((_, colIndex) => (
+                  <td key={colIndex} className="px-5 py-4 whitespace-nowrap">
+                    <div className="h-4 bg-black/5 animate-pulse rounded w-24" />
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : data.length === 0 ? (
             <tr>
               <td
                 colSpan={columns.length}

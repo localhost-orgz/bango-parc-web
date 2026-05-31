@@ -152,15 +152,6 @@ export default function ReservasiPage() {
     );
   }, [reservations, searchTerm]);
 
-  if (loading) {
-    return (
-      <div className="p-8 flex items-center justify-center min-h-[50vh] text-black/50 text-sm gap-2">
-        <Loader2 className="w-5 h-5 animate-spin" />
-        Memuat data reservasi...
-      </div>
-    );
-  }
-
   if (error) {
     return <div className="p-8 text-red-500 text-sm">{error}</div>;
   }
@@ -222,7 +213,26 @@ export default function ReservasiPage() {
           </thead>
 
           <tbody>
-            {filteredReservations.length === 0 ? (
+            {loading ? (
+              [...Array(5)].map((_, i) => (
+                <tr key={i} className="border-b border-[#0F131F]/5 last:border-0">
+                  <td className="px-5 py-4"><div className="h-4 bg-black/5 animate-pulse rounded w-16" /></td>
+                  <td className="px-5 py-4">
+                    <div className="flex flex-col gap-1.5">
+                      <div className="h-4 bg-black/5 animate-pulse rounded w-24" />
+                      <div className="h-3 bg-black/5 animate-pulse rounded w-32" />
+                    </div>
+                  </td>
+                  <td className="px-5 py-4"><div className="h-4 bg-black/5 animate-pulse rounded w-16" /></td>
+                  <td className="px-5 py-4"><div className="h-4 bg-black/5 animate-pulse rounded w-20" /></td>
+                  <td className="px-5 py-4"><div className="h-4 bg-black/5 animate-pulse rounded w-24" /></td>
+                  <td className="px-5 py-4"><div className="h-4 bg-black/5 animate-pulse rounded w-20" /></td>
+                  <td className="px-5 py-4"><div className="h-6 bg-black/5 animate-pulse rounded w-16" /></td>
+                  <td className="px-5 py-4"><div className="h-6 bg-black/5 animate-pulse rounded w-16" /></td>
+                  <td className="px-5 py-4"><div className="h-8 bg-black/5 animate-pulse rounded w-20" /></td>
+                </tr>
+              ))
+            ) : filteredReservations.length === 0 ? (
               <tr>
                 <td colSpan={9} className="text-center py-16 text-sm text-black/30 bg-white">
                   Tidak ada data reservasi ditemukan.
