@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Image as ImageIcon,
   Search,
@@ -10,225 +10,40 @@ import {
   ShieldCheck,
   User,
   X,
+  Loader2,
 } from "lucide-react";
 import SortHeader from "@/components/admin/users/SortHeader";
 import RoleBadge from "@/components/admin/users/RoleBadge";
 import DetailPanel from "@/components/admin/users/DetailPanel";
+import axiosInstance from "@/lib/axios";
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
-const usersData = [
-  {
-    id: "USR-001",
-    name: "Andi Pratama",
-    email: "andi.pratama@email.com",
-    whatsapp: "+62 812-3456-7890",
-    role: "user",
-    avatar: "A",
-    avatarColor: "bg-[#896d51]",
-    joinedAt: "12 Januari 2025",
-    stats: { planned: 3, finished: 5, canceled: 1, totalSpent: 8500000 },
-    orders: [
-      {
-        id: "B-2025-011",
-        area: "Semi-Indoor & Outdoor",
-        type: "Reguler",
-        date: "15 Mar 2025",
-        amount: 2000000,
-        status: "Finished",
-      },
-      {
-        id: "B-2025-022",
-        area: "Outdoor",
-        type: "Reguler",
-        date: "20 Apr 2025",
-        amount: 2000000,
-        status: "Finished",
-      },
-      {
-        id: "B-2025-034",
-        area: "Indoor",
-        type: "Reguler",
-        date: "10 Jun 2025",
-        amount: 2200000,
-        status: "Finished",
-      },
-      {
-        id: "B-2025-041",
-        area: "Semi-Indoor & Outdoor",
-        type: "Reguler",
-        date: "5 Aug 2025",
-        amount: 2300000,
-        status: "Finished",
-      },
-      {
-        id: "B-2026-001",
-        area: "Semi-Indoor & Outdoor",
-        type: "Reguler",
-        date: "24 Mei 2026",
-        amount: 2200000,
-        status: "Finished",
-      },
-    ],
-  },
-  {
-    id: "USR-002",
-    name: "Siti Rahayu",
-    email: "siti.rahayu@email.com",
-    whatsapp: "+62 857-1234-5678",
-    role: "user",
-    avatar: "S",
-    avatarColor: "bg-[#0F131F]",
-    joinedAt: "3 Maret 2025",
-    stats: { planned: 1, finished: 1, canceled: 0, totalSpent: 15000000 },
-    orders: [
-      {
-        id: "B-2026-002",
-        area: "Indoor",
-        type: "Wedding",
-        date: "21 Jun 2026",
-        amount: 15000000,
-        status: "Finished",
-      },
-    ],
-  },
-  {
-    id: "USR-003",
-    name: "Budi Santoso",
-    email: "budi.s@email.com",
-    whatsapp: "+62 821-9876-5432",
-    role: "user",
-    avatar: "B",
-    avatarColor: "bg-teal-700",
-    joinedAt: "20 Februari 2025",
-    stats: { planned: 2, finished: 3, canceled: 2, totalSpent: 5500000 },
-    orders: [
-      {
-        id: "B-2025-013",
-        area: "Outdoor",
-        type: "Reguler",
-        date: "8 Feb 2025",
-        amount: 2000000,
-        status: "Finished",
-      },
-      {
-        id: "B-2025-028",
-        area: "Outdoor",
-        type: "Reguler",
-        date: "14 Apr 2025",
-        amount: 1500000,
-        status: "Finished",
-      },
-      {
-        id: "B-2026-003",
-        area: "Outdoor",
-        type: "Reguler",
-        date: "17 Mei 2026",
-        amount: 2000000,
-        status: "Finished",
-      },
-    ],
-  },
-  {
-    id: "USR-004",
-    name: "Dewi Lestari",
-    email: "dewi.lestari@email.com",
-    whatsapp: "+62 813-5678-9012",
-    role: "user",
-    avatar: "D",
-    avatarColor: "bg-rose-700",
-    joinedAt: "7 April 2025",
-    stats: { planned: 0, finished: 1, canceled: 1, totalSpent: 2000000 },
-    orders: [
-      {
-        id: "B-2025-045",
-        area: "Semi-Indoor & Outdoor",
-        type: "Reguler",
-        date: "30 Jul 2025",
-        amount: 2000000,
-        status: "Finished",
-      },
-    ],
-  },
-  {
-    id: "USR-005",
-    name: "Reza Firmansyah",
-    email: "reza.f@email.com",
-    whatsapp: "+62 878-2345-6789",
-    role: "user",
-    avatar: "R",
-    avatarColor: "bg-blue-800",
-    joinedAt: "1 Januari 2026",
-    stats: { planned: 1, finished: 0, canceled: 0, totalSpent: 0 },
-    orders: [],
-  },
-  {
-    id: "USR-006",
-    name: "Mega Putri",
-    email: "mega.p@email.com",
-    whatsapp: "+62 819-6543-2109",
-    role: "user",
-    avatar: "M",
-    avatarColor: "bg-violet-700",
-    joinedAt: "15 Juni 2025",
-    stats: { planned: 0, finished: 2, canceled: 0, totalSpent: 4000000 },
-    orders: [
-      {
-        id: "B-2025-051",
-        area: "Outdoor",
-        type: "Reguler",
-        date: "10 Sep 2025",
-        amount: 2000000,
-        status: "Finished",
-      },
-      {
-        id: "B-2026-006",
-        area: "Outdoor",
-        type: "Reguler",
-        date: "18 Mei 2026",
-        amount: 2000000,
-        status: "Finished",
-      },
-    ],
-  },
-  {
-    id: "USR-007",
-    name: "Ahmad Fauzi",
-    email: "ahmad.fauzi@bangoparc.com",
-    whatsapp: "+62 811-0000-0001",
-    role: "admin",
-    avatar: "AF",
-    avatarColor: "bg-[#896d51]",
-    joinedAt: "1 Januari 2024",
-    stats: { planned: 0, finished: 0, canceled: 0, totalSpent: 0 },
-    orders: [],
-  },
-  {
-    id: "USR-008",
-    name: "Nina Kartika",
-    email: "nina.kartika@email.com",
-    whatsapp: "+62 856-7890-1234",
-    role: "user",
-    avatar: "N",
-    avatarColor: "bg-amber-700",
-    joinedAt: "28 Agustus 2025",
-    stats: { planned: 2, finished: 1, canceled: 1, totalSpent: 3500000 },
-    orders: [
-      {
-        id: "B-2025-062",
-        area: "Indoor",
-        type: "Reguler",
-        date: "20 Nov 2025",
-        amount: 3500000,
-        status: "Finished",
-      },
-    ],
-  },
-];
+function formatIndonesianDateSimple(dateStr) {
+  if (!dateStr) return "-";
+  const months = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+  const datePart = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
+  const parts = datePart.split("-");
+  if (parts.length !== 3) return dateStr;
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const day = parseInt(parts[2], 10);
+  
+  const monthName = months[month];
+  return `${day} ${monthName} ${year}`;
+}
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function UsersPage() {
+  const [users, setUsers] = useState([]);
+  const [reservations, setReservations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("Semua");
   const [roleOpen, setRoleOpen] = useState(false);
@@ -237,6 +52,111 @@ export default function UsersPage() {
   const [selectedId, setSelectedId] = useState(null);
 
   const roleOptions = ["Semua", "user", "admin"];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [usersRes, resvRes] = await Promise.all([
+          axiosInstance.get("https://bango-parc-service.vercel.app/api/users"),
+          axiosInstance.get("https://bango-parc-service.vercel.app/api/reservation/all")
+        ]);
+        setUsers(usersRes.data.users || []);
+        setReservations(resvRes.data.data || []);
+        setError(null);
+      } catch (err) {
+        console.error("Gagal mengambil data user/reservasi:", err);
+        setError("Gagal memuat data pengguna dari server.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const formattedUsers = useMemo(() => {
+    const avatarColors = [
+      "bg-[#896d51]",
+      "bg-[#0F131F]",
+      "bg-teal-700",
+      "bg-rose-700",
+      "bg-blue-800",
+      "bg-violet-700",
+      "bg-amber-700",
+      "bg-emerald-700",
+      "bg-indigo-700"
+    ];
+
+    return users.map((u) => {
+      // Find reservations for this user
+      const userResvs = reservations.filter((r) => r.customerId === u.id);
+      
+      // Calculate stats
+      let planned = 0;
+      let finished = 0;
+      let canceled = 0;
+      let totalSpent = 0;
+      
+      const orders = userResvs.map((r) => {
+        const isCompleted = r.status === "COMPLETED";
+        const isCancelled = r.status === "CANCELLED" || r.status === "EXPIRED";
+        
+        if (isCompleted) {
+          finished++;
+          totalSpent += Number(r.paidAmount || r.totalPrice) || 0;
+        } else if (isCancelled) {
+          canceled++;
+        } else {
+          planned++;
+          totalSpent += Number(r.paidAmount) || 0;
+        }
+        
+        let statusText = "Ongoing";
+        if (isCompleted) statusText = "Finished";
+        else if (isCancelled) statusText = "Canceled";
+        
+        const areas = r.areaReservations?.map(ar => ar.area?.name).filter(Boolean) || [];
+        const areaName = areas.length > 0 ? areas.join(" & ") : "Venue Bango Parc";
+        
+        return {
+          id: r.bookingCode || `BP-${r.id}`,
+          area: areaName,
+          type: r.reservationType?.name || "Reguler",
+          date: formatIndonesianDateSimple(r.startDateTime),
+          amount: Number(r.totalPrice) || 0,
+          status: statusText,
+        };
+      });
+      
+      let joinedAt = "15 Mei 2026";
+      if (userResvs.length > 0) {
+        const sorted = [...userResvs].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        joinedAt = formatIndonesianDateSimple(sorted[0].createdAt);
+      }
+      
+      const nameParts = u.fullName ? u.fullName.split(" ") : ["G"];
+      const initials = nameParts.map(p => p[0]).slice(0, 2).join("").toUpperCase();
+      
+      const colorIndex = u.id % avatarColors.length;
+      const avatarColor = avatarColors[colorIndex];
+      
+      return {
+        id: `USR-${String(u.id).padStart(3, "0")}`,
+        rawId: u.id,
+        name: u.fullName || "User Bango Parc",
+        email: u.email || "-",
+        whatsapp: u.whatsappNumber || "-",
+        role: u.role?.toLowerCase() === "admin" ? "admin" : "user",
+        avatar: initials,
+        avatarColor,
+        joinedAt,
+        stats: { planned, finished, canceled, totalSpent },
+        orders,
+      };
+    });
+  }, [users, reservations]);
+
+  const usersData = formattedUsers;
 
   const handleSort = (field) => {
     if (sortField === field) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -465,7 +385,19 @@ export default function UsersPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.length === 0 && (
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="text-center py-16 text-sm text-[#0F131F]/50"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-[#896d51]" />
+                        <span>Memuat data pengguna...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filtered.length === 0 ? (
                   <tr>
                     <td
                       colSpan={6}
@@ -474,11 +406,11 @@ export default function UsersPage() {
                       Tidak ada pengguna yang cocok
                     </td>
                   </tr>
-                )}
-                {filtered.map((u) => {
-                  const isSelected = selectedId === u.id;
-                  return (
-                    <tr
+                ) : (
+                  filtered.map((u) => {
+                    const isSelected = selectedId === u.id;
+                    return (
+                      <tr
                       key={u.id}
                       className={`border-b border-[#0F131F]/5 last:border-0 transition-colors ${isSelected ? "bg-[#896d51]/6 border-l-2 border-l-[#896d51]" : "hover:bg-[#f9f8f6] border-l-2 border-l-transparent"}`}
                     >
@@ -552,7 +484,8 @@ export default function UsersPage() {
                       </td>
                     </tr>
                   );
-                })}
+                })
+              )}
               </tbody>
             </table>
           </div>
