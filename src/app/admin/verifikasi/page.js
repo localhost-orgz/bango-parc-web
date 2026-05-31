@@ -149,6 +149,11 @@ export default function PaymentVerificationPage() {
   const [typeOpen, setTypeOpen] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
 
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectTargetId, setRejectTargetId] = useState("");
+  const [rejectReason, setRejectReason] = useState("");
+  const [isRejecting, setIsRejecting] = useState(false);
+
   useEffect(() => {
     const fetchPayments = async () => {
       try {
@@ -252,30 +257,39 @@ export default function PaymentVerificationPage() {
     }
   };
 
-  const handleReject = async (id) => {
-    const item = data.find(p => p.id === id);
-    const targetId = item?.apiId || id;
-    
-    const reason = prompt("Masukkan alasan penolakan pembayaran:");
-    if (reason === null) return; // Cancelled
-    if (!reason.trim()) {
-      alert("Alasan penolakan wajib diisi!");
-      return;
-    }
+  const handleReject = (id) => {
+    setRejectTargetId(id);
+    setRejectReason("");
+    setShowRejectModal(true);
+  };
 
-    // Optimistic/local UI update
-    setData((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, status: "Rejected" } : p)),
-    );
+  const confirmReject = async () => {
+    if (!rejectReason.trim() || !rejectTargetId) return;
+
+    const item = data.find((p) => p.id === rejectTargetId);
+    const targetId = item?.apiId || rejectTargetId;
 
     try {
+      setIsRejecting(true);
+      
       await axiosInstance.patch("https://bango-parc-service.vercel.app/api/payment/reject", {
         paymentProofId: Number(targetId),
-        rejectionReason: reason
+        rejectionReason: rejectReason
       });
+
+      // Optimistic/local UI update
+      setData((prev) =>
+        prev.map((p) => (p.id === rejectTargetId ? { ...p, status: "Rejected" } : p)),
+      );
+
+      setShowRejectModal(false);
+      setRejectReason("");
+      setRejectTargetId("");
     } catch (err) {
       console.error("Gagal memperbarui status di server:", err);
       alert("Gagal menolak pembayaran: " + (err.response?.data?.error || err.message));
+    } finally {
+      setIsRejecting(false);
     }
   };
 
@@ -568,6 +582,54 @@ export default function PaymentVerificationPage() {
           onReject={handleReject}
         />
       </div>
+
+      {/* Rejection Modal Overlay */}
+      {showRejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+          <div className="bg-white w-full max-w-md shadow-2xl p-6 border border-[#0F131F]/10 rounded flex flex-col gap-4 animate-in fade-in zoom-in duration-200">
+            <h3 className="font-crimson-pro text-xl font-bold text-[#0F131F]">
+              Tolak Bukti Pembayaran
+            </h3>
+            <p className="text-xs text-black/55 leading-relaxed">
+              Silakan masukkan alasan penolakan untuk kode order <span className="font-mono font-bold text-[#0F131F]">{rejectTargetId}</span>. Alasan ini akan dapat dilihat langsung oleh pelanggan pada halaman profil mereka.
+            </p>
+            <textarea
+              rows={4}
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Contoh: Bukti transfer tidak terbaca / buram. Silakan unggah kembali bukti pembayaran yang jelas."
+              className="w-full p-3 border border-[#0F131F]/15 text-sm outline-none focus:border-[#0F131F] transition-colors resize-none bg-[#f3f4f7]/20 placeholder:text-black/35 rounded"
+            />
+            <div className="flex justify-end gap-3 text-sm pt-2">
+              <button
+                onClick={() => {
+                  setShowRejectModal(false);
+                  setRejectReason("");
+                  setRejectTargetId("");
+                }}
+                disabled={isRejecting}
+                className="px-4 py-2 border border-[#0F131F]/15 hover:bg-black/5 font-semibold transition-all disabled:opacity-50 cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmReject}
+                disabled={!rejectReason.trim() || isRejecting}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold flex items-center gap-1.5 transition-all disabled:bg-red-300 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {isRejecting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Mengirim...
+                  </>
+                ) : (
+                  "Kirim Penolakan"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
