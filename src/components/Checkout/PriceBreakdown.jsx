@@ -2,6 +2,10 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function PriceBreakdown({ data }) {
+  const rentPrice = data.pricePerSession || 0;
+  const dpMinimum = rentPrice > 2000000 ? 1000000 : rentPrice * 0.5;
+  const dpLabel = rentPrice > 2000000 ? "DP minimum" : "DP minimum (50%)";
+
   return (
     <div className="bg-white border-2 border-[#0F131F] p-5 sm:p-6">
       <h5 className="font-crimson-pro text-xl text-[#0F131F] mb-5 pb-3 border-b border-[#0F131F]/10">
@@ -10,34 +14,18 @@ export default function PriceBreakdown({ data }) {
       <div className="flex flex-col gap-3">
         <div className="flex justify-between text-sm text-black/55">
           <span>Sewa venue ({data.duration} jam)</span>
-          <span>Rp{data.pricePerSession.toLocaleString("id-ID")}</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="line-through text-black/25">Harga normal</span>
-          <span className="line-through text-black/25">
-            Rp{data.originalPrice.toLocaleString("id-ID")}
-          </span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-emerald-600">Diskon</span>
-          <span className="text-emerald-600">
-            -Rp{data.discount.toLocaleString("id-ID")}
-          </span>
-        </div>
-        <div className="flex justify-between text-sm text-black/55">
-          <span>Pajak & Biaya (10%)</span>
-          <span>Rp{data.tax.toLocaleString("id-ID")}</span>
+          <span>Rp{rentPrice.toLocaleString("id-ID")}</span>
         </div>
         <div className="h-px w-full bg-[#0F131F]/12 my-1" />
         <div className="flex justify-between">
           <span className="font-semibold text-[#0F131F]">Total</span>
           <span className="font-semibold text-xl text-[#0F131F]">
-            Rp{data.total.toLocaleString("id-ID")}
+            Rp{rentPrice.toLocaleString("id-ID")}
           </span>
         </div>
         <div className="flex justify-between text-xs text-black/35 -mt-1">
-          <span>DP minimum (50%)</span>
-          <span>Rp{(data.total / 2).toLocaleString("id-ID")}</span>
+          <span>{dpLabel}</span>
+          <span>Rp{dpMinimum.toLocaleString("id-ID")}</span>
         </div>
       </div>
 

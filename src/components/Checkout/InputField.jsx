@@ -4,6 +4,10 @@ export default function InputField({
   type = "text",
   required = false,
   hint,
+  value,
+  onChange,
+  disabled = false,
+  readOnly = false,
 }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -14,7 +18,15 @@ export default function InputField({
       <input
         type={type}
         placeholder={placeholder}
-        className="w-full h-11 border-b-2 border-[#0F131F]/20 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none focus:border-[#0F131F] transition-colors px-1"
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        readOnly={readOnly}
+        className={`w-full h-11 border-b-2 bg-transparent text-sm text-[#0F131F] placeholder:text-black/25 outline-none transition-colors px-1 ${
+          disabled || readOnly
+            ? "border-gray-200 text-gray-500 cursor-not-allowed opacity-75"
+            : "border-[#0F131F]/20 focus:border-[#0F131F]"
+        }`}
       />
       {hint && <p className="text-[10px] text-black/30">{hint}</p>}
     </div>

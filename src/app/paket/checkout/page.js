@@ -163,9 +163,6 @@ function CheckoutContent() {
   });
 
   const venueName = (type === "wedding" ? "Wedding " : "") + resolvedAreaNames.join(" & ");
-  const totalDiscount = totalOriginalPrice - totalDiscountedPrice;
-  const totalTax = Math.round(totalDiscountedPrice * 0.1);
-  const totalPayable = totalDiscountedPrice + totalTax;
   const formattedDate = formatIndonesianDate(dateStr);
 
   const bookingData = {
@@ -176,10 +173,10 @@ function CheckoutContent() {
     endTime: end,
     duration,
     pricePerSession: totalDiscountedPrice,
-    originalPrice: totalOriginalPrice,
-    discount: totalDiscount,
-    tax: totalTax,
-    total: totalPayable,
+    originalPrice: totalDiscountedPrice,
+    discount: 0,
+    tax: 0,
+    total: totalDiscountedPrice,
     image: firstAreaImage,
   };
 
