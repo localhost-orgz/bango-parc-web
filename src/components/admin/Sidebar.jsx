@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import axiosInstance from "@/lib/axios";
 import {
   Package,
   GalleryHorizontal,
@@ -24,19 +26,37 @@ const dataItems = [
   { label: "Pengguna", icon: Users, path: "/admin/users" },
 ];
 
-const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
-  {
-    label: "Verifikasi Pembayaran",
-    icon: CreditCard,
-    path: "/admin/verifikasi",
-    badge: 3,
-  },
-  { label: "Data Reservasi", icon: CalendarDays, path: "/admin/reservasi" },
-];
-
 function Sidebar() {
   const pathname = usePathname();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    const fetchPendingCount = async () => {
+      try {
+        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/payment");
+        const apiData = res.data?.result || res.data?.data || [];
+        const pendingItems = apiData.filter(p => {
+          const rawStatus = (p.approvalStatus || p.status || "PENDING").toUpperCase();
+          return rawStatus === "PENDING";
+        });
+        setPendingCount(pendingItems.length);
+      } catch (err) {
+        console.error("Gagal mengambil count verifikasi pembayaran di sidebar:", err);
+      }
+    };
+    fetchPendingCount();
+  }, []);
+
+  const navItems = [
+    { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
+    {
+      label: "Verifikasi Pembayaran",
+      icon: CreditCard,
+      path: "/admin/verifikasi",
+      badge: pendingCount > 0 ? pendingCount : null,
+    },
+    { label: "Data Reservasi", icon: CalendarDays, path: "/admin/reservasi" },
+  ];
 
   // Helper buat ngecek aktif 🔎
   const isActive = (path) => {
