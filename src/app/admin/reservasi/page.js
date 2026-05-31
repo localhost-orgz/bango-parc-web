@@ -120,7 +120,16 @@ export default function ReservasiPage() {
       try {
         setLoading(true);
         const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/reservation/all");
-        setReservations(res.data.data || []);
+        const rawList = res.data.data || [];
+        const uniqueList = [];
+        const seenIds = new Set();
+        for (const item of rawList) {
+          if (item && item.id && !seenIds.has(item.id)) {
+            seenIds.add(item.id);
+            uniqueList.push(item);
+          }
+        }
+        setReservations(uniqueList);
         setError(null);
       } catch (err) {
         console.error(err);

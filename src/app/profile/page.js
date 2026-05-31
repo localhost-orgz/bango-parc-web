@@ -349,7 +349,17 @@ export default function ProfilePage() {
   };
 
   const mappedReal = realReservations.map(mapRealToUi);
-  const reservations = [...mappedReal, ...DUMMY_RESERVATIONS];
+  const combined = [...mappedReal, ...DUMMY_RESERVATIONS];
+
+  // Deduplicate by ID to prevent duplicate items from SQL JOINs or collisions
+  const reservations = [];
+  const seenIds = new Set();
+  for (const item of combined) {
+    if (!seenIds.has(item.id)) {
+      seenIds.add(item.id);
+      reservations.push(item);
+    }
+  }
 
   return (
     <main className="w-full min-h-screen bg-[#F4F7FA]">
