@@ -930,6 +930,7 @@ function DetailPaketContent() {
         priceVal: getAreaPrice(activeArea, type),
         price: formatRupiah(getAreaPrice(activeArea, type)),
         areaFacilities: activeArea.areaFacilities,
+        areaPrices: activeArea.areaPrices,
       }
     : (currentPackages.find((p) => String(p.id) === String(id)) || currentPackages[0]);
 
@@ -947,6 +948,7 @@ function DetailPaketContent() {
           priceVal: getAreaPrice(foundArea, type),
           price: formatRupiah(getAreaPrice(foundArea, type)),
           areaFacilities: foundArea.areaFacilities,
+          areaPrices: foundArea.areaPrices,
         };
       }
       return currentPackages.find((p) => String(p.id) === String(areaId));
