@@ -1,10 +1,26 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
-export default function PriceBreakdown({ data }) {
+export default function PriceBreakdown({ data, onPaymentProceed }) {
+  const [submitting, setSubmitting] = useState(false);
   const rentPrice = data.pricePerSession || 0;
   const dpMinimum = rentPrice > 2000000 ? 1000000 : rentPrice * 0.5;
   const dpLabel = rentPrice > 2000000 ? "DP minimum" : "DP minimum (50%)";
+
+  const handleProceed = async (e) => {
+    e.preventDefault();
+    if (onPaymentProceed) {
+      setSubmitting(true);
+      try {
+        await onPaymentProceed();
+      } catch (err) {
+        console.error("Booking error:", err);
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  };
 
   return (
     <div className="bg-white border-2 border-[#0F131F] p-5 sm:p-6">
@@ -31,13 +47,33 @@ export default function PriceBreakdown({ data }) {
 
       <div className="h-px w-full bg-[#0F131F]/12 my-5" />
 
-      <Link
-        href={"/payment"}
-        className="w-full bg-[#0F131F] flex justify-center items-center gap-2 py-3.5 text-sm font-medium text-white hover:bg-[#1e2540] transition-colors"
-      >
-        Lanjutkan ke Pembayaran
-        <ArrowRight size={16} strokeWidth={1.5} />
-      </Link>
+      {onPaymentProceed ? (
+        <button
+          onClick={handleProceed}
+          disabled={submitting}
+          className="w-full bg-[#0F131F] flex justify-center items-center gap-2 py-3.5 text-sm font-medium text-white hover:bg-[#1e2540] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Memproses Booking...</span>
+            </>
+          ) : (
+            <>
+              Lanjutkan ke Pembayaran
+              <ArrowRight size={16} strokeWidth={1.5} />
+            </>
+          )}
+        </button>
+      ) : (
+        <Link
+          href={"/payment"}
+          className="w-full bg-[#0F131F] flex justify-center items-center gap-2 py-3.5 text-sm font-medium text-white hover:bg-[#1e2540] transition-colors"
+        >
+          Lanjutkan ke Pembayaran
+          <ArrowRight size={16} strokeWidth={1.5} />
+        </Link>
+      )}
 
       <p className="text-[10px] text-center text-black/30 mt-3">
         Dengan melanjutkan, Anda menyetujui{" "}

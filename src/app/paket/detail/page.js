@@ -18,7 +18,7 @@ import {
   Loader2,
 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import axiosInstance from "@/lib/axios";
 
@@ -514,9 +514,23 @@ function BookingCard({
   onStartChange,
   onEndChange,
 }) {
+  const router = useRouter();
   const selectedDateKey = selectedDate?.key || "";
   const areaIdsParam = selectedAreaIds.join(",");
   const isReady = selectedAreaIds.length > 0 && selectedDate && selectedStart && selectedEnd;
+
+  const handleContinue = () => {
+    if (!isReady) return;
+    const sessionData = {
+      ids: areaIdsParam,
+      type: pkg.type,
+      date: selectedDateKey,
+      start: selectedStart,
+      end: selectedEnd,
+    };
+    localStorage.setItem("bango_parc_booking_session", JSON.stringify(sessionData));
+    router.push("/paket/checkout");
+  };
 
   return (
     <div className="w-full p-5 border-2 border-[#0F131F] mt-8 bg-white">
@@ -553,16 +567,16 @@ function BookingCard({
         <div className="h-px w-full bg-[#0F131F]/70 mb-1 mt-3" />
 
         {isReady ? (
-          <Link
-            href={`/paket/checkout?ids=${areaIdsParam}&type=${pkg.type}&date=${selectedDateKey}&start=${selectedStart}&end=${selectedEnd}`}
-            className="bg-[#0F131F] flex justify-center items-center py-3 text-sm font-medium text-white hover:bg-[#7a6047] transition-colors"
+          <button
+            onClick={handleContinue}
+            className="w-full bg-[#0F131F] flex justify-center items-center py-3 text-sm font-medium text-white hover:bg-[#7a6047] transition-colors cursor-pointer"
           >
             Lanjutkan Booking
-          </Link>
+          </button>
         ) : (
           <button
             disabled
-            className="bg-gray-300 flex justify-center items-center py-3 text-sm font-medium text-gray-500 cursor-not-allowed border border-gray-200"
+            className="w-full bg-gray-300 flex justify-center items-center py-3 text-sm font-medium text-gray-500 cursor-not-allowed border border-gray-200"
           >
             Lanjutkan Booking
           </button>

@@ -18,7 +18,7 @@ import {
   Landmark,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/Landing/Navbar";
 
 // Simulasi data tetap sama
@@ -132,6 +132,18 @@ export default function PaymentPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef(null);
+  const [dynamicOrderData, setDynamicOrderData] = useState(orderData);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("bango_parc_payment_order");
+    if (saved) {
+      try {
+        setDynamicOrderData(JSON.parse(saved));
+      } catch (e) {
+        console.error("Gagal membaca payment order dari localStorage:", e);
+      }
+    }
+  }, []);
 
   const selected = paymentMethods.find((m) => m.id === selectedMethod);
 
@@ -155,9 +167,9 @@ export default function PaymentPage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         {/* LEFT — Order Summary */}
         <div className="lg:col-span-4 flex flex-col gap-4 order-1 lg:order-1">
-          <OrderCode code={orderData.orderCode} />
-          <VenueInfo orderData={orderData} />
-          <PriceBreakdown orderData={orderData} paymentType={paymentType} />
+          <OrderCode code={dynamicOrderData.orderCode} />
+          <VenueInfo orderData={dynamicOrderData} />
+          <PriceBreakdown orderData={dynamicOrderData} paymentType={paymentType} />
           <AlertPayment />
         </div>
 
@@ -166,8 +178,8 @@ export default function PaymentPage() {
           <PaymentTypeSelect
             paymentType={paymentType}
             onSelectPaymentType={setPaymentType}
-            total={orderData.total}
-            dpAmount={orderData.dpAmount}
+            total={dynamicOrderData.total}
+            dpAmount={dynamicOrderData.dpAmount}
           />
 
           <PaymentMethodSelect
@@ -177,13 +189,13 @@ export default function PaymentPage() {
           />
 
           {selected.type === "qris" && (
-            <QrisPayment orderData={orderData} paymentType={paymentType} />
+            <QrisPayment orderData={dynamicOrderData} paymentType={paymentType} />
           )}
 
           {selected.type === "transfer" && (
             <TransferPayment
               selected={selected}
-              orderData={orderData}
+              orderData={dynamicOrderData}
               copied={copied}
               onCopy={setCopied}
               paymentType={paymentType}
