@@ -26,136 +26,7 @@ import DetailPanel from "@/components/admin/verification/DetailPanel";
 import SortHeader from "@/components/admin/verification/SortHeader";
 import axiosInstance from "@/lib/axios";
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-
-const payments = [
-  {
-    id: "B-2026-001",
-    orderer: {
-      name: "Andi Pratama",
-      email: "andi.pratama@email.com",
-      phone: "+62 812-3456-7890",
-      avatar: "A",
-    },
-    area: "Semi-Indoor & Outdoor",
-    type: "Reguler",
-    date: "Sabtu, 24 Mei 2026",
-    time: "09:00 – 12:00",
-    duration: 3,
-    paymentAmount: 1100000,
-    paymentType: "DP",
-    totalAmount: 2200000,
-    status: "Pending",
-    submittedAt: "10 Mei 2026, 14:23",
-    evidenceUrl:
-      "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&auto=format&fit=crop",
-  },
-  {
-    id: "B-2026-002",
-    orderer: {
-      name: "Siti Rahayu",
-      email: "siti.rahayu@email.com",
-      phone: "+62 857-1234-5678",
-      avatar: "S",
-    },
-    area: "Indoor",
-    type: "Wedding",
-    date: "Sabtu, 21 Juni 2026",
-    time: "07:00 – 22:00",
-    duration: 15,
-    paymentAmount: 7500000,
-    paymentType: "DP",
-    totalAmount: 15000000,
-    status: "Pending",
-    submittedAt: "9 Mei 2026, 10:05",
-    evidenceUrl:
-      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&auto=format&fit=crop",
-  },
-  {
-    id: "B-2026-003",
-    orderer: {
-      name: "Budi Santoso",
-      email: "budi.s@email.com",
-      phone: "+62 821-9876-5432",
-      avatar: "B",
-    },
-    area: "Outdoor",
-    type: "Reguler",
-    date: "Minggu, 17 Mei 2026",
-    time: "13:00 – 16:00",
-    duration: 3,
-    paymentAmount: 2200000,
-    paymentType: "Pelunasan",
-    totalAmount: 2200000,
-    status: "Approved",
-    submittedAt: "7 Mei 2026, 09:30",
-    evidenceUrl:
-      "https://images.unsplash.com/photo-1580519542036-c47de6196ba5?w=600&auto=format&fit=crop",
-  },
-  {
-    id: "B-2026-004",
-    orderer: {
-      name: "Dewi Lestari",
-      email: "dewi.lestari@email.com",
-      phone: "+62 813-5678-9012",
-      avatar: "D",
-    },
-    area: "Semi-Indoor & Outdoor",
-    type: "Reguler",
-    date: "Jumat, 22 Mei 2026",
-    time: "10:00 – 13:00",
-    duration: 3,
-    paymentAmount: 1000000,
-    paymentType: "DP",
-    totalAmount: 2000000,
-    status: "Rejected",
-    submittedAt: "6 Mei 2026, 16:45",
-    evidenceUrl:
-      "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&auto=format&fit=crop",
-  },
-  {
-    id: "B-2026-005",
-    orderer: {
-      name: "Reza Firmansyah",
-      email: "reza.f@email.com",
-      phone: "+62 878-2345-6789",
-      avatar: "R",
-    },
-    area: "Indoor",
-    type: "Wedding",
-    date: "Sabtu, 25 Juli 2026",
-    time: "07:00 – 22:00",
-    duration: 15,
-    paymentAmount: 10000000,
-    paymentType: "DP",
-    totalAmount: 20000000,
-    status: "Pending",
-    submittedAt: "8 Mei 2026, 11:20",
-    evidenceUrl:
-      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop",
-  },
-  {
-    id: "B-2026-006",
-    orderer: {
-      name: "Mega Putri",
-      email: "mega.p@email.com",
-      phone: "+62 819-6543-2109",
-      avatar: "M",
-    },
-    area: "Outdoor",
-    type: "Reguler",
-    date: "Senin, 18 Mei 2026",
-    time: "15:00 – 18:00",
-    duration: 3,
-    paymentAmount: 2000000,
-    paymentType: "Pelunasan",
-    totalAmount: 2000000,
-    status: "Approved",
-    submittedAt: "5 Mei 2026, 13:10",
-    evidenceUrl:
-      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&auto=format&fit=crop",
-  },
-];
+// No mock data fallback required
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
@@ -179,20 +50,24 @@ const formatSubmittedAt = (dateStr) => {
 };
 
 const mapApiPaymentToUi = (apiItem) => {
+  const sched = apiItem.paymentSchedule || {};
+  const resv = sched.reservation || apiItem.reservation || {};
+  const cust = resv.customer || apiItem.customer || {};
+
   const orderer = {
-    name: apiItem.reservation?.customer?.fullName || apiItem.customer?.fullName || apiItem.orderer?.name || "Guest",
-    email: apiItem.reservation?.customer?.email || apiItem.customer?.email || apiItem.orderer?.email || "-",
-    phone: apiItem.reservation?.customer?.whatsappNumber || apiItem.customer?.whatsappNumber || apiItem.orderer?.phone || "-",
-    avatar: (apiItem.reservation?.customer?.fullName || apiItem.customer?.fullName || apiItem.orderer?.name || "G")[0].toUpperCase()
+    name: apiItem.senderName || cust.fullName || apiItem.orderer?.name || "Guest",
+    email: cust.email || apiItem.orderer?.email || "-",
+    phone: cust.whatsappNumber || apiItem.orderer?.phone || "-",
+    avatar: (apiItem.senderName || cust.fullName || apiItem.orderer?.name || "G")[0].toUpperCase()
   };
 
-  const areas = apiItem.reservation?.areaReservations?.map(ar => ar.area?.name) || [];
-  const areaName = areas.length > 0 ? areas.join(", ") : (apiItem.area || "Semi-Indoor & Outdoor");
+  const areas = resv.areaReservations?.map(ar => ar.area?.name).filter(Boolean) || [];
+  const areaName = areas.length > 0 ? areas.join(" & ") : (apiItem.area || "Semi-Indoor & Outdoor");
 
-  const reservationType = apiItem.reservation?.reservationType?.name || apiItem.type || "Reguler";
+  const reservationType = resv.reservationType?.name || apiItem.type || "Reguler";
 
-  const startDt = apiItem.reservation?.startDateTime || apiItem.startDateTime;
-  const endDt = apiItem.reservation?.endDateTime || apiItem.endDateTime;
+  const startDt = resv.startDateTime || apiItem.startDateTime;
+  const endDt = resv.endDateTime || apiItem.endDateTime;
   
   let formattedDate = apiItem.date || "-";
   let formattedTime = apiItem.time || "-";
@@ -210,10 +85,10 @@ const mapApiPaymentToUi = (apiItem) => {
       if (endDt) {
         const endDateObj = new Date(endDt);
         const pad = (n) => n.toString().padStart(2, "0");
-        const sh = pad(dateObj.getHours());
-        const sm = pad(dateObj.getMinutes());
-        const eh = pad(endDateObj.getHours());
-        const em = pad(endDateObj.getMinutes());
+        const sh = pad(dateObj.getUTCHours());
+        const sm = pad(dateObj.getUTCMinutes());
+        const eh = pad(endDateObj.getUTCHours());
+        const em = pad(endDateObj.getUTCMinutes());
         formattedTime = `${sh}:${sm} – ${eh}:${em}`;
         
         duration = Math.round((endDateObj - dateObj) / (1000 * 60 * 60));
@@ -223,7 +98,7 @@ const mapApiPaymentToUi = (apiItem) => {
     }
   }
 
-  let payType = apiItem.paymentType || "DP";
+  let payType = apiItem.paymentType || (sched.installmentNumber === 1 ? "DP" : "Pelunasan") || "DP";
   if (payType === "FULL" || payType === "Lunas" || payType === "full") {
     payType = "Pelunasan";
   } else if (payType === "DP" || payType === "dp" || payType === "PARTIAL") {
@@ -231,15 +106,17 @@ const mapApiPaymentToUi = (apiItem) => {
   }
 
   let status = "Pending";
-  const rawStatus = (apiItem.status || "PENDING").toUpperCase();
+  const rawStatus = (apiItem.approvalStatus || apiItem.status || "PENDING").toUpperCase();
   if (rawStatus === "APPROVED" || rawStatus === "VERIFIED") {
     status = "Approved";
   } else if (rawStatus === "REJECTED" || rawStatus === "DENIED" || rawStatus === "TOLAK") {
     status = "Rejected";
   }
 
+  const subTime = apiItem.uploadedAt || apiItem.createdAt;
+
   return {
-    id: apiItem.bookingCode || apiItem.reservation?.bookingCode || apiItem.id?.toString() || "B-2026-000",
+    id: resv.bookingCode || apiItem.bookingCode || `BP-${resv.id || apiItem.id}`,
     apiId: apiItem.id,
     orderer,
     area: areaName,
@@ -247,12 +124,12 @@ const mapApiPaymentToUi = (apiItem) => {
     date: formattedDate,
     time: formattedTime,
     duration,
-    paymentAmount: Number(apiItem.amount || apiItem.paymentAmount || apiItem.reservation?.paidAmount || 0),
+    paymentAmount: Number(apiItem.amount || 0),
     paymentType: payType,
-    totalAmount: Number(apiItem.totalAmount || apiItem.reservation?.totalPrice || 0),
+    totalAmount: Number(resv.totalPrice || apiItem.totalAmount || 0),
     status,
-    submittedAt: apiItem.createdAt ? formatSubmittedAt(apiItem.createdAt) : (apiItem.submittedAt || "-"),
-    evidenceUrl: apiItem.evidenceUrl || apiItem.proofImageUrl || apiItem.imageUrl || "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&auto=format&fit=crop"
+    submittedAt: subTime ? formatSubmittedAt(subTime) : "-",
+    evidenceUrl: apiItem.proofImage || apiItem.evidenceUrl || apiItem.proofImageUrl || apiItem.imageUrl || "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&auto=format&fit=crop"
   };
 };
 
@@ -278,19 +155,15 @@ export default function PaymentVerificationPage() {
         setLoading(true);
         const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/payment");
         const apiData = res.data?.result || res.data?.data || [];
-        if (apiData.length > 0) {
-          const mapped = apiData.map(mapApiPaymentToUi);
-          setData(mapped);
-          setSelectedId(mapped[0]?.id || "");
-        } else {
-          setData(payments);
-          setSelectedId(payments[0]?.id || "");
-        }
+        const mapped = apiData.map(mapApiPaymentToUi);
+        setData(mapped);
+        setSelectedId(mapped[0]?.id || "");
         setError(null);
       } catch (err) {
         console.error("Gagal mengambil data pembayaran:", err);
-        setData(payments);
-        setSelectedId(payments[0]?.id || "");
+        setError("Gagal mengambil data pembayaran dari server.");
+        setData([]);
+        setSelectedId("");
       } finally {
         setLoading(false);
       }

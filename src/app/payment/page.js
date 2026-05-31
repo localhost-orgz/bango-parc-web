@@ -16,10 +16,15 @@ import {
   FileImage,
   QrCode,
   Landmark,
+  User,
+  CreditCard,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/Landing/Navbar";
+import axiosInstance from "@/lib/axios";
 
 // Simulasi data tetap sama
 const orderData = {
@@ -126,6 +131,7 @@ function PaymentTypeSelect({ paymentType, onSelectPaymentType, total, dpAmount }
 }
 
 export default function PaymentPage() {
+  const router = useRouter();
   const [paymentType, setPaymentType] = useState("full");
   const [selectedMethod, setSelectedMethod] = useState("qris");
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -134,6 +140,36 @@ export default function PaymentPage() {
   const fileInputRef = useRef(null);
   const [dynamicOrderData, setDynamicOrderData] = useState(orderData);
 
+  const [senderName, setSenderName] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [reservation, setReservation] = useState(null);
+  const [loadingReservation, setLoadingReservation] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync amount when payment option or order data changes
+  const amountToPay = paymentType === "full" ? dynamicOrderData.total : dynamicOrderData.dpAmount;
+  useEffect(() => {
+    if (amountToPay) {
+      setPaymentAmount(amountToPay);
+    }
+  }, [amountToPay]);
+
+  // Prefill sender name from user profile
+  useEffect(() => {
+    const savedProfile = localStorage.getItem("bango_parc_user_profile");
+    if (savedProfile) {
+      try {
+        const parsed = JSON.parse(savedProfile);
+        if (parsed.fullName) {
+          setSenderName(parsed.fullName);
+        }
+      } catch (e) {
+        console.error("Gagal membaca profil dari localStorage:", e);
+      }
+    }
+  }, []);
+
+  // Fetch dynamic payment order from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("bango_parc_payment_order");
     if (saved) {
@@ -144,6 +180,105 @@ export default function PaymentPage() {
       }
     }
   }, []);
+
+  // Fetch reservation details to retrieve the paymentSchedules ID
+  useEffect(() => {
+    const fetchReservationDetails = async () => {
+      if (!dynamicOrderData.reservationId) return;
+      try {
+        setLoadingReservation(true);
+        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/reservation/all");
+        const found = res.data.data?.find((r) => r.id === Number(dynamicOrderData.reservationId));
+        if (found) {
+          setReservation(found);
+        }
+      } catch (err) {
+        console.error("Gagal mengambil detail reservasi:", err);
+      } finally {
+        setLoadingReservation(false);
+      }
+    };
+    fetchReservationDetails();
+  }, [dynamicOrderData.reservationId]);
+
+  const handleSubmitPayment = async (e) => {
+    if (e) e.preventDefault();
+    if (!uploadedFile) {
+      alert("Silakan pilih atau seret berkas bukti pembayaran terlebih dahulu.");
+      return;
+    }
+    if (!senderName.trim()) {
+      alert("Silakan isi nama pengirim transfer.");
+      return;
+    }
+    if (!paymentAmount) {
+      alert("Silakan isi nominal transfer.");
+      return;
+    }
+
+    // 1. Resolve paymentScheduleId
+    let paymentScheduleId = null;
+    if (reservation && reservation.paymentSchedules && reservation.paymentSchedules.length > 0) {
+      const pendingSchedules = [...reservation.paymentSchedules]
+        .filter(s => s.status === "PENDING" || s.status === "UNPAID")
+        .sort((a, b) => a.installmentNumber - b.installmentNumber);
+
+      if (pendingSchedules.length > 0) {
+        if (paymentType === "dp") {
+          const dpSched = pendingSchedules.find(s => s.installmentNumber === 1);
+          paymentScheduleId = dpSched ? dpSched.id : pendingSchedules[0].id;
+        } else {
+          paymentScheduleId = pendingSchedules[0].id;
+        }
+      } else {
+        paymentScheduleId = reservation.paymentSchedules[0].id;
+      }
+    }
+
+    // Fallback if no paymentScheduleId is resolved
+    if (!paymentScheduleId) {
+      if (!dynamicOrderData.reservationId) {
+        // Mock success for dummy order
+        setIsSubmitting(true);
+        setTimeout(() => {
+          setIsSubmitting(false);
+          alert("Bukti pembayaran dikirim! (Pemesanan dummy disimulasikan berhasil)");
+          router.push("/profile");
+        }, 1200);
+        return;
+      }
+      alert("Gagal memproses pembayaran: Jadwal pembayaran tidak ditemukan pada server.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const formData = new FormData();
+      formData.append("file", uploadedFile);
+      formData.append("paymentScheduleId", String(paymentScheduleId));
+      formData.append("amount", String(paymentAmount));
+      formData.append("senderName", senderName);
+
+      await axiosInstance.post(
+        "https://bango-parc-service.vercel.app/api/payment",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      alert("Bukti pembayaran berhasil dikirim! Silakan tunggu konfirmasi admin.");
+      router.push("/profile");
+    } catch (err) {
+      console.error("Gagal mengirim bukti pembayaran:", err);
+      alert(err.response?.data?.message || "Gagal mengirim bukti pembayaran. Silakan coba lagi.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const selected = paymentMethods.find((m) => m.id === selectedMethod);
 
@@ -210,6 +345,41 @@ export default function PaymentPage() {
 
             <div className="w-full h-px bg-[#0f131f]/10 mb-5" />
 
+            {/* Form Inputs for Sender and Amount */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+              <div className="flex flex-col gap-1.5 text-left">
+                <label htmlFor="senderName" className="text-xs font-semibold text-[#0f131f]/60 tracking-wide uppercase flex items-center gap-1.5">
+                  <User size={12} className="text-[#896d51]" />
+                  Nama Pengirim
+                </label>
+                <input
+                  id="senderName"
+                  type="text"
+                  required
+                  value={senderName}
+                  onChange={(e) => setSenderName(e.target.value)}
+                  placeholder="Nama pengirim transfer"
+                  className="w-full h-10 border-b border-[#0f131f]/20 bg-transparent text-sm text-[#0f131f] placeholder:text-black/25 outline-none focus:border-[#0f131f] transition-colors px-1"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 text-left">
+                <label htmlFor="paymentAmount" className="text-xs font-semibold text-[#0f131f]/60 tracking-wide uppercase flex items-center gap-1.5">
+                  <CreditCard size={12} className="text-[#896d51]" />
+                  Nominal Transfer (Rp)
+                </label>
+                <input
+                  id="paymentAmount"
+                  type="number"
+                  required
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(e.target.value)}
+                  placeholder="Nominal transfer"
+                  className="w-full h-10 border-b border-[#0f131f]/20 bg-transparent text-sm text-[#0f131f] placeholder:text-black/25 outline-none focus:border-[#0f131f] transition-colors px-1"
+                />
+              </div>
+            </div>
+
             <div
               onDragOver={(e) => {
                 e.preventDefault();
@@ -218,7 +388,7 @@ export default function PaymentPage() {
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`w-full border-2 border-dashed flex flex-col items-center justify-center gap-3 py-8 sm:py-10 px-4 text-center cursor-pointer transition-all ${
+              className={`w-full border-2 border-dashed flex flex-col items-center justify-center gap-3 py-8 sm:py-10 px-4 text-center cursor-pointer transition-all mb-4 ${
                 isDragging
                   ? "border-[#0f131f] bg-[#0f131f]/5"
                   : uploadedFile
@@ -290,15 +460,31 @@ export default function PaymentPage() {
 
             <div className="mt-5 flex flex-col gap-3">
               <button
-                disabled={!uploadedFile}
+                type="button"
+                onClick={handleSubmitPayment}
+                disabled={!uploadedFile || !senderName || !paymentAmount || isSubmitting || loadingReservation}
                 className={`w-full flex justify-center items-center gap-2 py-3.5 text-sm font-medium transition-all ${
-                  uploadedFile
-                    ? "bg-[#0f131f] text-white hover:bg-[#1a2135] active:scale-[0.98]"
+                  (uploadedFile && senderName && paymentAmount && !isSubmitting && !loadingReservation)
+                    ? "bg-[#0f131f] text-white hover:bg-[#1a2135] active:scale-[0.98] cursor-pointer"
                     : "bg-[#0f131f]/20 text-[#0f131f]/40 cursor-not-allowed"
                 }`}
               >
-                <Upload size={16} strokeWidth={1.5} />
-                Kirim Bukti Pembayaran
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin text-white" />
+                    Mengirim Bukti...
+                  </>
+                ) : loadingReservation ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin text-[#0f131f]/40" />
+                    Menghubungkan Server...
+                  </>
+                ) : (
+                  <>
+                    <Upload size={16} strokeWidth={1.5} />
+                    Kirim Bukti Pembayaran
+                  </>
+                )}
               </button>
 
               <p className="text-[10px] sm:text-xs text-center text-black/40 leading-relaxed">

@@ -209,6 +209,8 @@ export default function ProfilePage() {
   };
 
   const handlePayNow = (res) => {
+    let createdOrder = null;
+
     if (res.raw) {
       const r = res.raw;
       const areaNames = r.areas?.map((a) => a.area?.name).filter(Boolean) || [];
@@ -216,12 +218,19 @@ export default function ProfilePage() {
       const totalPrice = Number(r.totalPrice) || 0;
       const dpAmount = totalPrice > 2000000 ? 1000000 : totalPrice * 0.5;
       
-      const createdOrder = {
+      const s = new Date(r.startDateTime);
+      const e = new Date(r.endDateTime);
+      const startH = String(s.getUTCHours()).padStart(2, "0");
+      const startM = String(s.getUTCMinutes()).padStart(2, "0");
+      const endH = String(e.getUTCHours()).padStart(2, "0");
+      const endM = String(e.getUTCMinutes()).padStart(2, "0");
+      
+      createdOrder = {
         venueName: r.reservationType?.name === "Wedding" ? "Wedding " + areaStr : areaStr,
         venueLocation: "Bango Parc, Depok",
         date: formatIndonesianDateSimple(r.startDateTime),
-        startTime: new Date(r.startDateTime).toISOString().split("T")[1].substring(0, 5),
-        endTime: new Date(r.endDateTime).toISOString().split("T")[1].substring(0, 5),
+        startTime: `${startH}:${startM}`,
+        endTime: `${endH}:${endM}`,
         duration: getDurationHours(r.startDateTime, r.endDateTime),
         subtotal: totalPrice,
         discount: 0,
@@ -231,6 +240,42 @@ export default function ProfilePage() {
         orderCode: r.code || r.bookingCode || `BP-${r.id}`,
         reservationId: r.id,
       };
+    } else {
+      // Dummy reservation fallback
+      const totalPrice = Number(res.price.replace(/[^0-9]/g, "")) || 0;
+      const dpAmount = totalPrice > 2000000 ? 1000000 : totalPrice * 0.5;
+
+      let startTime = "00:00";
+      let endTime = "00:00";
+      let duration = 0;
+
+      const timeSlotMatch = res.timeSlot.match(/(\d{2}\.\d{2})\s*-\s*(\d{2}\.\d{2})/);
+      if (timeSlotMatch) {
+        startTime = timeSlotMatch[1].replace(".", ":");
+        endTime = timeSlotMatch[2].replace(".", ":");
+        const startHour = parseInt(startTime.split(":")[0], 10);
+        const endHour = parseInt(endTime.split(":")[0], 10);
+        duration = endHour - startHour;
+      }
+
+      createdOrder = {
+        venueName: res.area || res.packageName || "Venue Bango Parc",
+        venueLocation: "Bango Parc, Depok",
+        date: res.date,
+        startTime,
+        endTime,
+        duration,
+        subtotal: totalPrice,
+        discount: 0,
+        tax: 0,
+        total: totalPrice,
+        dpAmount,
+        orderCode: res.id,
+        reservationId: null,
+      };
+    }
+
+    if (createdOrder) {
       localStorage.setItem("bango_parc_payment_order", JSON.stringify(createdOrder));
     }
     router.push("/payment");
