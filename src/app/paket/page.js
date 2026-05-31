@@ -66,21 +66,30 @@ function TypeToggle({ isWedding, setIsWedding }) {
 const getFacilityWeight = (fac) => {
   const name = (fac.name || "").toLowerCase();
   const icon = (fac.icon || "").toLowerCase();
-  if (name.includes("kapasitas") || icon.includes("users")) return 1;
-  if (name.includes("listrik") || icon.includes("zap")) return 2;
-  if (name.includes("area") || icon.includes("sparkles")) return 3;
-  if (name.includes("kursi") || icon.includes("armchair")) return 4;
+  if (name.includes("kapasitas") || name.includes("pax") || icon.includes("users")) return 1;
+  if (name.includes("listrik") || name.includes("watt") || icon.includes("zap")) return 2;
+  if (name.includes("area") || name.includes("dekor") || icon.includes("sparkles")) return 3;
+  if (name.includes("kursi") || name.includes("chair") || icon.includes("armchair")) return 4;
   return 99;
 };
 
 const getFacilityLabel = (fac) => {
   const name = (fac.name || "").toLowerCase();
   const icon = (fac.icon || "").toLowerCase();
-  if (name.includes("kapasitas") || icon.includes("users")) return "Kapasitas";
-  if (name.includes("listrik") || icon.includes("zap")) return "Listrik";
-  if (name.includes("area") || icon.includes("sparkles")) return "Area";
-  if (name.includes("kursi") || icon.includes("armchair")) return "Kursi Variasi";
+  if (name.includes("kapasitas") || name.includes("pax") || icon.includes("users")) return "Kapasitas";
+  if (name.includes("listrik") || name.includes("watt") || icon.includes("zap")) return "Listrik";
+  if (name.includes("area") || name.includes("dekor") || icon.includes("sparkles")) return "Area";
+  if (name.includes("kursi") || name.includes("chair") || icon.includes("armchair")) return "Kursi Variasi";
   return fac.name;
+};
+
+const getFacilityDisplayValue = (stat) => {
+  const label = getFacilityLabel(stat);
+  const rawValue = stat.value && stat.value !== "-" ? stat.value : stat.name;
+  if (label === "Kapasitas" && /^\d+$/.test(rawValue)) {
+    return `${rawValue} Pax`;
+  }
+  return rawValue;
 };
 
 // ─── Reguler Card ─────────────────────────────────────────────────────────────
@@ -129,15 +138,15 @@ function RegulerCard({ venue }) {
           {sortedStats.map((stat) => (
             <div key={stat.id || stat.name} className="flex items-center gap-3 text-[#0F131F]">
               <span
-                className="text-[#896d51] shrink-0 w-6 h-6 flex items-center justify-center [&>svg]:w-5 [&>svg]:h-5"
+                className="text-[#896d51] shrink-0 w-7 h-7 flex items-center justify-center [&>svg]:w-6 [&>svg]:h-6"
                 dangerouslySetInnerHTML={{ __html: stat.icon }}
               />
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] text-black/45 uppercase tracking-wider font-bold leading-none">
+                <span className="text-xs text-black/45 uppercase tracking-wider font-bold leading-none">
                   {getFacilityLabel(stat)}
                 </span>
-                <span className="text-xs font-semibold text-[#0F131F] mt-1 break-words leading-tight">
-                  {stat.value && stat.value !== "-" ? stat.value : stat.name}
+                <span className="text-sm font-semibold text-[#0F131F] mt-1 break-words leading-tight">
+                  {getFacilityDisplayValue(stat)}
                 </span>
               </div>
             </div>
@@ -204,15 +213,15 @@ function WeddingCard({ pkg }) {
           {sortedStats.map((stat) => (
             <div key={stat.id || stat.name} className="flex items-center gap-3 text-[#0F131F]">
               <span
-                className="text-[#896d51] shrink-0 w-6 h-6 flex items-center justify-center [&>svg]:w-5 [&>svg]:h-5"
+                className="text-[#896d51] shrink-0 w-7 h-7 flex items-center justify-center [&>svg]:w-6 [&>svg]:h-6"
                 dangerouslySetInnerHTML={{ __html: stat.icon }}
               />
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] text-black/45 uppercase tracking-wider font-bold leading-none">
+                <span className="text-xs text-black/45 uppercase tracking-wider font-bold leading-none">
                   {getFacilityLabel(stat)}
                 </span>
-                <span className="text-xs font-semibold text-[#0F131F] mt-1 break-words leading-tight">
-                  {stat.value && stat.value !== "-" ? stat.value : stat.name}
+                <span className="text-sm font-semibold text-[#0F131F] mt-1 break-words leading-tight">
+                  {getFacilityDisplayValue(stat)}
                 </span>
               </div>
             </div>

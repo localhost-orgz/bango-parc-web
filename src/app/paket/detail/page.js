@@ -640,8 +640,32 @@ function VenueSidebar({
   );
 }
 
+// ─── Facility Ordering & Label Helpers ──────────────────────────────────────────
+
+const getFacilityWeight = (label) => {
+  const l = (label || "").toLowerCase();
+  if (l.includes("kapasitas") || l.includes("pax")) return 1;
+  if (l.includes("listrik") || l.includes("zap") || l.includes("watt")) return 2;
+  if (l.includes("area") || l.includes("dekor") || l.includes("sparkles")) return 3;
+  if (l.includes("kursi") || l.includes("chair") || l.includes("armchair")) return 4;
+  return 99;
+};
+
+const getFacilityLabel = (label) => {
+  const l = (label || "").toLowerCase();
+  if (l.includes("kapasitas") || l.includes("pax")) return "Kapasitas";
+  if (l.includes("listrik") || l.includes("zap") || l.includes("watt")) return "Listrik";
+  if (l.includes("area") || l.includes("dekor") || l.includes("sparkles")) return "Area";
+  if (l.includes("kursi") || l.includes("chair") || l.includes("armchair")) return "Kursi Variasi";
+  return label;
+};
+
 // ─── Reguler Card (for Recommendations) ───────────────────────────────────────
 function RegulerCard({ venue }) {
+  const sortedStats = [...(venue.stats || [])].sort(
+    (a, b) => getFacilityWeight(a.label) - getFacilityWeight(b.label)
+  );
+
   return (
     <div className="col-span-1 w-full bg-white border border-[#0F131F]/10 flex flex-col group">
       {/* Image */}
@@ -659,7 +683,7 @@ function RegulerCard({ venue }) {
       </div>
 
       {/* Body */}
-      <div className="flex flex-col items-start p-5 flex-1">
+      <div className="flex flex-col items-start p-5 flex-1 w-full">
         {/* Price */}
         <div className="flex items-end gap-2 flex-wrap">
           <span className="text-2xl font-semibold text-[#0F131F]">
@@ -673,24 +697,26 @@ function RegulerCard({ venue }) {
           <span className="text-sm mb-0.5 text-black/50">/ 3 jam</span>
         </div>
 
-        <p className="text-sm mt-3 text-black/55 leading-relaxed">
+        <p className="text-sm mt-3 text-black/55 leading-relaxed line-clamp-2 min-h-10">
           {venue.desc}
         </p>
 
         {/* Stats */}
-        <div className="w-full mt-5 grid grid-cols-2 gap-3">
-          {venue.stats.map(({ icon: Icon, label, value }) => (
-            <div key={label} className="flex items-center gap-2">
-              <Icon
-                size={14}
-                className="text-[#896d51] shrink-0"
-                strokeWidth={1.7}
-              />
-              <div className="flex flex-col">
-                <span className="text-[10px] text-black/40 uppercase tracking-wide leading-none">
-                  {label}
+        <div className="w-full mt-6 grid grid-cols-2 gap-x-4 gap-y-5">
+          {sortedStats.map(({ icon: Icon, label, value }) => (
+            <div key={label} className="flex items-center gap-3 text-[#0F131F]">
+              <div className="text-[#896d51] shrink-0 w-7 h-7 flex items-center justify-center">
+                <Icon
+                  size={20}
+                  className="shrink-0"
+                  strokeWidth={1.8}
+                />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs text-black/45 uppercase tracking-wider font-bold leading-none">
+                  {getFacilityLabel(label)}
                 </span>
-                <span className="text-xs font-medium text-[#0F131F] mt-0.5">
+                <span className="text-sm font-semibold text-[#0F131F] mt-1 break-words leading-tight">
                   {value}
                 </span>
               </div>
@@ -731,7 +757,7 @@ function WeddingCard({ pkg }) {
           </span>
         </div>
       </div>
-      <div className="flex flex-col items-start p-5 flex-1">
+      <div className="flex flex-col items-start p-5 flex-1 w-full">
         <div className="flex flex-col gap-1 mb-4">
           <div className="flex items-end gap-1.5 flex-wrap">
             <span className="text-lg font-semibold text-[#0F131F]">
@@ -757,15 +783,15 @@ function WeddingCard({ pkg }) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-1.5 w-full">
+        <div className="flex flex-col gap-2.5 w-full">
           {pkg.features.map(({ id, icon: Icon, label }) => (
-            <div key={id} className="flex items-center gap-2">
+            <div key={id} className="flex items-center gap-3">
               <Icon
-                size={13}
+                size={18}
                 className="text-[#896d51] shrink-0"
-                strokeWidth={1.7}
+                strokeWidth={1.8}
               />
-              <span className="text-xs text-black/60">{label}</span>
+              <span className="text-sm text-black/75 font-medium leading-tight">{label}</span>
             </div>
           ))}
         </div>
