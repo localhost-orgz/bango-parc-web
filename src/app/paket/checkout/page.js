@@ -143,6 +143,10 @@ function CheckoutContent() {
   const endHour = parseInt(end.split(":")[0]) || 11;
   const duration = endHour - startHour;
 
+  // Calculate booking interval multiplier
+  const intervalDuration = type === "wedding" ? 5 : 3;
+  const numIntervals = Math.max(1, Math.round(duration / intervalDuration));
+
   // Resolve areas and calculate prices
   let totalDiscountedPrice = 0;
   let totalOriginalPrice = 0;
@@ -161,7 +165,8 @@ function CheckoutContent() {
       const priceObj = foundArea.areaPrices?.find(
         (ap) => ap.reservationType?.name?.toLowerCase() === type
       );
-      const discountedPrice = priceObj ? Number(priceObj.price) : 0;
+      const baseDiscounted = priceObj ? Number(priceObj.price) : 0;
+      const discountedPrice = baseDiscounted * numIntervals;
       // Add a premium aesthetic 25% discount to API area prices
       const originalPrice = Math.round(discountedPrice * 1.25 / 50000) * 50000;
       
@@ -178,15 +183,17 @@ function CheckoutContent() {
           firstAreaImage = fallbackPkg.img || fallbackPkg.thumbnail || "/depan.jpg";
         }
         
-        let discountedPrice = 0;
-        let originalPrice = 0;
+        let baseDiscounted = 0;
+        let baseOriginal = 0;
         if (type === "wedding") {
-          discountedPrice = fallbackPkg.five_hours_disc_val || 0;
-          originalPrice = fallbackPkg.current_five_hours_val || discountedPrice;
+          baseDiscounted = fallbackPkg.five_hours_disc_val || 0;
+          baseOriginal = fallbackPkg.current_five_hours_val || baseDiscounted;
         } else {
-          discountedPrice = fallbackPkg.priceVal || 0;
-          originalPrice = fallbackPkg.priceOriVal || discountedPrice;
+          baseDiscounted = fallbackPkg.priceVal || 0;
+          baseOriginal = fallbackPkg.priceOriVal || baseDiscounted;
         }
+        const discountedPrice = baseDiscounted * numIntervals;
+        const originalPrice = baseOriginal * numIntervals;
         totalDiscountedPrice += discountedPrice;
         totalOriginalPrice += originalPrice;
       } else {
