@@ -79,7 +79,12 @@ function isStartHourValid(time, pkgType, dayReservations) {
   return !dayReservations.some((r) => {
     const exStart = new Date(r.startDateTime).getUTCHours();
     const exEnd = new Date(r.endDateTime).getUTCHours();
-    return Math.max(S, exStart) < Math.min(E + 1, exEnd + 1);
+    
+    // Enforce Rule 1: clear time is not needed if the event ends at or after 20:00 (8 PM)
+    const exEndBuffer = exEnd >= 20 ? exEnd : exEnd + 1;
+    const candidateEndBuffer = E >= 20 ? E : E + 1;
+    
+    return Math.max(S, exStart) < Math.min(candidateEndBuffer, exEndBuffer);
   });
 }
 
@@ -100,7 +105,12 @@ function isEndTimeValid(time, selectedStart, pkgType, dayReservations) {
   return !dayReservations.some((r) => {
     const exStart = new Date(r.startDateTime).getUTCHours();
     const exEnd = new Date(r.endDateTime).getUTCHours();
-    return Math.max(S, exStart) < Math.min(E + 1, exEnd + 1);
+    
+    // Enforce Rule 1: clear time is not needed if the event ends at or after 20:00 (8 PM)
+    const exEndBuffer = exEnd >= 20 ? exEnd : exEnd + 1;
+    const candidateEndBuffer = E >= 20 ? E : E + 1;
+    
+    return Math.max(S, exStart) < Math.min(candidateEndBuffer, exEndBuffer);
   });
 }
 
@@ -270,6 +280,57 @@ function BookingTerms() {
   );
 }
 
+function CustomSelect({ value, onChange, options, placeholder, disabled, label }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative flex flex-1 flex-col">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex h-11 items-center justify-between border-b-2 border-[#0F131F] bg-transparent text-sm outline-none px-1 text-[#0F131F] font-semibold text-left transition-all ${
+          disabled ? "opacity-30 cursor-not-allowed" : "hover:border-[#896d51] cursor-pointer"
+        }`}
+      >
+        <span className={value ? "text-[#0F131F]" : "text-black/35 font-normal"}>
+          {value ? options.find((o) => o.value === value)?.label || value : placeholder}
+        </span>
+        <span className="text-[#0F131F]/60 text-[9px] ml-2 transition-transform duration-200">
+          {isOpen ? "▲" : "▼"}
+        </span>
+      </button>
+
+      {isOpen && !disabled && (
+        <>
+          {/* Overlay to close on outside click */}
+          <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
+          <div className="absolute top-full left-0 right-0 mt-1 z-40 bg-white border border-[#0F131F]/15 shadow-xl max-h-60 overflow-y-auto rounded-none">
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  onChange(opt.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 text-xs transition-colors ${
+                  value === opt.value
+                    ? "bg-[#896d51]/20 font-bold text-[#896d51]"
+                    : "text-black/70 hover:bg-[#896d51]/10 hover:text-[#0F131F]"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+      <span className="text-[10px] text-black/35 mt-1 font-semibold uppercase tracking-wider">{label}</span>
+    </div>
+  );
+}
+
 function BookedEventsList({ events }) {
   if (!events?.length) return null;
   return (
@@ -337,6 +398,27 @@ function TimeSlotPicker({
   onStartChange,
   onEndChange,
 }) {
+  const startOptions = TIME_SLOTS.map((time) => {
+    const valid = isStartHourValid(time, pkgType, dayReservations);
+    return {
+      value: time,
+      label: time,
+      disabled: !valid,
+    };
+  }).filter((o) => !o.disabled);
+
+  const endOptions = selectedStart
+    ? TIME_SLOTS.map((time) => {
+        const valid = isEndTimeValid(time, selectedStart, pkgType, dayReservations);
+        const label = getEndTimeLabel(time, selectedStart, pkgType, dayReservations);
+        return {
+          value: time,
+          label: time + label,
+          disabled: !valid,
+        };
+      }).filter((o) => !o.disabled)
+    : [];
+
   return (
     <div className="flex flex-col mt-1">
       <div className="w-full font-crimson-text mb-2 font-semibold text-sm">
@@ -353,69 +435,30 @@ function TimeSlotPicker({
 
           <div className="flex gap-4 items-start">
             {/* Start time */}
-            <div className="flex-1 flex flex-col">
-              <select
-                value={selectedStart}
-                onChange={(e) => onStartChange(e.target.value)}
-                className="h-11 border-b-2 border-[#0F131F] bg-transparent text-sm outline-none"
-              >
-                <option value="">Jam mulai</option>
-                {TIME_SLOTS.map((time) => {
-                  const disabled = !isStartHourValid(time, pkgType, dayReservations);
-                  return (
-                    <option key={time} value={time} disabled={disabled}>
-                      {time} {disabled ? "• BOOKED/CONFLICT" : ""}
-                    </option>
-                  );
-                })}
-              </select>
-              <span className="text-[10px] text-black/30 mt-1">Check-in</span>
-            </div>
+            <CustomSelect
+              value={selectedStart}
+              onChange={onStartChange}
+              options={startOptions}
+              placeholder="Jam mulai"
+              label="Check-in"
+            />
 
             <ArrowRight
-              className="shrink-0 mt-2"
+              className="shrink-0 mt-3"
               size={20}
               strokeWidth={1.5}
               color="#0F131F"
             />
 
             {/* End time */}
-            <div className="flex-1 flex flex-col">
-              <select
-                value={selectedEnd}
-                onChange={(e) => onEndChange(e.target.value)}
-                disabled={!selectedStart}
-                className={`h-11 border-b-2 border-[#0F131F] bg-transparent text-sm outline-none ${
-                  !selectedStart ? "opacity-40 cursor-not-allowed" : ""
-                }`}
-              >
-                <option value="">
-                  {!selectedStart ? "Pilih jam mulai dulu" : "Jam selesai"}
-                </option>
-                {selectedStart &&
-                  TIME_SLOTS.map((time) => {
-                    const disabled = !isEndTimeValid(
-                      time,
-                      selectedStart,
-                      pkgType,
-                      dayReservations,
-                    );
-                    const label = getEndTimeLabel(
-                      time,
-                      selectedStart,
-                      pkgType,
-                      dayReservations,
-                    );
-                    return (
-                      <option key={time} value={time} disabled={disabled}>
-                        {time}
-                        {label}
-                      </option>
-                    );
-                  })}
-              </select>
-              <span className="text-[10px] text-black/30 mt-1">Check-out</span>
-            </div>
+            <CustomSelect
+              value={selectedEnd}
+              onChange={onEndChange}
+              options={endOptions}
+              placeholder={!selectedStart ? "Pilih jam mulai dulu" : "Jam selesai"}
+              disabled={!selectedStart}
+              label="Check-out"
+            />
           </div>
 
           <AvailabilityLegend dayReservations={dayReservations} />
