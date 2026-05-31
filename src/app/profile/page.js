@@ -11,11 +11,127 @@ import {
   Clock, 
   ExternalLink,
   LogOut,
-  Ticket
+  Ticket,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
+import axiosInstance from "@/lib/axios";
+
+// ─── Formatting Helpers ────────────────────────────────────────────────────────
+function formatIndonesianDateSimple(dateStr) {
+  if (!dateStr) return "";
+  const months = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+  const datePart = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
+  const parts = datePart.split("-");
+  if (parts.length !== 3) return dateStr;
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const day = parseInt(parts[2], 10);
+  
+  const monthName = months[month];
+  return `${day} ${monthName} ${year}`;
+}
+
+function getDurationHours(startIso, endIso) {
+  const s = new Date(startIso);
+  const e = new Date(endIso);
+  const diffMs = e - s;
+  return Math.max(1, Math.round(diffMs / (1000 * 60 * 60)));
+}
+
+function formatTimeSlot(startIso, endIso) {
+  const s = new Date(startIso);
+  const e = new Date(endIso);
+  const startH = String(s.getUTCHours()).padStart(2, "0");
+  const startM = String(s.getUTCMinutes()).padStart(2, "0");
+  const endH = String(e.getUTCHours()).padStart(2, "0");
+  const endM = String(e.getUTCMinutes()).padStart(2, "0");
+  const duration = getDurationHours(startIso, endIso);
+  
+  return `${startH}.${startM} - ${endH}.${endM} WIB (${duration} jam)`;
+}
+
+function formatRupiah(amount) {
+  return "Rp " + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function getReservationStatusText(status) {
+  switch (status) {
+    case "WAITING_DP":
+      return "Menunggu Pembayaran";
+    case "WAITING_CONFIRMATION":
+      return "Menunggu Konfirmasi";
+    case "CONFIRMED":
+      return "Dikonfirmasi";
+    case "ONGOING":
+      return "Berjalan";
+    case "COMPLETED":
+      return "Selesai";
+    case "CANCELLED":
+      return "Dibatalkan";
+    case "EXPIRED":
+      return "Kedaluwarsa";
+    default:
+      return status;
+  }
+}
+
+function getReservationBadgeColor(status) {
+  switch (status) {
+    case "WAITING_DP":
+      return "bg-amber-50 text-amber-700 border-amber-200";
+    case "WAITING_CONFIRMATION":
+      return "bg-orange-50 text-orange-700 border-orange-200";
+    case "CONFIRMED":
+    case "ONGOING":
+      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    case "COMPLETED":
+      return "bg-purple-50 text-purple-700 border-purple-200";
+    case "CANCELLED":
+      return "bg-gray-100 text-gray-700 border-gray-200";
+    case "EXPIRED":
+    default:
+      return "bg-gray-100 text-gray-700 border-gray-200";
+  }
+}
+
+const DUMMY_RESERVATIONS = [
+  {
+    id: "BP-2026-0812",
+    packageName: "Royal Excellence Wedding Package",
+    area: "Area Tengah & Belakang (Semi-indoor & Outdoor)",
+    date: "12 Agustus 2026",
+    timeSlot: "08.00 - 13.00 WIB (5 jam)",
+    price: "Rp 65.000.000",
+    status: "Dikonfirmasi",
+    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  },
+  {
+    id: "BP-2026-0925",
+    packageName: "Intimate Deluxe Package",
+    area: "Area Depan (Garden Outdoor)",
+    date: "25 September 2026",
+    timeSlot: "15.00 - 18.00 WIB (3 jam)",
+    price: "Rp 28.000.000",
+    status: "Menunggu Pembayaran",
+    badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+  },
+  {
+    id: "BP-2025-1110",
+    packageName: "Corporate Gathering & Seminar",
+    area: "Ruang Tengah (Indoor Exclusive)",
+    date: "10 November 2025",
+    timeSlot: "09.00 - 12.00 WIB (3 jam)",
+    price: "Rp 18.000.000",
+    status: "Selesai",
+    badgeColor: "bg-gray-100 text-gray-700 border-gray-200",
+  }
+];
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -32,6 +148,9 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  const [realReservations, setRealReservations] = useState([]);
+  const [loadingReal, setLoadingReal] = useState(false);
+
   // Load from local storage if exists
   useEffect(() => {
     const savedProfile = localStorage.getItem("bango_parc_user_profile");
@@ -42,6 +161,21 @@ export default function ProfilePage() {
         console.error("Failed to parse saved profile", e);
       }
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchRealReservations = async () => {
+      try {
+        setLoadingReal(true);
+        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/reservation/me");
+        setRealReservations(res.data.data || []);
+      } catch (err) {
+        console.error("Gagal mengambil data reservasi me:", err);
+      } finally {
+        setLoadingReal(false);
+      }
+    };
+    fetchRealReservations();
   }, []);
 
   const handleProfileChange = (e) => {
@@ -74,39 +208,58 @@ export default function ProfilePage() {
     router.push("/login");
   };
 
-  // Premium mock reservations matching Bango Parc packaging style
-  const [reservations] = useState([
-    {
-      id: "BP-2026-0812",
-      packageName: "Royal Excellence Wedding Package",
-      area: "Area Tengah & Belakang (Semi-indoor & Outdoor)",
-      date: "12 Agustus 2026",
-      timeSlot: "08.00 - 13.00 WIB (5 jam)",
-      price: "Rp 65.000.000",
-      status: "Dikonfirmasi",
-      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    },
-    {
-      id: "BP-2026-0925",
-      packageName: "Intimate Deluxe Package",
-      area: "Area Depan (Garden Outdoor)",
-      date: "25 September 2026",
-      timeSlot: "15.00 - 18.00 WIB (3 jam)",
-      price: "Rp 28.000.000",
-      status: "Menunggu Pembayaran",
-      badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
-    },
-    {
-      id: "BP-2025-1110",
-      packageName: "Corporate Gathering & Seminar",
-      area: "Ruang Tengah (Indoor Exclusive)",
-      date: "10 November 2025",
-      timeSlot: "09.00 - 12.00 WIB (3 jam)",
-      price: "Rp 18.000.000",
-      status: "Selesai",
-      badgeColor: "bg-gray-100 text-gray-700 border-gray-200",
+  const handlePayNow = (res) => {
+    if (res.raw) {
+      const r = res.raw;
+      const areaNames = r.areas?.map((a) => a.area?.name).filter(Boolean) || [];
+      const areaStr = areaNames.length > 0 ? areaNames.join(" & ") : "Venue Bango Parc";
+      const totalPrice = Number(r.totalPrice) || 0;
+      const dpAmount = totalPrice > 2000000 ? 1000000 : totalPrice * 0.5;
+      
+      const createdOrder = {
+        venueName: r.reservationType?.name === "Wedding" ? "Wedding " + areaStr : areaStr,
+        venueLocation: "Bango Parc, Depok",
+        date: formatIndonesianDateSimple(r.startDateTime),
+        startTime: new Date(r.startDateTime).toISOString().split("T")[1].substring(0, 5),
+        endTime: new Date(r.endDateTime).toISOString().split("T")[1].substring(0, 5),
+        duration: getDurationHours(r.startDateTime, r.endDateTime),
+        subtotal: totalPrice,
+        discount: 0,
+        tax: 0,
+        total: totalPrice,
+        dpAmount: dpAmount,
+        orderCode: r.code || r.bookingCode || `BP-${r.id}`,
+        reservationId: r.id,
+      };
+      localStorage.setItem("bango_parc_payment_order", JSON.stringify(createdOrder));
     }
-  ]);
+    router.push("/payment");
+  };
+
+  const mapRealToUi = (r) => {
+    const areaNames = r.areas?.map((a) => a.area?.name).filter(Boolean) || [];
+    const areaStr = areaNames.length > 0 ? areaNames.join(" & ") : "Venue Bango Parc";
+    
+    const isWedding = r.reservationType?.name?.toLowerCase() === "wedding";
+    const packageName = isWedding 
+      ? "Wedding Venue Exclusive Package" 
+      : "Reguler Venue Rental Package";
+      
+    return {
+      id: r.code || r.bookingCode || `BP-${r.id}`,
+      packageName,
+      area: areaStr,
+      date: formatIndonesianDateSimple(r.startDateTime),
+      timeSlot: formatTimeSlot(r.startDateTime, r.endDateTime),
+      price: formatRupiah(Number(r.totalPrice) || 0),
+      status: getReservationStatusText(r.status),
+      badgeColor: getReservationBadgeColor(r.status),
+      raw: r,
+    };
+  };
+
+  const mappedReal = realReservations.map(mapRealToUi);
+  const reservations = [...mappedReal, ...DUMMY_RESERVATIONS];
 
   return (
     <main className="w-full min-h-screen bg-[#f3f4f7]">
@@ -286,6 +439,13 @@ export default function ProfilePage() {
                   Riwayat dan status pemesanan venue Bango Parc Anda.
                 </p>
 
+                {loadingReal && (
+                  <div className="flex items-center justify-center gap-2 text-black/55 text-sm py-8 bg-[#f3f4f7]/30 border border-[#0F131F]/10 mb-6 rounded">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#896d51]" />
+                    <span>Memuat data reservasi...</span>
+                  </div>
+                )}
+
                 {/* Reservation List */}
                 <div className="flex flex-col gap-6">
                   {reservations.map((res) => (
@@ -336,7 +496,7 @@ export default function ProfilePage() {
                           </button>
                         ) : res.status === "Menunggu Pembayaran" ? (
                           <button 
-                            onClick={() => router.push("/payment")}
+                            onClick={() => handlePayNow(res)}
                             className="flex items-center gap-1.5 px-4 py-2.5 bg-[#896d51] text-white hover:bg-[#0F131F] transition-all duration-300 font-semibold text-[11px] uppercase tracking-wider mt-2 group cursor-pointer rounded border border-[#896d51] hover:border-[#0F131F]"
                           >
                             Bayar Sekarang
