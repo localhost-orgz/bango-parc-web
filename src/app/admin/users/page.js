@@ -204,12 +204,8 @@ export default function UsersPage() {
   const selectedUser = usersData.find((u) => u.id === selectedId) || null;
 
   return (
-    <div className="flex bg-white font-sans -m-6 min-h-screen">
-      {/* Center — Table */}
-      <div
-        className="flex flex-col min-w-0 transition-all duration-300 flex-1 border-r border-[#0F131F]/10 p-6"
-      >
-        {/* Header Section */}
+    <div className="bg-white font-sans -m-6 min-h-screen p-6 flex flex-col">
+      {/* Header Section */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="font-crimson-pro text-3xl text-[#0F131F] font-semibold">
@@ -511,23 +507,21 @@ export default function UsersPage() {
               )}
               </tbody>
             </table>
-          </div>
         </div>
       </div>
 
-      {/* Right Panel — Detail */}
-      <div
-        className={`bg-white border-l border-[#0F131F]/10 transition-all duration-300 shrink-0 ${
-          selectedUser ? "w-80" : "w-0 overflow-hidden"
-        }`}
-      >
-        {selectedUser && (
-          <DetailPanel
-            user={selectedUser}
-            onClose={() => setSelectedId(null)}
-          />
-        )}
-      </div>
+      {/* User Detail Modal */}
+      {selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="absolute inset-0" onClick={() => setSelectedId(null)} />
+          <div className="relative bg-white border border-[#0F131F]/15 w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <DetailPanel
+              user={selectedUser}
+              onClose={() => setSelectedId(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
