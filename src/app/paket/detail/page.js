@@ -15,10 +15,12 @@ import {
   UtensilsCrossed,
   Users,
   Wifi,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import axiosInstance from "@/lib/axios";
 
 // ─── Internal Components & Data ────────────────────────────────────────────────
 import BookingCalendar from "@/components/BookingCalendar";
@@ -206,13 +208,24 @@ function FacilitiesGrid({ items }) {
         Fasilitas &amp; Fitur Paket
       </h4>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {items.map(({ icon: Icon, label }) => (
+        {items.map((item) => (
           <div
-            key={label}
+            key={item.label}
             className="flex items-center gap-2.5 p-3 border border-[#0F131F]/20 bg-white"
           >
-            <Icon size={18} className="text-[#896d51] shrink-0" strokeWidth={1.5} />
-            <span className="text-xs text-[#0F131F]">{label}</span>
+            {item.icon && typeof item.icon === "string" && item.icon.includes("<svg") ? (
+              <span
+                className="text-[#896d51] shrink-0 w-6 h-6 flex items-center justify-center [&>svg]:w-5 [&>svg]:h-5"
+                dangerouslySetInnerHTML={{ __html: item.icon }}
+              />
+            ) : (
+              <div className="text-[#896d51] shrink-0 w-5 h-5 flex items-center justify-center">
+                {item.icon ? (
+                  <item.icon size={18} className="shrink-0" strokeWidth={1.5} />
+                ) : null}
+              </div>
+            )}
+            <span className="text-xs text-[#0F131F]">{item.label}</span>
           </div>
         ))}
       </div>
@@ -534,23 +547,35 @@ function VenueSidebar({
   onOpenCalendar,
   onStartChange,
   onEndChange,
+  areas = [],
 }) {
-  const allAreas = [
-    { id: "depan", label: "Area Depan" },
-    { id: "tengah", label: "Ruang Tengah" },
-    { id: "belakang", label: "Area Belakang" },
-  ];
+  const allAreas = areas.length > 0
+    ? areas.map((area) => ({ id: area.id, label: area.name }))
+    : [
+        { id: "depan", label: "Area Depan" },
+        { id: "tengah", label: "Ruang Tengah" },
+        { id: "belakang", label: "Area Belakang" },
+      ];
 
   const isWedding = pkg.type === "wedding";
 
-  // Calculate dynamic pricing sums
-  const totalThreeHoursDiscVal = selectedPackages.reduce((sum, p) => sum + (p.three_hours_disc_val || 0), 0);
-  const totalCurrentThreeHoursVal = selectedPackages.reduce((sum, p) => sum + (p.current_three_hours_val || 0), 0);
-  const totalFiveHoursDiscVal = selectedPackages.reduce((sum, p) => sum + (p.five_hours_disc_val || 0), 0);
-  const totalCurrentFiveHoursVal = selectedPackages.reduce((sum, p) => sum + (p.current_five_hours_val || 0), 0);
+  const getAreaPrice = (area, typeName) => {
+    if (area.areaPrices) {
+      const priceObj = area.areaPrices?.find(
+        (ap) => ap.reservationType?.name?.toLowerCase() === typeName
+      );
+      return Number(priceObj?.price) || 0;
+    }
+    // Fallback dummy
+    return isWedding
+      ? (area.five_hours_disc_val || 0)
+      : (area.priceVal || 0);
+  };
 
-  const totalPriceVal = selectedPackages.reduce((sum, p) => sum + (p.priceVal || 0), 0);
-  const totalPriceOriVal = selectedPackages.reduce((sum, p) => sum + (p.priceOriVal || 0), 0);
+  const totalPriceVal = selectedPackages.reduce(
+    (sum, p) => sum + getAreaPrice(p, isWedding ? "wedding" : "reguler"),
+    0
+  );
 
   return (
     <div className="w-full px-4 lg:px-15 col-span-1 lg:col-span-5">
@@ -565,7 +590,7 @@ function VenueSidebar({
         </span>
         <div className="flex flex-wrap gap-2">
           {allAreas.map((area) => {
-            const isSelected = selectedAreaIds.includes(area.id);
+            const isSelected = selectedAreaIds.map(String).includes(String(area.id));
             return (
               <button
                 key={area.id}
@@ -584,42 +609,16 @@ function VenueSidebar({
         </div>
       </div>
 
-      <p className="text-sm text-black/50 mt-4 w-full lg:w-[80%]">
+      <p className="text-sm text-black/50 mt-4 w-full lg:w-[80%] leading-relaxed line-clamp-3">
         {pkg.desc}
       </p>
 
-      {isWedding ? (
-        <div className="flex flex-col gap-1.5 mt-5">
-          <div className="flex items-end gap-2 flex-wrap">
-            <span className="text-2xl font-semibold text-[#0F131F]">
-              {formatRupiah(totalThreeHoursDiscVal)}
-            </span>
-            {totalCurrentThreeHoursVal > 0 && (
-              <span className="line-through text-black/30 mb-0.5 text-sm">{formatRupiah(totalCurrentThreeHoursVal)}</span>
-            )}
-            <span className="font-semibold text-black/50 text-xs">/ 3 jam</span>
-          </div>
-          <div className="flex items-end gap-2 flex-wrap">
-            <span className="text-2xl font-semibold text-[#0F131F]">
-              {formatRupiah(totalFiveHoursDiscVal)}
-            </span>
-            {totalCurrentFiveHoursVal > 0 && (
-              <span className="line-through text-black/30 mb-0.5 text-sm">{formatRupiah(totalCurrentFiveHoursVal)}</span>
-            )}
-            <span className="font-semibold text-black/50 text-xs">/ 5 jam</span>
-          </div>
-        </div>
-      ) : (
-        <div className="flex mt-5 items-end gap-2 flex-wrap">
-          <span className="text-3xl font-semibold text-[#0F131F]">
-            {formatRupiah(totalPriceVal)}
-          </span>
-          {totalPriceOriVal > 0 && (
-            <span className="line-through text-black/30 mb-0.5">{formatRupiah(totalPriceOriVal)}</span>
-          )}
-          <span className="font-semibold text-[#0F131F]">/ 3 jam</span>
-        </div>
-      )}
+      <div className="flex mt-5 items-end gap-2 flex-wrap">
+        <span className="text-3xl font-semibold text-[#0F131F]">
+          {formatRupiah(totalPriceVal)}
+        </span>
+        <span className="font-semibold text-[#0F131F]">/ {isWedding ? "5" : "3"} jam</span>
+      </div>
 
       <p className="text-xs text-black/40 mt-1">
         *Harga belum termasuk katering dan dekorasi
@@ -642,28 +641,47 @@ function VenueSidebar({
 
 // ─── Facility Ordering & Label Helpers ──────────────────────────────────────────
 
-const getFacilityWeight = (label) => {
-  const l = (label || "").toLowerCase();
-  if (l.includes("kapasitas") || l.includes("pax")) return 1;
-  if (l.includes("listrik") || l.includes("zap") || l.includes("watt")) return 2;
-  if (l.includes("area") || l.includes("dekor") || l.includes("sparkles")) return 3;
-  if (l.includes("kursi") || l.includes("chair") || l.includes("armchair")) return 4;
+const getFacilityLabel = (fac) => {
+  if (!fac) return "";
+  const name = typeof fac === "string" ? fac : fac.name || "";
+  const icon = typeof fac === "object" && fac.icon ? fac.icon : "";
+  const n = name.toLowerCase();
+  const i = icon.toLowerCase();
+  if (n.includes("kapasitas") || n.includes("pax") || i.includes("users")) return "Kapasitas";
+  if (n.includes("listrik") || n.includes("watt") || i.includes("zap")) return "Listrik";
+  if (n.includes("area") || n.includes("dekor") || i.includes("sparkles")) return "Area";
+  if (n.includes("kursi") || n.includes("chair") || i.includes("armchair")) return "Kursi Variasi";
+  return name;
+};
+
+const getFacilityWeight = (fac) => {
+  if (!fac) return 99;
+  const name = typeof fac === "string" ? fac : fac.name || "";
+  const icon = typeof fac === "object" && fac.icon ? fac.icon : "";
+  const n = name.toLowerCase();
+  const i = icon.toLowerCase();
+  if (n.includes("kapasitas") || n.includes("pax") || i.includes("users")) return 1;
+  if (n.includes("listrik") || n.includes("watt") || i.includes("zap")) return 2;
+  if (n.includes("area") || n.includes("dekor") || i.includes("sparkles")) return 3;
+  if (n.includes("kursi") || n.includes("chair") || i.includes("armchair")) return 4;
   return 99;
 };
 
-const getFacilityLabel = (label) => {
-  const l = (label || "").toLowerCase();
-  if (l.includes("kapasitas") || l.includes("pax")) return "Kapasitas";
-  if (l.includes("listrik") || l.includes("zap") || l.includes("watt")) return "Listrik";
-  if (l.includes("area") || l.includes("dekor") || l.includes("sparkles")) return "Area";
-  if (l.includes("kursi") || l.includes("chair") || l.includes("armchair")) return "Kursi Variasi";
-  return label;
+const getFacilityDisplayValue = (fac) => {
+  if (!fac) return "";
+  if (typeof fac === "string") return fac;
+  const label = getFacilityLabel(fac);
+  const rawValue = fac.value && fac.value !== "-" ? fac.value : fac.name;
+  if (label === "Kapasitas" && /^\d+$/.test(rawValue)) {
+    return `${rawValue} Pax`;
+  }
+  return rawValue;
 };
 
 // ─── Reguler Card (for Recommendations) ───────────────────────────────────────
 function RegulerCard({ venue }) {
   const sortedStats = [...(venue.stats || [])].sort(
-    (a, b) => getFacilityWeight(a.label) - getFacilityWeight(b.label)
+    (a, b) => getFacilityWeight(a) - getFacilityWeight(b)
   );
 
   return (
@@ -703,21 +721,26 @@ function RegulerCard({ venue }) {
 
         {/* Stats */}
         <div className="w-full mt-6 grid grid-cols-2 gap-x-4 gap-y-5">
-          {sortedStats.map(({ icon: Icon, label, value }) => (
-            <div key={label} className="flex items-center gap-3 text-[#0F131F]">
-              <div className="text-[#896d51] shrink-0 w-7 h-7 flex items-center justify-center">
-                <Icon
-                  size={20}
-                  className="shrink-0"
-                  strokeWidth={1.8}
+          {sortedStats.map((stat) => (
+            <div key={stat.id || stat.name} className="flex items-center gap-3 text-[#0F131F]">
+              {stat.icon && typeof stat.icon === "string" && stat.icon.includes("<svg") ? (
+                <span
+                  className="text-[#896d51] shrink-0 w-7 h-7 flex items-center justify-center [&>svg]:w-6 [&>svg]:h-6"
+                  dangerouslySetInnerHTML={{ __html: stat.icon }}
                 />
-              </div>
+              ) : (
+                <div className="text-[#896d51] shrink-0 w-7 h-7 flex items-center justify-center">
+                  {stat.icon ? (
+                    <stat.icon size={20} className="shrink-0" strokeWidth={1.8} />
+                  ) : null}
+                </div>
+              )}
               <div className="flex flex-col min-w-0">
                 <span className="text-xs text-black/45 uppercase tracking-wider font-bold leading-none">
-                  {getFacilityLabel(label)}
+                  {getFacilityLabel(stat)}
                 </span>
                 <span className="text-sm font-semibold text-[#0F131F] mt-1 break-words leading-tight">
-                  {value}
+                  {getFacilityDisplayValue(stat)}
                 </span>
               </div>
             </div>
@@ -743,6 +766,10 @@ function RegulerCard({ venue }) {
 
 // ─── Wedding Card (for Recommendations) ───────────────────────────────────────
 function WeddingCard({ pkg }) {
+  const sortedStats = [...(pkg.stats || [])].sort(
+    (a, b) => getFacilityWeight(a) - getFacilityWeight(b)
+  );
+
   return (
     <div className="col-span-1 w-full bg-white border border-[#0F131F]/10 flex flex-col group">
       <div className="w-full aspect-video relative bg-black overflow-hidden">
@@ -758,40 +785,47 @@ function WeddingCard({ pkg }) {
         </div>
       </div>
       <div className="flex flex-col items-start p-5 flex-1 w-full">
-        <div className="flex flex-col gap-1 mb-4">
-          <div className="flex items-end gap-1.5 flex-wrap">
-            <span className="text-lg font-semibold text-[#0F131F]">
-              {pkg.three_hours_disc}
+        {/* Price */}
+        <div className="flex items-end gap-2 flex-wrap">
+          <span className="text-2xl font-semibold text-[#0F131F]">
+            {pkg.price || "Rp0"}
+          </span>
+          {pkg.priceOri && (
+            <span className="line-through text-sm mb-0.5 text-black/30">
+              {pkg.priceOri}
             </span>
-            {pkg.current_three_hours && (
-              <span className="line-through text-xs mb-0.5 text-black/30">
-                {pkg.current_three_hours}
-              </span>
-            )}
-            <span className="text-xs mb-0.5 text-black/50">/ 3 jam</span>
-          </div>
-          <div className="flex items-end gap-1.5 flex-wrap">
-            <span className="text-lg font-semibold text-[#0F131F]">
-              {pkg.five_hours_disc}
-            </span>
-            {pkg.current_five_hours && (
-              <span className="line-through text-xs mb-0.5 text-black/30">
-                {pkg.current_five_hours}
-              </span>
-            )}
-            <span className="text-xs mb-0.5 text-black/50">/ 5 jam</span>
-          </div>
+          )}
+          <span className="text-sm mb-0.5 text-black/50">/ 5 jam</span>
         </div>
 
-        <div className="flex flex-col gap-2.5 w-full">
-          {pkg.features.map(({ id, icon: Icon, label }) => (
-            <div key={id} className="flex items-center gap-3">
-              <Icon
-                size={18}
-                className="text-[#896d51] shrink-0"
-                strokeWidth={1.8}
-              />
-              <span className="text-sm text-black/75 font-medium leading-tight">{label}</span>
+        <p className="text-sm mt-3 text-black/55 leading-relaxed line-clamp-2 min-h-10">
+          {pkg.desc}
+        </p>
+
+        {/* Stats */}
+        <div className="w-full mt-6 grid grid-cols-2 gap-x-4 gap-y-5">
+          {sortedStats.map((stat) => (
+            <div key={stat.id || stat.name} className="flex items-center gap-3 text-[#0F131F]">
+              {stat.icon && typeof stat.icon === "string" && stat.icon.includes("<svg") ? (
+                <span
+                  className="text-[#896d51] shrink-0 w-7 h-7 flex items-center justify-center [&>svg]:w-6 [&>svg]:h-6"
+                  dangerouslySetInnerHTML={{ __html: stat.icon }}
+                />
+              ) : (
+                <div className="text-[#896d51] shrink-0 w-7 h-7 flex items-center justify-center">
+                  {stat.icon ? (
+                    <stat.icon size={20} className="shrink-0" strokeWidth={1.8} />
+                  ) : null}
+                </div>
+              )}
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs text-black/45 uppercase tracking-wider font-bold leading-none">
+                  {getFacilityLabel(stat)}
+                </span>
+                <span className="text-sm font-semibold text-[#0F131F] mt-1 break-words leading-tight">
+                  {getFacilityDisplayValue(stat)}
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -819,13 +853,28 @@ function DetailPaketContent() {
   const id = searchParams.get("id") || "depan";
   const type = searchParams.get("type") || "reguler";
 
-  const currentPackages = type === "wedding" ? wedding_packages : reguler_packages;
-  const pkg = currentPackages.find((p) => p.id === id) || currentPackages[0];
-
+  const [areas, setAreas] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedAreaIds, setSelectedAreaIds] = useState([id]);
 
   useEffect(() => {
-    setSelectedAreaIds([id]);
+    const fetchAreas = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/area");
+        setAreas(res.data.data || []);
+      } catch (err) {
+        console.error("Gagal mengambil data area:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAreas();
+  }, []);
+
+  useEffect(() => {
+    const parsedId = isNaN(Number(id)) ? id : Number(id);
+    setSelectedAreaIds([parsedId]);
   }, [id]);
 
   const [openCalendar, setOpenCalendar] = useState(false);
@@ -836,20 +885,72 @@ function DetailPaketContent() {
   const bookedHours = selectedDate ? getBookedHours(selectedDate.events) : [];
 
   const toggleArea = (areaId) => {
-    // Keep at least one area selected at all times
     setSelectedAreaIds((prev) => {
-      if (prev.includes(areaId)) {
-        if (prev.length > 1) {
-          return prev.filter((item) => item !== areaId);
+      const parsedId = typeof areaId === "number" ? areaId : Number(areaId) || areaId;
+      const normalizedPrev = prev.map((p) => (typeof p === "number" ? p : Number(p) || p));
+      if (normalizedPrev.includes(parsedId)) {
+        if (normalizedPrev.length > 1) {
+          return normalizedPrev.filter((item) => item !== parsedId);
         }
         return prev;
       }
-      return [...prev, areaId];
+      return [...normalizedPrev, parsedId];
     });
   };
 
+  const getAreaImage = (name) => {
+    const lowercaseName = (name || "").toLowerCase();
+    if (lowercaseName.includes("depan")) return "/depan.jpg";
+    if (lowercaseName.includes("tengah")) return "/tengah.jpg";
+    if (lowercaseName.includes("belakang")) return "/belakang.jpg";
+    return "/depan.jpg";
+  };
+
+  const getAreaPrice = (area, typeName) => {
+    if (area.areaPrices) {
+      const priceObj = area.areaPrices?.find(
+        (ap) => ap.reservationType?.name?.toLowerCase() === typeName
+      );
+      return Number(priceObj?.price) || 0;
+    }
+    return area.priceVal || 0;
+  };
+
+  const activeArea = areas.find((a) => String(a.id) === String(id));
+  const currentPackages = type === "wedding" ? wedding_packages : reguler_packages;
+
+  const pkg = activeArea
+    ? {
+        id: activeArea.id,
+        type: type,
+        name: type === "wedding" ? "Wedding " + activeArea.name : activeArea.name,
+        img: getAreaImage(activeArea.name),
+        thumbnail: getAreaImage(activeArea.name),
+        desc: activeArea.description,
+        priceVal: getAreaPrice(activeArea, type),
+        price: formatRupiah(getAreaPrice(activeArea, type)),
+        areaFacilities: activeArea.areaFacilities,
+      }
+    : (currentPackages.find((p) => String(p.id) === String(id)) || currentPackages[0]);
+
   const selectedPackages = selectedAreaIds
-    .map((areaId) => currentPackages.find((p) => p.id === areaId))
+    .map((areaId) => {
+      const foundArea = areas.find((a) => String(a.id) === String(areaId));
+      if (foundArea) {
+        return {
+          id: foundArea.id,
+          type: type,
+          name: type === "wedding" ? "Wedding " + foundArea.name : foundArea.name,
+          img: getAreaImage(foundArea.name),
+          thumbnail: getAreaImage(foundArea.name),
+          desc: foundArea.description,
+          priceVal: getAreaPrice(foundArea, type),
+          price: formatRupiah(getAreaPrice(foundArea, type)),
+          areaFacilities: foundArea.areaFacilities,
+        };
+      }
+      return currentPackages.find((p) => String(p.id) === String(areaId));
+    })
     .filter(Boolean);
 
   const getCombinedName = () => {
@@ -864,16 +965,37 @@ function DetailPaketContent() {
     const allItems = [];
     const seen = new Set();
     selectedPackages.forEach((p) => {
-      const items = p.type === "wedding"
-        ? p.features.map((f) => ({ icon: f.icon, label: f.label }))
-        : p.stats.map((s) => ({ icon: s.icon, label: `${s.label}: ${s.value}` }));
+      if (p.areaFacilities) {
+        // Real API data
+        const facilities = p.areaFacilities
+          ?.map((af) => af.facility)
+          ?.filter((f) => f && f.isDisplay) || [];
 
-      items.forEach((item) => {
-        if (!seen.has(item.label)) {
-          seen.add(item.label);
-          allItems.push(item);
-        }
-      });
+        facilities.forEach((f) => {
+          const label = getFacilityLabel(f);
+          const displayValue = getFacilityDisplayValue(f);
+          const combinedLabel = `${label}: ${displayValue}`;
+          if (!seen.has(combinedLabel)) {
+            seen.add(combinedLabel);
+            allItems.push({
+              icon: f.icon,
+              label: combinedLabel,
+            });
+          }
+        });
+      } else {
+        // Fallback dummy data
+        const items = p.type === "wedding"
+          ? p.features.map((f) => ({ icon: f.icon, label: f.label }))
+          : p.stats.map((s) => ({ icon: s.icon, label: `${s.label}: ${s.value}` }));
+
+        items.forEach((item) => {
+          if (!seen.has(item.label)) {
+            seen.add(item.label);
+            allItems.push(item);
+          }
+        });
+      }
     });
     return allItems;
   };
@@ -892,7 +1014,51 @@ function DetailPaketContent() {
     setSelectedEnd(""); // reset end when start changes
   }
 
-  const otherPackages = currentPackages.filter((p) => p.id !== id);
+  const getOtherPackages = () => {
+    if (areas.length > 0) {
+      const filteredAreas = areas.filter((area) => String(area.id) !== String(id));
+      return filteredAreas.map((area) => {
+        const price = getAreaPrice(area, type);
+        const stats = area.areaFacilities
+          ?.map((af) => af.facility)
+          ?.filter((f) => f && f.isDisplay) || [];
+
+        if (type === "wedding") {
+          return {
+            id: area.id,
+            name: "Wedding " + area.name,
+            thumbnail: getAreaImage(area.name),
+            desc: area.description,
+            price: formatRupiah(price),
+            stats,
+          };
+        } else {
+          return {
+            id: area.id,
+            name: area.name,
+            img: getAreaImage(area.name),
+            desc: area.description,
+            price: formatRupiah(price),
+            stats,
+          };
+        }
+      });
+    }
+    return currentPackages.filter((p) => String(p.id) !== String(id));
+  };
+
+  const otherPackages = getOtherPackages();
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen bg-[#f3f4f7] flex items-center justify-center">
+        <div className="flex items-center gap-2 text-black/55 text-sm">
+          <Loader2 className="w-5 h-5 animate-spin text-[#896d51]" />
+          <span>Memuat detail paket &amp; area...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="w-full min-h-screen bg-[#f3f4f7]">
@@ -922,6 +1088,7 @@ function DetailPaketContent() {
           onOpenCalendar={() => setOpenCalendar(true)}
           onStartChange={handleStartChange}
           onEndChange={setSelectedEnd}
+          areas={areas}
         />
       </section>
 
