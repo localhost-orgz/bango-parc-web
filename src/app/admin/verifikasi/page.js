@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   CreditCard,
   Image as ImageIcon,
@@ -137,6 +138,7 @@ const mapApiPaymentToUi = (apiItem) => {
 
 export default function PaymentVerificationPage() {
   const [activeFilter, setActiveFilter] = useState("Pending");
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("Semua Tipe");
   const [payTypeFilter, setPayTypeFilter] = useState("Semua Pembayaran");
@@ -298,7 +300,7 @@ export default function PaymentVerificationPage() {
   return (
     <div className="flex min-h-screen bg-[#f3f4f7] font-sans">
       {/* Center — Table */}
-      <div className="flex-1 flex flex-col min-w-0 border-r border-[#0F131F]/10">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar */}
         <header className="h-16 bg-white border-b border-[#0F131F]/10 px-8 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
@@ -524,16 +526,11 @@ export default function PaymentVerificationPage() {
                   </tr>
                 ) : (
                   filtered.map((p) => {
-                    const isSelected = selectedId === p.id;
                     return (
                       <tr
                         key={p.id}
-                        onClick={() => setSelectedId(p.id)}
-                        className={`border-b border-[#0F131F]/5 cursor-pointer transition-colors last:border-0 ${
-                          isSelected
-                            ? "bg-[#896d51]/6 border-l-2 border-l-[#896d51]"
-                            : "hover:bg-[#f9f8f6] border-l-2 border-l-transparent"
-                        }`}
+                        onClick={() => router.push(`/admin/verifikasi/${p.apiId}`)}
+                        className="border-b border-[#0F131F]/5 cursor-pointer transition-colors last:border-0 hover:bg-[#f9f8f6] border-l-2 border-l-transparent"
                       >
                         {/* Order Code */}
                         <td className="px-4 py-3.5">
@@ -595,63 +592,6 @@ export default function PaymentVerificationPage() {
           </div>
         </div>
       </div>
-
-      {/* Right Panel — Detail */}
-      <div className="w-80 bg-white shrink-0 flex flex-col border-l border-[#0F131F]/10 min-h-screen">
-        <DetailPanel
-          item={selectedItem}
-          onApprove={handleApprove}
-          onReject={handleReject}
-        />
-      </div>
-
-      {/* Rejection Modal Overlay */}
-      {showRejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-          <div className="bg-white w-full max-w-md shadow-2xl p-6 border border-[#0F131F]/10 rounded flex flex-col gap-4 animate-in fade-in zoom-in duration-200">
-            <h3 className="font-crimson-pro text-xl font-bold text-[#0F131F]">
-              Tolak Bukti Pembayaran
-            </h3>
-            <p className="text-xs text-black/55 leading-relaxed">
-              Silakan masukkan alasan penolakan untuk kode order <span className="font-mono font-bold text-[#0F131F]">{rejectTargetId}</span>. Alasan ini akan dapat dilihat langsung oleh pelanggan pada halaman profil mereka.
-            </p>
-            <textarea
-              rows={4}
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="Contoh: Bukti transfer tidak terbaca / buram. Silakan unggah kembali bukti pembayaran yang jelas."
-              className="w-full p-3 border border-[#0F131F]/15 text-sm outline-none focus:border-[#0F131F] transition-colors resize-none bg-[#f3f4f7]/20 placeholder:text-black/35 rounded"
-            />
-            <div className="flex justify-end gap-3 text-sm pt-2">
-              <button
-                onClick={() => {
-                  setShowRejectModal(false);
-                  setRejectReason("");
-                  setRejectTargetId("");
-                }}
-                disabled={isRejecting}
-                className="px-4 py-2 border border-[#0F131F]/15 hover:bg-black/5 font-semibold transition-all disabled:opacity-50 cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                onClick={confirmReject}
-                disabled={!rejectReason.trim() || isRejecting}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold flex items-center gap-1.5 transition-all disabled:bg-red-300 disabled:cursor-not-allowed cursor-pointer"
-              >
-                {isRejecting ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Mengirim...
-                  </>
-                ) : (
-                  "Kirim Penolakan"
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
