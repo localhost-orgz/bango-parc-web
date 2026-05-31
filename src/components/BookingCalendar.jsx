@@ -72,7 +72,9 @@ const STATUS_CONFIG = {
   },
 };
 
-export default function BookingCalendar({ onDateSelect }) {
+export default function BookingCalendar({ onDateSelect, bookedDates: customBookedDates }) {
+  const activeBookedDates = customBookedDates || bookedDates;
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -107,7 +109,7 @@ export default function BookingCalendar({ onDateSelect }) {
 
   function handleDayClick(day) {
     const key = toKey(year, month, day);
-    const data = bookedDates[key];
+    const data = activeBookedDates[key];
     const status = data?.status ?? "available";
 
     // Blocked statuses cannot be selected
@@ -125,7 +127,7 @@ export default function BookingCalendar({ onDateSelect }) {
     });
   }
 
-  const selectedData = selected ? bookedDates[selected] : null;
+  const selectedData = selected ? activeBookedDates[selected] : null;
   const selectedStatus =
     selectedData?.status ?? (selected ? "available" : null);
 
@@ -181,7 +183,7 @@ export default function BookingCalendar({ onDateSelect }) {
             const key = toKey(year, month, day);
             const date = new Date(year, month, day);
             const isPast = date < today;
-            const data = bookedDates[key];
+            const data = activeBookedDates[key];
             const status = data?.status ?? "available";
             const cfg = STATUS_CONFIG[status];
             const isSelected = selected === key;

@@ -27,24 +27,15 @@ import BookingCalendar from "@/components/BookingCalendar";
 import Navbar from "@/components/Landing/Navbar";
 import { reguler_packages, wedding_packages } from "@/constants/package";
 
-const TIME_SLOTS = [
-  "07:00",
-  "08:00",
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-  "18:00",
-  "19:00",
-  "20:00",
-  "21:00",
-  "22:00",
-];
+const OPEN_HOUR = 8;
+const CLOSE_HOUR = 22;
+const TIME_SLOTS = (() => {
+  const slots = [];
+  for (let h = OPEN_HOUR; h <= CLOSE_HOUR; h++) {
+    slots.push(`${String(h).padStart(2, "0")}:00`);
+  }
+  return slots;
+})();
 
 const MIN_DURATION = 3;
 
@@ -62,7 +53,7 @@ const BOOKING_TERMS = [
   "Acara pernikahan hanya 1 per hari (full day exclusive)",
   "Acara umum maksimal 2 per hari",
   "Pembatalan kurang dari 3 hari tidak dapat dikembalikan",
-  "Jam operasional venue: 07.00 – 22.00 WIB",
+  "Jam operasional venue: 08.00 – 22.00 WIB",
 ];
 
 // ─── Pure Utility Functions ───────────────────────────────────────────────────
@@ -78,21 +69,44 @@ function getBookedHours(events = []) {
   });
 }
 
-function isEndTimeValid(time, selectedStart, bookedHours) {
-  const startHour = parseInt(selectedStart.split(":")[0]);
-  const endHour = parseInt(time.split(":")[0]);
-  const duration = endHour - startHour;
-  return (
-    endHour > startHour &&
-    duration >= MIN_DURATION &&
-    duration % MIN_DURATION === 0 &&
-    !bookedHours.includes(time)
-  );
+function isStartHourValid(time, pkgType, dayReservations) {
+  const S = parseInt(time.split(":")[0]);
+  const duration = pkgType === "wedding" ? 5 : 3;
+  const E = S + duration;
+  if (E > CLOSE_HOUR) return false;
+  
+  // Check overlap with any reservation in dayReservations
+  return !dayReservations.some((r) => {
+    const exStart = new Date(r.startDateTime).getUTCHours();
+    const exEnd = new Date(r.endDateTime).getUTCHours();
+    return Math.max(S, exStart) < Math.min(E + 1, exEnd + 1);
+  });
 }
 
-function getEndTimeLabel(time, selectedStart, bookedHours) {
-  if (!isEndTimeValid(time, selectedStart, bookedHours)) {
-    return bookedHours.includes(time) ? " • BOOKED" : " • INVALID";
+function isEndTimeValid(time, selectedStart, pkgType, dayReservations) {
+  const S = parseInt(selectedStart.split(":")[0]);
+  const E = parseInt(time.split(":")[0]);
+  const duration = E - S;
+  
+  if (pkgType === "wedding") {
+    if (duration !== 5) return false;
+  } else {
+    if (duration < 3 || duration % 3 !== 0) return false;
+  }
+  
+  if (E > CLOSE_HOUR) return false;
+  
+  // Check overlap with any reservation in dayReservations
+  return !dayReservations.some((r) => {
+    const exStart = new Date(r.startDateTime).getUTCHours();
+    const exEnd = new Date(r.endDateTime).getUTCHours();
+    return Math.max(S, exStart) < Math.min(E + 1, exEnd + 1);
+  });
+}
+
+function getEndTimeLabel(time, selectedStart, pkgType, dayReservations) {
+  if (!isEndTimeValid(time, selectedStart, pkgType, dayReservations)) {
+    return " • INVALID";
   }
   const duration =
     parseInt(time.split(":")[0]) - parseInt(selectedStart.split(":")[0]);
@@ -283,11 +297,20 @@ function BookedEventsList({ events }) {
   );
 }
 
-function AvailabilityLegend({ bookedHours }) {
+function AvailabilityLegend({ dayReservations }) {
+  const isHourOccupied = (timeStr) => {
+    const H = parseInt(timeStr.split(":")[0]);
+    return dayReservations.some((r) => {
+      const exStart = new Date(r.startDateTime).getUTCHours();
+      const exEnd = new Date(r.endDateTime).getUTCHours();
+      return H >= exStart && H <= exEnd;
+    });
+  };
+
   return (
     <div className="mt-4 flex flex-wrap gap-2">
       {TIME_SLOTS.map((time) => {
-        const isBooked = bookedHours.includes(time);
+        const isBooked = isHourOccupied(time);
         return (
           <div
             key={time}
@@ -309,7 +332,8 @@ function TimeSlotPicker({
   selectedDate,
   selectedStart,
   selectedEnd,
-  bookedHours,
+  dayReservations,
+  pkgType,
   onStartChange,
   onEndChange,
 }) {
@@ -337,10 +361,10 @@ function TimeSlotPicker({
               >
                 <option value="">Jam mulai</option>
                 {TIME_SLOTS.map((time) => {
-                  const isBooked = bookedHours.includes(time);
+                  const disabled = !isStartHourValid(time, pkgType, dayReservations);
                   return (
-                    <option key={time} value={time} disabled={isBooked}>
-                      {time} {isBooked ? "• BOOKED" : ""}
+                    <option key={time} value={time} disabled={disabled}>
+                      {time} {disabled ? "• BOOKED/CONFLICT" : ""}
                     </option>
                   );
                 })}
@@ -370,18 +394,20 @@ function TimeSlotPicker({
                 </option>
                 {selectedStart &&
                   TIME_SLOTS.map((time) => {
-                    const valid = isEndTimeValid(
+                    const disabled = !isEndTimeValid(
                       time,
                       selectedStart,
-                      bookedHours,
+                      pkgType,
+                      dayReservations,
                     );
                     const label = getEndTimeLabel(
                       time,
                       selectedStart,
-                      bookedHours,
+                      pkgType,
+                      dayReservations,
                     );
                     return (
-                      <option key={time} value={time} disabled={!valid}>
+                      <option key={time} value={time} disabled={disabled}>
                         {time}
                         {label}
                       </option>
@@ -392,7 +418,7 @@ function TimeSlotPicker({
             </div>
           </div>
 
-          <AvailabilityLegend bookedHours={bookedHours} />
+          <AvailabilityLegend dayReservations={dayReservations} />
 
           <div className="mt-4 p-3 bg-[#0F131F]/5 border border-[#0F131F]/15">
             <p className="text-[11px] text-black/50 leading-relaxed">
@@ -440,7 +466,7 @@ function BookingCard({
   selectedDate,
   selectedStart,
   selectedEnd,
-  bookedHours,
+  dayReservations,
   onOpenCalendar,
   onStartChange,
   onEndChange,
@@ -467,7 +493,8 @@ function BookingCard({
           selectedDate={selectedDate}
           selectedStart={selectedStart}
           selectedEnd={selectedEnd}
-          bookedHours={bookedHours}
+          dayReservations={dayReservations}
+          pkgType={pkg.type}
           onStartChange={onStartChange}
           onEndChange={onEndChange}
         />
@@ -475,7 +502,7 @@ function BookingCard({
         <div className="flex items-center gap-1.5 mt-1">
           <Clock size={12} color="#0F131F" strokeWidth={1.5} />
           <span className="text-[11px] text-black/40">
-            Jam operasional: 07.00 – 22.00 WIB · Min. 3 jam
+            Jam operasional: 08.00 – 22.00 WIB · Min. {pkg.type === "wedding" ? 5 : 3} jam
           </span>
         </div>
 
@@ -496,7 +523,7 @@ function BookingCard({
   );
 }
 
-function CalendarModal({ pkg, onClose, onDateSelect }) {
+function CalendarModal({ pkg, onClose, onDateSelect, bookedDates }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
       <div className="relative bg-white w-full max-w-120 border border-[#0F131F]/20 shadow-2xl p-5">
@@ -516,7 +543,7 @@ function CalendarModal({ pkg, onClose, onDateSelect }) {
           </p>
         </div>
 
-        <BookingCalendar onDateSelect={onDateSelect} />
+        <BookingCalendar onDateSelect={onDateSelect} bookedDates={bookedDates} />
 
         <div className="mt-5 pt-4 border-t border-[#0F131F]/10 flex items-start gap-2">
           <Clock
@@ -526,7 +553,7 @@ function CalendarModal({ pkg, onClose, onDateSelect }) {
             className="mt-0.5 shrink-0"
           />
           <p className="text-[11px] text-black/40 leading-relaxed">
-            Durasi sewa minimal 3 jam. Kelebihan waktu dikenakan biaya tambahan.
+            Durasi sewa minimal {pkg.type === "wedding" ? 5 : 3} jam. Kelebihan waktu dikenakan biaya tambahan.
           </p>
         </div>
       </div>
@@ -543,7 +570,7 @@ function VenueSidebar({
   selectedDate,
   selectedStart,
   selectedEnd,
-  bookedHours,
+  dayReservations,
   onOpenCalendar,
   onStartChange,
   onEndChange,
@@ -630,7 +657,7 @@ function VenueSidebar({
         selectedDate={selectedDate}
         selectedStart={selectedStart}
         selectedEnd={selectedEnd}
-        bookedHours={bookedHours}
+        dayReservations={dayReservations}
         onOpenCalendar={onOpenCalendar}
         onStartChange={onStartChange}
         onEndChange={onEndChange}
@@ -881,8 +908,89 @@ function DetailPaketContent() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedStart, setSelectedStart] = useState("");
   const [selectedEnd, setSelectedEnd] = useState("");
+  const [reservations, setReservations] = useState([]);
 
-  const bookedHours = selectedDate ? getBookedHours(selectedDate.events) : [];
+  useEffect(() => {
+    const fetchReservations = async () => {
+      try {
+        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/reservation/all");
+        setReservations(res.data.data || []);
+      } catch (err) {
+        console.error("Gagal mengambil data reservasi:", err);
+      }
+    };
+    fetchReservations();
+  }, []);
+
+  const getDynamicBookedDates = () => {
+    const computed = {};
+    const active = reservations.filter(
+      (r) => r.status !== "CANCELLED" && r.status !== "EXPIRED"
+    );
+    active.forEach((r) => {
+      const d = new Date(r.startDateTime);
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(d.getUTCDate()).padStart(2, "0");
+      const dateKey = `${y}-${m}-${day}`;
+      
+      const startH = String(d.getUTCHours()).padStart(2, "0");
+      const startM = String(d.getUTCMinutes()).padStart(2, "0");
+      const endD = new Date(r.endDateTime);
+      const endH = String(endD.getUTCHours()).padStart(2, "0");
+      const endM = String(endD.getUTCMinutes()).padStart(2, "0");
+      
+      const timeStr = `${startH}:${startM} – ${endH}:${endM}`;
+      const isWedding = r.reservationType?.name?.toLowerCase() === "wedding";
+      
+      if (!computed[dateKey]) {
+        computed[dateKey] = {
+          status: "available",
+          events: [],
+        };
+      }
+      
+      computed[dateKey].events.push({
+        name: isWedding
+          ? `Wedding ${r.customer?.fullName || "Guest"}`
+          : `Acara ${r.customer?.fullName || "Guest"}`,
+        time: timeStr,
+        isWedding,
+        rawStart: r.startDateTime,
+        rawEnd: r.endDateTime,
+      });
+    });
+    
+    Object.keys(computed).forEach((key) => {
+      const dayData = computed[key];
+      const hasWedding = dayData.events.some((e) => e.isWedding);
+      if (hasWedding) {
+        dayData.status = "wedding";
+      } else if (dayData.events.length >= 2) {
+        dayData.status = "full";
+      } else if (dayData.events.length === 1) {
+        dayData.status = "half";
+      }
+    });
+    return computed;
+  };
+
+  const dynamicBookedDates = getDynamicBookedDates();
+
+  const getDayReservations = () => {
+    if (!selectedDate?.key) return [];
+    return reservations.filter((r) => {
+      if (r.status === "CANCELLED" || r.status === "EXPIRED") return false;
+      const d = new Date(r.startDateTime);
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(d.getUTCDate()).padStart(2, "0");
+      const dateKey = `${y}-${m}-${day}`;
+      return dateKey === selectedDate.key;
+    });
+  };
+
+  const dayReservations = getDayReservations();
 
   const toggleArea = (areaId) => {
     setSelectedAreaIds((prev) => {
@@ -1086,7 +1194,7 @@ function DetailPaketContent() {
           selectedDate={selectedDate}
           selectedStart={selectedStart}
           selectedEnd={selectedEnd}
-          bookedHours={bookedHours}
+          dayReservations={dayReservations}
           onOpenCalendar={() => setOpenCalendar(true)}
           onStartChange={handleStartChange}
           onEndChange={setSelectedEnd}
@@ -1115,9 +1223,10 @@ function DetailPaketContent() {
 
       {openCalendar && (
         <CalendarModal
-          pkg={{ name: combinedName }}
+          pkg={pkg}
           onClose={() => setOpenCalendar(false)}
           onDateSelect={handleDateSelect}
+          bookedDates={dynamicBookedDates}
         />
       )}
     </main>
