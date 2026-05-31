@@ -245,6 +245,46 @@ function WeddingCard({ pkg }) {
   );
 }
 
+// ─── Skeleton Card ─────────────────────────────────────────────────────────────
+function SkeletonCard() {
+  return (
+    <div className="col-span-1 w-full bg-white border border-[#0F131F]/10 flex flex-col">
+      {/* Image Skeleton */}
+      <div className="w-full aspect-video bg-black/5 animate-pulse" />
+
+      {/* Body Skeleton */}
+      <div className="flex flex-col items-start p-5 flex-1 w-full gap-3">
+        {/* Price Skeleton */}
+        <div className="h-7 w-32 bg-black/5 animate-pulse rounded" />
+
+        {/* Desc Skeleton */}
+        <div className="w-full flex flex-col gap-2 mt-1">
+          <div className="h-4 w-full bg-black/5 animate-pulse rounded" />
+          <div className="h-4 w-[70%] bg-black/5 animate-pulse rounded" />
+        </div>
+
+        {/* Stats Grid Skeleton */}
+        <div className="w-full mt-6 grid grid-cols-2 gap-x-4 gap-y-5">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-7 h-7 bg-black/5 animate-pulse rounded-full shrink-0" />
+              <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                <div className="h-2.5 w-12 bg-black/5 animate-pulse rounded" />
+                <div className="h-3.5 w-20 bg-black/5 animate-pulse rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="w-full h-px bg-[#0F131F]/10 my-5" />
+
+        {/* Button Skeleton */}
+        <div className="h-11 w-full bg-black/5 animate-pulse rounded" />
+      </div>
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 const formatRupiah = (amount) => {
   if (amount === null || amount === undefined || amount === 0) return null;
@@ -317,16 +357,7 @@ function page() {
     };
   });
 
-  if (loading) {
-    return (
-      <div className="w-full min-h-screen bg-[#f3f4f7] flex items-center justify-center">
-        <div className="flex items-center gap-2 text-black/50 text-sm">
-          <Loader2 className="w-5 h-5 animate-spin text-[#896d51]" />
-          <span>Memuat paket &amp; area...</span>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <main className="w-full min-h-screen bg-[#f3f4f7]">
@@ -366,11 +397,15 @@ function page() {
       <section className="section-layout grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="col-span-1 lg:col-span-10 lg:col-start-2 w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {!isWedding
-              ? reguler_cards_data.map((v) => (
-                  <RegulerCard key={v.id} venue={v} />
-                ))
-              : wedding_cards_data.map((p) => <WeddingCard key={p.id} pkg={p} />)}
+            {loading ? (
+              [...Array(3)].map((_, i) => <SkeletonCard key={i} />)
+            ) : !isWedding ? (
+              reguler_cards_data.map((v) => (
+                <RegulerCard key={v.id} venue={v} />
+              ))
+            ) : (
+              wedding_cards_data.map((p) => <WeddingCard key={p.id} pkg={p} />)
+            )}
           </div>
         </div>
       </section>
