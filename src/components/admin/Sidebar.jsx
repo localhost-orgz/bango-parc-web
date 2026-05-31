@@ -12,6 +12,7 @@ import {
   CalendarDays,
   CreditCard,
   Book,
+  Users,
 } from "lucide-react";
 
 const dataItems = [
@@ -20,6 +21,7 @@ const dataItems = [
   { label: "Gallery", icon: GalleryHorizontal, path: "/admin/gallery" },
   { label: "Addon", icon: Package, path: "/admin/addon" },
   { label: "Facility", icon: Wrench, path: "/admin/facility" },
+  { label: "Pengguna", icon: Users, path: "/admin/users" },
 ];
 
 const navItems = [

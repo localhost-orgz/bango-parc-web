@@ -284,30 +284,27 @@ export default function UsersPage() {
   const selectedUser = usersData.find((u) => u.id === selectedId) || null;
 
   return (
-    <div className="flex min-h-screen bg-[#f3f4f7] font-sans">
+    <div className="flex bg-white font-sans -m-6 min-h-screen">
       {/* Center — Table */}
       <div
-        className={`flex flex-col min-w-0 transition-all duration-300 ${selectedUser ? "flex-1" : "flex-1"} border-r border-[#0F131F]/10`}
+        className="flex flex-col min-w-0 transition-all duration-300 flex-1 border-r border-[#0F131F]/10 p-6"
       >
-        {/* Topbar */}
-        <header className="h-16 bg-white border-b border-[#0F131F]/10 px-8 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <h1 className="font-crimson-pro text-2xl text-[#0F131F]">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="font-crimson-pro text-3xl text-[#0F131F] font-semibold">
               Pengguna
             </h1>
-            <span className="text-[10px] font-bold text-black/30 bg-[#0F131F]/5 border border-[#0F131F]/10 px-2 py-0.5">
-              {usersData.length} total
-            </span>
+            <p className="text-black/40 text-sm mt-1">
+              Kelola akun pengguna yang terdaftar di sistem Bango Parc.
+            </p>
           </div>
-          <div className="w-9 h-9 bg-[#0F131F] rounded-full flex items-center justify-center">
-            <span className="text-white text-xs font-semibold">A</span>
-          </div>
-        </header>
+          <span className="text-[10px] font-bold text-[#0F131F]/40 bg-[#0F131F]/5 border border-[#0F131F]/10 px-2.5 py-1">
+            {usersData.length} total
+          </span>
+        </div>
 
-        <div className="flex-1 p-6 flex flex-col gap-4 overflow-hidden">
-          <p className="text-sm text-black/40">
-            Kelola akun pengguna yang terdaftar di sistem Bango Parc.
-          </p>
+        <div className="flex-1 flex flex-col gap-4 overflow-hidden">
 
           {/* Search + Filter */}
           <div className="flex items-center gap-3">
