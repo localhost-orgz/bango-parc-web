@@ -516,6 +516,7 @@ function BookingCard({
 }) {
   const selectedDateKey = selectedDate?.key || "";
   const areaIdsParam = selectedAreaIds.join(",");
+  const isReady = selectedAreaIds.length > 0 && selectedDate && selectedStart && selectedEnd;
 
   return (
     <div className="w-full p-5 border-2 border-[#0F131F] mt-8 bg-white">
@@ -551,12 +552,21 @@ function BookingCard({
 
         <div className="h-px w-full bg-[#0F131F]/70 mb-1 mt-3" />
 
-        <Link
-          href={`/paket/checkout?ids=${areaIdsParam}&type=${pkg.type}&date=${selectedDateKey}&start=${selectedStart}&end=${selectedEnd}`}
-          className="bg-[#0F131F] flex justify-center items-center py-3 text-sm font-medium text-white hover:bg-[#7a6047] transition-colors"
-        >
-          Lanjutkan Booking
-        </Link>
+        {isReady ? (
+          <Link
+            href={`/paket/checkout?ids=${areaIdsParam}&type=${pkg.type}&date=${selectedDateKey}&start=${selectedStart}&end=${selectedEnd}`}
+            className="bg-[#0F131F] flex justify-center items-center py-3 text-sm font-medium text-white hover:bg-[#7a6047] transition-colors"
+          >
+            Lanjutkan Booking
+          </Link>
+        ) : (
+          <button
+            disabled
+            className="bg-gray-300 flex justify-center items-center py-3 text-sm font-medium text-gray-500 cursor-not-allowed border border-gray-200"
+          >
+            Lanjutkan Booking
+          </button>
+        )}
 
         <p className="text-[10px] text-center text-black/30">
           Dengan melanjutkan, Anda menyetujui syarat &amp; ketentuan kami
