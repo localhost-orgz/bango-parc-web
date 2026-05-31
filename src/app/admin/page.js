@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Bell, Image as ImageIcon, ChevronDown } from "lucide-react";
 
-import BookingCalendar from "@/components/BookingCalendar";
+import AdminCalendar from "@/components/admin/AdminCalendar";
 
 import { bookedDates } from "@/constants/bookings";
 import RecentReservations from "@/components/admin/admin/RecentReservations";
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
           <section className="grid grid-cols-12 gap-4">
             <div className="col-span-7">
               {/* <OccupancyCalendar /> */}
-              <BookingCalendar
+              <AdminCalendar
                 onDateSelect={(data) => {
                   console.log("Selected date:", data);
                 }}
