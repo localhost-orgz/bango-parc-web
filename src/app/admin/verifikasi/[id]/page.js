@@ -122,9 +122,27 @@ export default function PaymentVerificationDetailPage() {
   const fetchDetail = async () => {
     try {
       setLoading(true);
-      const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/payment");
-      const apiData = res.data?.result || res.data?.data || [];
-      const mapped = apiData.map(mapApiPaymentToUi);
+      const [payRes, resvRes] = await Promise.all([
+        axiosInstance.get("https://bango-parc-service.vercel.app/api/payment"),
+        axiosInstance.get("https://bango-parc-service.vercel.app/api/reservation/all")
+      ]);
+      const apiData = payRes.data?.result || payRes.data?.data || [];
+      const allReservations = resvRes.data?.data || [];
+
+      const mapped = apiData.map((item) => {
+        const sched = item.paymentSchedule || {};
+        const resvId = sched.reservationId || item.reservationId;
+        const matchedResv = allReservations.find(r => r.id === resvId);
+        const enriched = {
+          ...item,
+          paymentSchedule: {
+            ...sched,
+            reservation: matchedResv || sched.reservation
+          }
+        };
+        return mapApiPaymentToUi(enriched);
+      });
+
       const found = mapped.find((p) => String(p.apiId) === String(id));
       if (found) {
         setItem(found);
