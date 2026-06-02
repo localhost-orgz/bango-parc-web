@@ -100,44 +100,7 @@ function getReservationBadgeColor(status) {
   }
 }
 
-const DUMMY_RESERVATIONS = [
-  {
-    id: "BP-2026-0812",
-    packageName: "Royal Excellence Wedding Package",
-    area: "Area Tengah & Belakang (Semi-indoor & Outdoor)",
-    date: "12 Agustus 2026",
-    timeSlot: "08.00 - 13.00 WIB (5 jam)",
-    price: "Rp 65.000.000",
-    status: "Dikonfirmasi",
-    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    paymentStatus: "PAID",
-    rejectionReason: null,
-  },
-  {
-    id: "BP-2026-0925",
-    packageName: "Intimate Deluxe Package",
-    area: "Area Depan (Garden Outdoor)",
-    date: "25 September 2026",
-    timeSlot: "15.00 - 18.00 WIB (3 jam)",
-    price: "Rp 28.000.000",
-    status: "Menunggu Pembayaran",
-    badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
-    paymentStatus: "PARTIAL",
-    rejectionReason: "Bukti transfer tidak terbaca / buram. Silakan unggah kembali bukti pembayaran yang jelas.",
-  },
-  {
-    id: "BP-2025-1110",
-    packageName: "Corporate Gathering & Seminar",
-    area: "Ruang Tengah (Indoor Exclusive)",
-    date: "10 November 2025",
-    timeSlot: "09.00 - 12.00 WIB (3 jam)",
-    price: "Rp 18.000.000",
-    status: "Selesai",
-    badgeColor: "bg-gray-100 text-gray-700 border-gray-200",
-    paymentStatus: "PAID",
-    rejectionReason: null,
-  }
-];
+const DUMMY_RESERVATIONS = [];
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -547,7 +510,22 @@ export default function ProfilePage() {
 
                 {/* Reservation List */}
                 <div className="flex flex-col gap-6">
-                  {reservations.map((res) => {
+                  {reservations.length === 0 && !loadingReal ? (
+                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 border border-dashed border-[#0F131F]/15 bg-[#f3f4f7]/10">
+                      <Calendar className="w-8 h-8 text-black/20 mb-3" />
+                      <p className="text-sm font-medium text-black/50">Belum Ada Reservasi</p>
+                      <p className="text-xs text-black/35 mt-1 max-w-xs">
+                        Anda belum memiliki riwayat reservasi. Silakan cari paket acara yang sesuai untuk memesan.
+                      </p>
+                      <Link 
+                        href="/paket"
+                        className="mt-4 px-5 py-2 bg-[#0F131F] text-white hover:bg-[#896d51] transition-all text-xs font-semibold uppercase tracking-wider rounded"
+                      >
+                        Lihat Paket
+                      </Link>
+                    </div>
+                  ) : (
+                    reservations.map((res) => {
                     const isTicketType = res.paymentStatus === "PAID" || res.paymentStatus === "PARTIAL";
                     const isCancelledOrExpired = res.status === "Dibatalkan" || res.status === "Kedaluwarsa";
 
@@ -673,7 +651,8 @@ export default function ProfilePage() {
                         </div>
                       </div>
                     );
-                  })}
+                  })
+                )}
                 </div>
               </div>
             )}
