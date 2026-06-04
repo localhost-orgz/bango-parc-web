@@ -5,7 +5,6 @@ import { Bell, Image as ImageIcon, ChevronDown } from "lucide-react";
 
 import AdminCalendar from "@/components/admin/AdminCalendar";
 
-import { bookedDates } from "@/constants/bookings";
 import RecentReservations from "@/components/admin/admin/RecentReservations";
 import CategoryCard from "@/components/admin/admin/CategoryCard";
 import TrendCard from "@/components/admin/admin/TrendCard";
@@ -110,7 +109,7 @@ export default function AdminDashboard() {
               />
             </div>
             <div className="col-span-1 lg:col-span-5">
-              <RecentReservations bookedDates={bookedDates} />
+              <RecentReservations />
             </div>
           </section>
         </main>
