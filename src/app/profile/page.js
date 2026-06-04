@@ -279,11 +279,14 @@ export default function ProfilePage() {
   };
 
   const mapRealToUi = (r) => {
-    const areaNames = r.areas?.map((a) => a.area?.name).filter(Boolean) || [];
+    const areaReservations = r.areaReservations || r.areas || [];
+    const areaNames = areaReservations
+      .map((a) => a.area?.name)
+      .filter(Boolean);
     const areaStr = areaNames.length > 0 ? areaNames.join(" & ") : "Venue Bango Parc";
     
     const isWedding = r.reservationType?.name?.toLowerCase() === "wedding";
-    const packageName = isWedding 
+    const packageLabel = isWedding 
       ? "Wedding Venue Exclusive Package" 
       : "Reguler Venue Rental Package";
 
@@ -298,8 +301,8 @@ export default function ProfilePage() {
       
     return {
       id: r.code || r.bookingCode || `BP-${r.id}`,
-      packageName,
-      area: areaStr,
+      packageName: areaStr,
+      area: packageLabel,
       date: formatIndonesianDateSimple(r.startDateTime),
       timeSlot: formatTimeSlot(r.startDateTime, r.endDateTime),
       price: formatRupiah(Number(r.totalPrice) || 0),
@@ -573,7 +576,7 @@ export default function ProfilePage() {
                               <Clock size={12} className="text-[#896d51]" />
                               <span>{res.date} · {res.timeSlot}</span>
                             </div>
-                            <span>Area: {res.area}</span>
+                            <span>{res.area}</span>
                           </div>
 
                           {/* Rejection Reason Display */}
