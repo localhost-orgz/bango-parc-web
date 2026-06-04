@@ -23,9 +23,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Navbar from "@/components/Landing/Navbar";
 import axiosInstance from "@/lib/axios";
+import RescheduleModal from "@/components/Payment/RescheduleModal";
 
 // Simulasi data tetap sama
 const orderData = {
@@ -182,25 +183,68 @@ export default function PaymentPage() {
     }
   }, []);
 
+  const [showReschedule, setShowReschedule] = useState(false);
+
   // Fetch reservation details to retrieve the paymentSchedules ID
-  useEffect(() => {
-    const fetchReservationDetails = async () => {
-      if (!dynamicOrderData.reservationId) return;
-      try {
-        setLoadingReservation(true);
-        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/reservation/all");
-        const found = res.data.data?.find((r) => r.id === Number(dynamicOrderData.reservationId));
-        if (found) {
-          setReservation(found);
-        }
-      } catch (err) {
-        console.error("Gagal mengambil detail reservasi:", err);
-      } finally {
-        setLoadingReservation(false);
+  const fetchReservationDetails = useCallback(async () => {
+    if (!dynamicOrderData.reservationId) return;
+    try {
+      setLoadingReservation(true);
+      const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/reservation/all");
+      const found = res.data.data?.find((r) => r.id === Number(dynamicOrderData.reservationId));
+      if (found) {
+        setReservation(found);
       }
-    };
-    fetchReservationDetails();
+    } catch (err) {
+      console.error("Gagal mengambil detail reservasi:", err);
+    } finally {
+      setLoadingReservation(false);
+    }
   }, [dynamicOrderData.reservationId]);
+
+  useEffect(() => {
+    fetchReservationDetails();
+  }, [fetchReservationDetails]);
+
+  const handleRescheduleSuccess = (newStart, newEnd) => {
+    const startDate = new Date(newStart);
+    const endDate = new Date(newEnd);
+    
+    const daysIndo = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const monthsIndo = [
+      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+    
+    const dayName = daysIndo[startDate.getDay()];
+    const dateNum = startDate.getDate();
+    const monthName = monthsIndo[startDate.getMonth()];
+    const yearNum = startDate.getFullYear();
+    const dateLabel = `${dayName}, ${dateNum} ${monthName} ${yearNum}`;
+    
+    const pad = (n) => String(n).padStart(2, "0");
+    const startTimeLabel = `${pad(startDate.getUTCHours())}:${pad(startDate.getUTCMinutes())}`;
+    const endTimeLabel = `${pad(endDate.getUTCHours())}:${pad(endDate.getUTCMinutes())}`;
+    
+    const duration = Math.round((endDate - startDate) / (1000 * 60 * 60));
+
+    const updated = {
+      ...dynamicOrderData,
+      date: dateLabel,
+      startTime: startTimeLabel,
+      endTime: endTimeLabel,
+      duration,
+    };
+    
+    setDynamicOrderData(updated);
+    localStorage.setItem("bango_parc_payment_order", JSON.stringify(updated));
+    fetchReservationDetails();
+  };
+
+  const canReschedule = reservation && 
+    reservation.status !== "CANCELLED" && 
+    reservation.status !== "COMPLETED" && 
+    reservation.status !== "EXPIRED";
 
   const handleSubmitPayment = async (e) => {
     if (e) e.preventDefault();
@@ -304,7 +348,10 @@ export default function PaymentPage() {
         {/* LEFT — Order Summary */}
         <div className="lg:col-span-4 flex flex-col gap-4 order-1 lg:order-1">
           <OrderCode code={dynamicOrderData.orderCode} />
-          <VenueInfo orderData={dynamicOrderData} />
+          <VenueInfo 
+            orderData={dynamicOrderData} 
+            onRescheduleClick={canReschedule ? () => setShowReschedule(true) : null}
+          />
           <PriceBreakdown orderData={dynamicOrderData} paymentType={paymentType} />
           <AlertPayment reservation={reservation} />
         </div>
@@ -535,6 +582,13 @@ export default function PaymentPage() {
           </Link>
         </div>
       </section>
+
+      <RescheduleModal
+        isOpen={showReschedule}
+        onClose={() => setShowReschedule(false)}
+        reservation={reservation}
+        onSuccess={handleRescheduleSuccess}
+      />
     </main>
   );
 }

@@ -1,6 +1,6 @@
 import { ArrowRight, CalendarDays, Clock } from "lucide-react";
 
-const VenueInfo = ({ orderData }) => {
+const VenueInfo = ({ orderData, onRescheduleClick }) => {
   return (
     <div className="bg-white border border-[#0f131f]/15 p-5 flex flex-col gap-3">
       <h5 className="font-crimson-text font-semibold text-xl text-[#0f131f] pb-2 border-b border-[#0f131f]/15">
@@ -30,6 +30,15 @@ const VenueInfo = ({ orderData }) => {
           </span>
         </div>
       </div>
+      {onRescheduleClick && (
+        <button
+          type="button"
+          onClick={onRescheduleClick}
+          className="mt-2 w-full py-2.5 bg-transparent border border-[#0f131f] text-[#0f131f] hover:bg-[#0f131f] hover:text-white transition-all text-xs font-semibold uppercase tracking-wider cursor-pointer"
+        >
+          Reschedule Booking
+        </button>
+      )}
     </div>
   );
 };
