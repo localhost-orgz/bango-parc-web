@@ -14,13 +14,17 @@ import {
 function TrendCard({ trendData = [], activeYear, onYearChange }) {
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
 
-  const chartData = (trendData || []).map((item) => {
-    const parts = item.month.split("-");
-    const yearShort = parts[0] ? parts[0].slice(-2) : "";
-    const monthIndex = parts[1] ? parseInt(parts[1], 10) - 1 : 0;
+  // Populate all 12 months for the selected activeYear
+  const chartData = monthNames.map((name, index) => {
+    const monthNum = String(index + 1).padStart(2, "0");
+    const monthKey = `${activeYear}-${monthNum}`;
+    
+    // Find matching item in trendData
+    const match = (trendData || []).find((item) => item.month === monthKey);
+    
     return {
-      month: `${monthNames[monthIndex]} '${yearShort}`,
-      count: item.count,
+      month: name,
+      count: match ? match.count : 0,
     };
   });
 
@@ -62,35 +66,29 @@ function TrendCard({ trendData = [], activeYear, onYearChange }) {
         </div>
       </div>
 
-      {chartData.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center border border-dashed border-[#0F131F]/10 py-16 text-sm text-black/45">
-          Tidak ada data reservasi untuk tahun {activeYear}
-        </div>
-      ) : (
-        <div className="w-full flex-1">
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={chartData} barSize={32}>
-              <XAxis
-                dataKey="month"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#00000066", fontSize: 11 }}
-              />
-              <YAxis hide />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: "#0F131F08" }} />
-              <Bar
-                dataKey="count"
-                radius={0}
-                label={{ position: "top", fontSize: 10, fill: "#00000055" }}
-              >
-                {chartData.map((entry, index) => (
-                  <Cell key={index} fill="#0F131F" />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
+      <div className="w-full flex-1">
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={chartData} barSize={32}>
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#00000066", fontSize: 11 }}
+            />
+            <YAxis hide />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: "#0F131F08" }} />
+            <Bar
+              dataKey="count"
+              radius={0}
+              label={{ position: "top", fontSize: 10, fill: "#00000055" }}
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={index} fill="#0F131F" />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

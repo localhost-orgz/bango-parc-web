@@ -39,7 +39,9 @@ export default function AdminDashboard() {
         const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/dashboard", {
           params: { month: activeMonth, year: activeYear }
         });
-        setDashboardData(res.data || null);
+        const rawData = res.data;
+        const actualData = (rawData && rawData.data) ? rawData.data : rawData;
+        setDashboardData(actualData || null);
       } catch (err) {
         console.error("Gagal mengambil data dashboard:", err);
       } finally {
