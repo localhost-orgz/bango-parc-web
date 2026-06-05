@@ -81,7 +81,7 @@ function Sidebar({ isOpen, onClose }) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 w-60 bg-[#0F131F] flex flex-col shrink-0 z-50 transform md:static md:translate-x-0 transition-transform duration-300 ease-in-out md:h-auto md:min-h-screen ${
+        className={`fixed inset-y-0 left-0 w-60 bg-[#0F131F] flex flex-col shrink-0 z-50 transform md:sticky md:top-0 md:h-screen md:overflow-y-auto md:translate-x-0 transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
