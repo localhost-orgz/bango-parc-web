@@ -10,7 +10,7 @@ const CustomTooltip = ({ active, payload, label }) => {
           <span className="text-xl font-bold text-white tracking-tight leading-none">
             {value}
           </span>
-          <span className="text-[11px] text-[#896d51] font-semibold">
+          <span className="text-[11px] text-white/75 font-semibold">
             reservasi
           </span>
         </div>
