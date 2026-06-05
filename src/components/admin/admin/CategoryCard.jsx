@@ -20,14 +20,14 @@ function CategoryCard({ categoryData, venueData }) {
       </div>
 
       {/* Pie Chart */}
-      <div className="flex items-center justify-center">
-        <PieChart width={220} height={160}>
+      <div className="flex items-center justify-center overflow-visible w-full">
+        <PieChart width={320} height={180}>
           <Pie
             data={categoryData}
-            cx={110}
-            cy={75}
-            innerRadius={40}
-            outerRadius={75}
+            cx={160}
+            cy={90}
+            innerRadius={45}
+            outerRadius={65}
             startAngle={90}
             endAngle={-270}
             dataKey="value"
