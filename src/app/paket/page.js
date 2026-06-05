@@ -1,7 +1,14 @@
 "use client";
 import Navbar from "@/components/Landing/Navbar";
 import { reguler_packages, wedding_packages } from "@/constants/package";
-import { ArrowRight, MoveRight, Phone, Calendar, Heart, Loader2 } from "lucide-react";
+import {
+  ArrowRight,
+  MoveRight,
+  Phone,
+  Calendar,
+  Heart,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import axiosInstance from "@/lib/axios";
@@ -38,7 +45,9 @@ function TypeToggle({ isWedding, setIsWedding }) {
                   : "text-[#896d51] hover:text-[#0F131F] hover:bg-[#896d51]/10"
               }`}
             >
-              <span className={`shrink-0 transition-transform duration-300 ${active ? "scale-110 text-[#896d51]" : "text-[#896d51]/75"}`}>
+              <span
+                className={`shrink-0 transition-transform duration-300 ${active ? "scale-110 text-[#896d51]" : "text-[#896d51]/75"}`}
+              >
                 {opt.icon}
               </span>
               <span className="flex flex-col items-start text-left">
@@ -66,20 +75,52 @@ function TypeToggle({ isWedding, setIsWedding }) {
 const getFacilityWeight = (fac) => {
   const name = (fac.name || "").toLowerCase();
   const icon = (fac.icon || "").toLowerCase();
-  if (name.includes("kapasitas") || name.includes("pax") || icon.includes("users")) return 1;
-  if (name.includes("listrik") || name.includes("watt") || icon.includes("zap")) return 2;
-  if (name.includes("area") || name.includes("dekor") || icon.includes("sparkles")) return 3;
-  if (name.includes("kursi") || name.includes("chair") || icon.includes("armchair")) return 4;
+  if (
+    name.includes("kapasitas") ||
+    name.includes("pax") ||
+    icon.includes("users")
+  )
+    return 1;
+  if (name.includes("listrik") || name.includes("watt") || icon.includes("zap"))
+    return 2;
+  if (
+    name.includes("area") ||
+    name.includes("dekor") ||
+    icon.includes("sparkles")
+  )
+    return 3;
+  if (
+    name.includes("kursi") ||
+    name.includes("chair") ||
+    icon.includes("armchair")
+  )
+    return 4;
   return 99;
 };
 
 const getFacilityLabel = (fac) => {
   const name = (fac.name || "").toLowerCase();
   const icon = (fac.icon || "").toLowerCase();
-  if (name.includes("kapasitas") || name.includes("pax") || icon.includes("users")) return "Kapasitas";
-  if (name.includes("listrik") || name.includes("watt") || icon.includes("zap")) return "Listrik";
-  if (name.includes("area") || name.includes("dekor") || icon.includes("sparkles")) return "Area";
-  if (name.includes("kursi") || name.includes("chair") || icon.includes("armchair")) return "Kursi Variasi";
+  if (
+    name.includes("kapasitas") ||
+    name.includes("pax") ||
+    icon.includes("users")
+  )
+    return "Kapasitas";
+  if (name.includes("listrik") || name.includes("watt") || icon.includes("zap"))
+    return "Listrik";
+  if (
+    name.includes("area") ||
+    name.includes("dekor") ||
+    icon.includes("sparkles")
+  )
+    return "Area";
+  if (
+    name.includes("kursi") ||
+    name.includes("chair") ||
+    icon.includes("armchair")
+  )
+    return "Kursi Variasi";
   return fac.name;
 };
 
@@ -95,7 +136,7 @@ const getFacilityDisplayValue = (stat) => {
 // ─── Reguler Card ─────────────────────────────────────────────────────────────
 function RegulerCard({ venue }) {
   const sortedStats = [...(venue.stats || [])].sort(
-    (a, b) => getFacilityWeight(a) - getFacilityWeight(b)
+    (a, b) => getFacilityWeight(a) - getFacilityWeight(b),
   );
 
   return (
@@ -136,16 +177,19 @@ function RegulerCard({ venue }) {
         {/* Stats */}
         <div className="w-full mt-6 grid grid-cols-2 gap-x-4 gap-y-5">
           {sortedStats.map((stat) => (
-            <div key={stat.id || stat.name} className="flex items-center gap-3 text-[#0F131F]">
+            <div
+              key={stat.id || stat.name}
+              className="flex items-center gap-3 text-[#0F131F]"
+            >
               <span
                 className="text-[#896d51] shrink-0 w-7 h-7 flex items-center justify-center [&>svg]:w-6 [&>svg]:h-6"
                 dangerouslySetInnerHTML={{ __html: stat.icon }}
               />
               <div className="flex flex-col min-w-0">
-                <span className="text-xs text-black/45 uppercase tracking-wider font-bold leading-none">
+                <span className="text-xs text-[#896d51]/80 tracking-wider font-semibold leading-none">
                   {getFacilityLabel(stat)}
                 </span>
-                <span className="text-sm font-semibold text-[#0F131F] mt-1 break-words leading-tight">
+                <span className="text-sm text-[#0F131F] mt-1 break-words leading-tight">
                   {getFacilityDisplayValue(stat)}
                 </span>
               </div>
@@ -173,7 +217,7 @@ function RegulerCard({ venue }) {
 // ─── Wedding Card ─────────────────────────────────────────────────────────────
 function WeddingCard({ pkg }) {
   const sortedStats = [...(pkg.stats || [])].sort(
-    (a, b) => getFacilityWeight(a) - getFacilityWeight(b)
+    (a, b) => getFacilityWeight(a) - getFacilityWeight(b),
   );
 
   return (
@@ -211,16 +255,19 @@ function WeddingCard({ pkg }) {
         {/* Stats */}
         <div className="w-full mt-6 grid grid-cols-2 gap-x-4 gap-y-5">
           {sortedStats.map((stat) => (
-            <div key={stat.id || stat.name} className="flex items-center gap-3 text-[#0F131F]">
+            <div
+              key={stat.id || stat.name}
+              className="flex items-center gap-3 text-[#0F131F]"
+            >
               <span
                 className="text-[#896d51] shrink-0 w-7 h-7 flex items-center justify-center [&>svg]:w-6 [&>svg]:h-6"
                 dangerouslySetInnerHTML={{ __html: stat.icon }}
               />
               <div className="flex flex-col min-w-0">
-                <span className="text-xs text-black/45 uppercase tracking-wider font-bold leading-none">
+                <span className="text-xs text-[#896d51]/80 tracking-wider font-semibold leading-none">
                   {getFacilityLabel(stat)}
                 </span>
-                <span className="text-sm font-semibold text-[#0F131F] mt-1 break-words leading-tight">
+                <span className="text-sm text-[#0F131F] mt-1 break-words leading-tight">
                   {getFacilityDisplayValue(stat)}
                 </span>
               </div>
@@ -302,36 +349,47 @@ const getAreaImage = (name) => {
 function page() {
   const [isWedding, setIsWedding] = useState(false);
   const [areas, setAreas] = useState([]);
+  const [galleries, setGalleries] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAreas = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/area");
-        setAreas(res.data.data || []);
+        const [areasRes, galleryRes] = await Promise.all([
+          axiosInstance.get("https://bango-parc-service.vercel.app/api/area"),
+          axiosInstance.get("https://bango-parc-service.vercel.app/api/gallery"),
+        ]);
+        setAreas(areasRes.data.data || []);
+        setGalleries(galleryRes.data.galleries || []);
       } catch (err) {
-        console.error("Gagal mengambil data area:", err);
+        console.error("Gagal mengambil data:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchAreas();
+    fetchData();
   }, []);
 
   const reguler_cards_data = areas.map((area) => {
     const priceObj = area.areaPrices?.find(
-      (ap) => ap.reservationType?.name?.toLowerCase() === "reguler"
+      (ap) => ap.reservationType?.name?.toLowerCase() === "reguler",
     );
     const price = Number(priceObj?.price) || 0;
-    const stats = area.areaFacilities
-      ?.map((af) => af.facility)
-      ?.filter((f) => f && f.isDisplay) || [];
+    const stats =
+      area.areaFacilities
+        ?.map((af) => af.facility)
+        ?.filter((f) => f && f.isDisplay) || [];
+
+    // Find primary image from gallery for this area
+    const primaryImg = galleries.find(
+      (g) => String(g.areaId) === String(area.id) && (g.isPrimary === true || g.isPrimary === "true" || g.isPrimary === 1)
+    );
 
     return {
       id: area.id,
       name: area.name,
-      img: getAreaImage(area.name),
+      img: primaryImg ? primaryImg.filePath : getAreaImage(area.name),
       desc: area.description,
       price: formatRupiah(price),
       stats,
@@ -340,24 +398,28 @@ function page() {
 
   const wedding_cards_data = areas.map((area) => {
     const priceObj = area.areaPrices?.find(
-      (ap) => ap.reservationType?.name?.toLowerCase() === "wedding"
+      (ap) => ap.reservationType?.name?.toLowerCase() === "wedding",
     );
     const price = Number(priceObj?.price) || 0;
-    const stats = area.areaFacilities
-      ?.map((af) => af.facility)
-      ?.filter((f) => f && f.isDisplay) || [];
+    const stats =
+      area.areaFacilities
+        ?.map((af) => af.facility)
+        ?.filter((f) => f && f.isDisplay) || [];
+
+    // Find primary image from gallery for this area
+    const primaryImg = galleries.find(
+      (g) => String(g.areaId) === String(area.id) && (g.isPrimary === true || g.isPrimary === "true" || g.isPrimary === 1)
+    );
 
     return {
       id: area.id,
       name: "Wedding " + area.name,
-      thumbnail: getAreaImage(area.name),
+      thumbnail: primaryImg ? primaryImg.filePath : getAreaImage(area.name),
       desc: area.description,
       price: formatRupiah(price),
       stats,
     };
   });
-
-
 
   return (
     <main className="w-full min-h-screen bg-[#f3f4f7]">
@@ -377,9 +439,9 @@ function page() {
           </h1>
         </div>
       </header>
- 
+
       <Navbar />
- 
+
       {/* Toggle Section */}
       <section className="w-full flex flex-col items-center py-14 gap-3 px-4">
         <h2 className="font-crimson-text text-4xl text-[#0F131F] text-center">
@@ -392,20 +454,20 @@ function page() {
           <TypeToggle isWedding={isWedding} setIsWedding={setIsWedding} />
         </div>
       </section>
- 
+
       {/* Cards Section */}
       <section className="section-layout grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="col-span-1 lg:col-span-10 lg:col-start-2 w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {loading ? (
-              [...Array(3)].map((_, i) => <SkeletonCard key={i} />)
-            ) : !isWedding ? (
-              reguler_cards_data.map((v) => (
-                <RegulerCard key={v.id} venue={v} />
-              ))
-            ) : (
-              wedding_cards_data.map((p) => <WeddingCard key={p.id} pkg={p} />)
-            )}
+            {loading
+              ? [...Array(3)].map((_, i) => <SkeletonCard key={i} />)
+              : !isWedding
+                ? reguler_cards_data.map((v) => (
+                    <RegulerCard key={v.id} venue={v} />
+                  ))
+                : wedding_cards_data.map((p) => (
+                    <WeddingCard key={p.id} pkg={p} />
+                  ))}
           </div>
         </div>
       </section>

@@ -16,6 +16,8 @@ import {
   Users,
   Wifi,
   Loader2,
+  ZoomIn,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -156,52 +158,224 @@ function PageHeader({ pkg }) {
 
 function ImageGallery({ pkg }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const images = [pkg.img || pkg.thumbnail || GALLERY_IMAGES[0], ...GALLERY_IMAGES.slice(1)];
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  const images = pkg.galleryList || [
+    { src: pkg.img || pkg.thumbnail || GALLERY_IMAGES[0], title: pkg.name, description: pkg.desc },
+    ...GALLERY_IMAGES.slice(1).map((url, i) => ({
+      src: url,
+      title: `${pkg.name} - Photo ${i + 2}`,
+      description: "Suasana indah di Bango Parc"
+    }))
+  ];
+
+  // Reset active index when active area changes
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [pkg.id]);
 
   function goTo(index) {
     setActiveIndex((index + images.length) % images.length);
   }
 
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setIsLightboxOpen(false);
+      if (e.key === "ArrowLeft") goTo(activeIndex - 1);
+      if (e.key === "ArrowRight") goTo(activeIndex + 1);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLightboxOpen, activeIndex, images.length]);
+
+  // Prevent body scroll when lightbox is open
+  useEffect(() => {
+    if (isLightboxOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isLightboxOpen]);
+
+  const currentImage = images[activeIndex];
+
   return (
-    <div>
-      {/* Main image */}
-      <div className="w-full h-auto aspect-video bg-gray-400 relative shadow-xs overflow-hidden sm:overflow-visible">
+    <div className="flex flex-col w-full">
+      {/* Main image container */}
+      <div className="w-full h-auto aspect-video bg-black/10 relative shadow-sm overflow-hidden group">
         <div
-          className="inset-0 absolute bg-cover bg-center transition-all duration-500"
-          style={{ backgroundImage: `url(${images[activeIndex]})` }}
+          className="inset-0 absolute bg-cover bg-center transition-all duration-500 cursor-pointer"
+          style={{ backgroundImage: `url(${currentImage?.src})` }}
+          onClick={() => setIsLightboxOpen(true)}
         />
-        <button
-          onClick={() => goTo(activeIndex - 1)}
-          className="rounded-full p-2.5 sm:p-3 z-10 absolute top-1/2 -translate-y-1/2 bg-[#0F131F] left-1 sm:-left-3 shadow-2xl border border-[#0F131F] group transition-all cursor-pointer hover:scale-105"
+        
+        {/* Hover Zoom Overlay */}
+        <div 
+          onClick={() => setIsLightboxOpen(true)}
+          className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center gap-1.5 cursor-zoom-in z-10"
         >
-          <ChevronLeft
-            color="#fff"
-            className="group-hover:stroke-white transition-colors"
-          />
+          <ZoomIn size={28} className="text-white animate-pulse" strokeWidth={1.5} />
+          <span className="text-white text-xs font-semibold uppercase tracking-wider">
+            Klik untuk memperbesar
+          </span>
+        </div>
+
+        {/* Counter Badge */}
+        <div className="absolute top-3 right-3 bg-[#0F131F]/80 backdrop-blur-xs text-white text-[10px] px-2.5 py-1 font-semibold tracking-wider uppercase z-10">
+          {activeIndex + 1} / {images.length}
+        </div>
+
+        {/* Navigation Arrows */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            goTo(activeIndex - 1);
+          }}
+          className="rounded-full p-2.5 z-20 absolute top-1/2 -translate-y-1/2 bg-[#0F131F]/85 hover:bg-[#896d51] left-3 shadow-md border border-[#0f131f]/20 group transition-all cursor-pointer hover:scale-105"
+        >
+          <ChevronLeft color="#fff" size={18} />
         </button>
         <button
-          onClick={() => goTo(activeIndex + 1)}
-          className="rounded-full p-2.5 sm:p-3 z-10 absolute top-1/2 -translate-y-1/2 right-1 sm:-right-3 shadow-2xl border border-[#0F131F] bg-[#0F131F] group transition-all hover:scale-105 cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            goTo(activeIndex + 1);
+          }}
+          className="rounded-full p-2.5 z-20 absolute top-1/2 -translate-y-1/2 bg-[#0F131F]/85 hover:bg-[#896d51] right-3 shadow-md border border-[#0f131f]/20 group transition-all hover:scale-105 cursor-pointer"
         >
-          <ChevronRight color="#fff" />
+          <ChevronRight color="#fff" size={18} />
         </button>
       </div>
 
-      {/* Thumbnails */}
-      <div className="flex gap-2 mt-5 overflow-x-auto lg:overflow-x-visible pb-1 lg:pb-0 scrollbar-none">
-        {images.map((src, i) => (
+      {/* Dynamic Caption Info */}
+      {currentImage?.title && (
+        <div className="mt-3 p-4 bg-white border border-[#0F131F]/10 flex flex-col">
+          <h5 className="font-semibold text-lg text-[#0F131F] font-crimson-pro leading-tight">
+            {currentImage.title}
+          </h5>
+          {currentImage.description && (
+            <p className="text-sm text-black/55 mt-1 leading-relaxed">
+              {currentImage.description}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Thumbnails strip */}
+      <div className="flex gap-2 mt-3 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-[#896d51]/35">
+        {images.map((img, i) => (
           <button
             key={i}
             onClick={() => goTo(i)}
-            className={`w-16 sm:w-20 lg:w-full shrink-0 lg:shrink h-auto aspect-video bg-gray-400 cursor-pointer transition-opacity bg-cover bg-center ${
+            className={`w-20 shrink-0 aspect-video bg-cover bg-center cursor-pointer transition-all duration-200 ${
               i === activeIndex
-                ? "ring-2 ring-[#0F131F] opacity-100"
-                : "opacity-60 hover:opacity-100"
+                ? "ring-2 ring-[#896d51] scale-[1.02] opacity-100"
+                : "opacity-60 hover:opacity-100 hover:scale-[1.01]"
             }`}
-            style={{ backgroundImage: `url(${src})` }}
+            style={{ backgroundImage: `url(${img.src})` }}
+            aria-label={img.title || `Thumbnail ${i + 1}`}
           />
         ))}
       </div>
+
+      {/* Lightbox Modal */}
+      {isLightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md p-4"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setIsLightboxOpen(false)}
+            className="absolute top-5 right-5 z-50 w-10 h-10 flex items-center justify-center border border-white/20 text-white/70 hover:text-white hover:border-white/50 transition-colors cursor-pointer rounded-full bg-black/40"
+            aria-label="Tutup"
+          >
+            <X size={20} strokeWidth={1.5} />
+          </button>
+
+          {/* Counter */}
+          <div className="absolute top-6 left-6 z-10 text-white/50 text-xs font-semibold tracking-widest">
+            {String(activeIndex + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}
+          </div>
+
+          {/* Left Arrow */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              goTo(activeIndex - 1);
+            }}
+            className="absolute left-4 md:left-8 z-30 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 border border-white/25 text-white/70 hover:text-white hover:bg-[#896d51] transition-all cursor-pointer hover:scale-105"
+            aria-label="Sebelumnya"
+          >
+            <ChevronLeft size={24} strokeWidth={1.5} />
+          </button>
+
+          {/* Right Arrow */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              goTo(activeIndex + 1);
+            }}
+            className="absolute right-4 md:right-8 z-30 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 border border-white/25 text-white/70 hover:text-white hover:bg-[#896d51] transition-all cursor-pointer hover:scale-105"
+            aria-label="Berikutnya"
+          >
+            <ChevronRight size={24} strokeWidth={1.5} />
+          </button>
+
+          {/* Image Display */}
+          <div
+            className="relative max-w-4xl w-full max-h-[70vh] flex flex-col items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={currentImage?.src}
+              alt={currentImage?.title || `Lightbox image ${activeIndex}`}
+              className="max-w-full max-h-[70vh] object-contain select-none shadow-2xl transition-all duration-300"
+            />
+          </div>
+
+          {/* Lightbox Caption & Info */}
+          {currentImage?.title && (
+            <div 
+              className="mt-6 text-center max-w-2xl px-4 z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h4 className="text-white font-crimson-pro text-2xl font-medium">
+                {currentImage.title}
+              </h4>
+              {currentImage.description && (
+                <p className="text-white/60 text-sm mt-1 leading-relaxed">
+                  {currentImage.description}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Lightbox Thumbnailstrip */}
+          <div 
+            className="absolute bottom-6 flex gap-2 max-w-[90vw] overflow-x-auto pb-1"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {images.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                className={`w-14 h-10 shrink-0 bg-cover bg-center transition-all duration-150 rounded border ${
+                  i === activeIndex
+                    ? "opacity-100 border-[#896d51] scale-[1.05]"
+                    : "opacity-30 border-transparent hover:opacity-60"
+                }`}
+                style={{ backgroundImage: `url(${img.src})` }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -948,6 +1122,7 @@ function DetailPaketContent() {
   const type = searchParams.get("type") || "reguler";
 
   const [areas, setAreas] = useState([]);
+  const [galleries, setGalleries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAreaIds, setSelectedAreaIds] = useState([id]);
 
@@ -955,8 +1130,12 @@ function DetailPaketContent() {
     const fetchAreas = async () => {
       try {
         setLoading(true);
-        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/area");
-        setAreas(res.data.data || []);
+        const [areasRes, galleryRes] = await Promise.all([
+          axiosInstance.get("https://bango-parc-service.vercel.app/api/area"),
+          axiosInstance.get("https://bango-parc-service.vercel.app/api/gallery"),
+        ]);
+        setAreas(areasRes.data.data || []);
+        setGalleries(galleryRes.data.galleries || []);
       } catch (err) {
         console.error("Gagal mengambil data area:", err);
       } finally {
@@ -1094,6 +1273,41 @@ function DetailPaketContent() {
   const activeArea = areas.find((a) => String(a.id) === String(id));
   const currentPackages = type === "wedding" ? wedding_packages : reguler_packages;
 
+  // Filter galleries for the activeArea
+  const activeAreaGalleries = galleries.filter(
+    (g) => String(g.areaId) === String(activeArea?.id)
+  );
+
+  // Sort so that isPrimary is first
+  activeAreaGalleries.sort((a, b) => {
+    const aPrimary = a.isPrimary === true || a.isPrimary === "true";
+    const bPrimary = b.isPrimary === true || b.isPrimary === "true";
+    if (aPrimary && !bPrimary) return -1;
+    if (!aPrimary && bPrimary) return 1;
+    return 0;
+  });
+
+  const activeAreaImages = activeAreaGalleries.map((g) => ({
+    src: g.filePath,
+    title: g.title || activeArea?.name,
+    description: g.description || activeArea?.description,
+  }));
+
+  const galleryList = activeAreaImages.length > 0
+    ? activeAreaImages
+    : [
+        {
+          src: getAreaImage(activeArea?.name),
+          title: activeArea?.name,
+          description: activeArea?.description || "Suasana indah di Bango Parc",
+        },
+        ...GALLERY_IMAGES.map((url, i) => ({
+          src: url,
+          title: `${activeArea?.name || "Bango Parc"} - Photo ${i + 1}`,
+          description: "Momen berharga dan suasana indah di Bango Parc.",
+        })),
+      ];
+
   const pkg = activeArea
     ? {
         id: activeArea.id,
@@ -1106,8 +1320,20 @@ function DetailPaketContent() {
         price: formatRupiah(getAreaPrice(activeArea, type)),
         areaFacilities: activeArea.areaFacilities,
         areaPrices: activeArea.areaPrices,
+        galleryList: galleryList,
       }
     : (currentPackages.find((p) => String(p.id) === String(id)) || currentPackages[0]);
+
+  if (pkg && !pkg.galleryList) {
+    pkg.galleryList = [
+      { src: pkg.img || pkg.thumbnail || GALLERY_IMAGES[0], title: pkg.name, description: pkg.desc },
+      ...GALLERY_IMAGES.slice(1).map((url, i) => ({
+        src: url,
+        title: `${pkg.name} - Photo ${i + 2}`,
+        description: "Momen berharga dan suasana indah di Bango Parc."
+      }))
+    ];
+  }
 
   const selectedPackages = selectedAreaIds
     .map((areaId) => {
