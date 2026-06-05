@@ -1,12 +1,12 @@
 "use client";
 
 import { ArrowLeft, Eye, EyeOff, User, Mail, Phone, Lock } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
-const BG_IMAGE =
-  "https://images.unsplash.com/photo-1519225495810-7517c2965a7d?w=1600&auto=format&fit=crop";
+const BG_IMAGE = "/log.jpg";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -93,16 +93,20 @@ export default function SignupPage() {
         style={{ backgroundImage: `url(${BG_IMAGE})` }}
       >
         {/* Background Overlay */}
-        <div className="absolute inset-0 bg-linear-to-t from-[#0F131F]/90 via-[#0F131F]/40 to-[#0F131F]/60 z-0" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F131F]/90 via-[#0F131F]/40 to-[#0F131F]/60 z-0" />
 
         {/* Top Logo branding */}
-        <div className="z-10 font-cinzel-deco text-xl font-bold tracking-widest">
-          BANGO PARC
-        </div>
+        <Image
+          src={"/logo-icon.png"}
+          height={100}
+          width={100}
+          className="w-13 h-auto z-10"
+          alt="image"
+        />
 
         {/* Bottom Copywriting content */}
         <div className="z-10 max-w-lg mt-auto flex flex-col gap-4">
-          <h2 className="font-crimson-pro text-4xl lg:text-5xl leading-tight font-semibold">
+          <h2 className="font-crimson-pro text-4xl lg:text-5xl leading-tight">
             Wujudkan Momen Spesial Anda Bersama Kami
           </h2>
           <p className="text-white/80 text-sm leading-relaxed font-sans">
@@ -111,8 +115,8 @@ export default function SignupPage() {
             di Bango Parc.
           </p>
           <div className="h-px bg-white/20 w-24 my-2" />
-          <span className="text-xs text-white/50 tracking-wider uppercase font-semibold">
-            Venue &amp; Eatery · Jakarta Selatan
+          <span className="text-xs text-white/50 tracking-wider uppercase font-medium">
+            Venue · Jakarta Selatan
           </span>
         </div>
       </div>
@@ -120,24 +124,19 @@ export default function SignupPage() {
       {/* RIGHT SECTION: Signup Form Container */}
       <div className="w-full md:w-1/2 min-h-screen bg-white flex flex-col justify-center items-center px-6 py-16 md:px-16 lg:px-24 relative">
         {/* Back Link Button */}
-        <Link
-          href="/"
-          className="absolute top-6 left-6 md:top-10 md:left-10 flex items-center gap-2 text-xs text-black/50 hover:text-black transition-colors font-medium group text-[#0F131F]"
-        >
-          <ArrowLeft
-            size={14}
-            strokeWidth={2.5}
-            className="group-hover:-translate-x-0.5 transition-transform"
-          />
-          Kembali ke Beranda
-        </Link>
 
+        <div className="w-full justify-start items-center max-w-md">
+          <Image
+            src={"/logo-full-black.png"}
+            height={100}
+            width={100}
+            className="w-17 h-auto mb-3"
+            alt="logo"
+          />
+        </div>
         {/* Content Box */}
         <div className="w-full max-w-md flex flex-col items-start mt-6">
           {/* Logo brand display */}
-          <div className="mb-8 font-cinzel-deco text-2xl font-bold tracking-widest text-[#0F131F]">
-            BANGO PARC
-          </div>
 
           {/* Greeting text */}
           <h1 className="font-crimson-pro text-4xl text-[#0F131F] font-semibold mb-3">
