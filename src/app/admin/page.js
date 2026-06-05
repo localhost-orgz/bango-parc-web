@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Bell, Image as ImageIcon, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Bell, Image as ImageIcon, ChevronDown, Loader2 } from "lucide-react";
+import axiosInstance from "@/lib/axios";
 
 import AdminCalendar from "@/components/admin/AdminCalendar";
 
@@ -10,23 +11,70 @@ import CategoryCard from "@/components/admin/admin/CategoryCard";
 import TrendCard from "@/components/admin/admin/TrendCard";
 import StatCard from "@/components/admin/admin/StatCard";
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
+const formatRupiah = (amount) => {
+  if (amount === null || amount === undefined) return "Rp0";
+  return "Rp" + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
 
-const categoryData = [
-  { name: "Reguler", value: 60, color: "#6ecac6" },
-  { name: "Wedding", value: 40, color: "#0F131F" },
-];
-
-const venueData = [
-  { name: "Area Depan", count: 3, max: 14 },
-  { name: "Area Tengah", count: 9, max: 14 },
-  { name: "Area Belakang", count: 2, max: 14 },
-];
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
+const formatIndonesianDate = (date) => {
+  const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+  const months = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+  return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+};
 
 export default function AdminDashboard() {
-  const [filter, setFilter] = useState("Bulanan");
+  const today = new Date();
+  const [activeMonth, setActiveMonth] = useState(today.getMonth() + 1);
+  const [activeYear, setActiveYear] = useState(today.getFullYear());
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosInstance.get("https://bango-parc-service.vercel.app/api/dashboard", {
+          params: { month: activeMonth, year: activeYear }
+        });
+        setDashboardData(res.data || null);
+      } catch (err) {
+        console.error("Gagal mengambil data dashboard:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, [activeMonth, activeYear]);
+
+  const defaultData = {
+    reservationsThisMonth: 0,
+    diffFromLastMonth: 0,
+    waitingVerification: 0,
+    revenueThisMonth: 0,
+    occupancyRate: 0,
+    reservationsPerMonth: [],
+    reservationTypeCompare: [],
+    areaReservationCount: []
+  };
+
+  const data = dashboardData || defaultData;
+
+  // Format Category Data for PieChart
+  const categoryData = (data.reservationTypeCompare || []).map((item) => ({
+    name: item.type,
+    value: item.percent,
+    color: item.type?.toLowerCase() === "wedding" ? "#0F131F" : "#6ecac6",
+  }));
+
+  // Format Venue Data for progress bars
+  const venueData = (data.areaReservationCount || []).map((item) => ({
+    name: item.area,
+    count: item.count,
+    max: Math.max(...(data.areaReservationCount || []).map(a => a.count), 1),
+  }));
 
   return (
     <>
@@ -38,7 +86,9 @@ export default function AdminDashboard() {
             Dashboard
           </h1>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-black/40 hidden sm:inline">Sabtu, 9 Mei 2026</span>
+            <span className="text-sm text-black/40 hidden sm:inline">
+              {formatIndonesianDate(today)}
+            </span>
             <button className="relative p-2 hover:bg-[#0F131F]/5 transition-colors">
               <Bell size={18} strokeWidth={1.5} color="#0F131F" />
             </button>
@@ -49,40 +99,60 @@ export default function AdminDashboard() {
         </header>
 
         {/* Body */}
-        <main className="flex-1 p-4 md:p-8 flex flex-col gap-6 overflow-auto">
+        <main className="flex-1 p-4 md:p-8 flex flex-col gap-6 overflow-auto relative">
+          {loading && (
+            <div className="absolute inset-0 bg-white/50 backdrop-blur-xs flex items-center justify-center z-50">
+              <Loader2 className="w-8 h-8 animate-spin text-[#896d51]" />
+            </div>
+          )}
+
           {/* Overview */}
           <section>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xs font-semibold uppercase tracking-widest text-black/40">
                 Overview
               </h2>
-              <button className="flex items-center gap-1.5 border border-[#0F131F] px-3 py-1.5 text-xs font-semibold bg-[#0F131F] text-white">
-                {filter}
-                <ChevronDown size={12} />
-              </button>
+              <select
+                value={activeMonth}
+                onChange={(e) => setActiveMonth(Number(e.target.value))}
+                className="border border-[#0F131F] px-3 py-1.5 text-xs font-semibold bg-[#0F131F] text-white outline-none cursor-pointer"
+              >
+                <option value={1}>Januari</option>
+                <option value={2}>Februari</option>
+                <option value={3}>Maret</option>
+                <option value={4}>April</option>
+                <option value={5}>Mei</option>
+                <option value={6}>Juni</option>
+                <option value={7}>Juli</option>
+                <option value={8}>Agustus</option>
+                <option value={9}>September</option>
+                <option value={10}>Oktober</option>
+                <option value={11}>November</option>
+                <option value={12}>Desember</option>
+              </select>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatCard
                 title="Reservasi bulan ini"
-                value="67"
-                sub="+4 dari bulan lalu"
+                value={String(data.reservationsThisMonth)}
+                sub={`${data.diffFromLastMonth >= 0 ? "+" : ""}${data.diffFromLastMonth} dari bulan lalu`}
               />
               <StatCard
                 title="Menunggu Verifikasi"
-                value="3"
+                value={String(data.waitingVerification)}
                 sub="Segera verifikasi!"
                 accent
-                highlight
+                highlight={data.waitingVerification > 0}
               />
               <StatCard
                 title="Revenue Bulan ini"
-                value="Rp. 19.000.000"
+                value={formatRupiah(data.revenueThisMonth)}
                 sub="DP + Pelunasan"
               />
               <StatCard
                 title="Tingkat Okupansi"
-                value="50 %"
+                value={`${data.occupancyRate}%`}
                 sub="Bulan ini per hari ini"
               />
             </div>
@@ -91,7 +161,11 @@ export default function AdminDashboard() {
           {/* Charts Row */}
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             <div className="col-span-1 lg:col-span-8">
-              <TrendCard />
+              <TrendCard 
+                trendData={data.reservationsPerMonth}
+                activeYear={activeYear}
+                onYearChange={setActiveYear}
+              />
             </div>
             <div className="col-span-1 lg:col-span-4">
               <CategoryCard categoryData={categoryData} venueData={venueData} />
@@ -103,8 +177,8 @@ export default function AdminDashboard() {
             <div className="col-span-1 lg:col-span-7">
               {/* <OccupancyCalendar /> */}
               <AdminCalendar
-                onDateSelect={(data) => {
-                  console.log("Selected date:", data);
+                onDateSelect={(date) => {
+                  console.log("Selected date:", date);
                 }}
               />
             </div>
