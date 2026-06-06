@@ -1,9 +1,16 @@
 import { AlertCircle } from "lucide-react";
 
-const TransferPayment = ({ selected, orderData, copied, onCopy, paymentType }) => {
+const TransferPayment = ({ selected, orderData, copied, onCopy, paymentType, isDpVerified }) => {
   const isFull = paymentType === "full";
-  const amountToPay = isFull ? orderData.total : orderData.dpAmount;
-  const label = isFull ? "Nominal Transfer (Lunas)" : "Nominal Transfer (DP 50%)";
+  const amountToPay = isDpVerified
+    ? (orderData.total - orderData.dpAmount)
+    : (isFull ? orderData.total : orderData.dpAmount);
+
+  const label = isDpVerified
+    ? "Nominal Transfer (Pelunasan sisa 50%)"
+    : isFull 
+      ? "Nominal Transfer (Lunas)" 
+      : "Nominal Transfer (DP 50%)";
 
   return (
     <>

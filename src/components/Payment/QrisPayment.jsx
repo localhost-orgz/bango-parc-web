@@ -1,12 +1,17 @@
 import { CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 
-const QrisPayment = ({ orderData, paymentType }) => {
+const QrisPayment = ({ orderData, paymentType, isDpVerified }) => {
   const isFull = paymentType === "full";
-  const amountToPay = isFull ? orderData.total : orderData.dpAmount;
-  const paymentDesc = isFull 
-    ? "Pembayaran lunas penuh (100%)" 
-    : `DP 50% dari total Rp${orderData.total.toLocaleString("id-ID")}`;
+  const amountToPay = isDpVerified
+    ? (orderData.total - orderData.dpAmount)
+    : (isFull ? orderData.total : orderData.dpAmount);
+
+  const paymentDesc = isDpVerified
+    ? "Pembayaran pelunasan sisa 50%"
+    : isFull 
+      ? "Pembayaran lunas penuh (100%)" 
+      : `DP 50% dari total Rp${orderData.total.toLocaleString("id-ID")}`;
 
   return (
     <div className="bg-white border border-[#0f131f]/15 p-4 sm:p-6">

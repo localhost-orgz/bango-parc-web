@@ -1,11 +1,16 @@
-const PriceBreakdown = ({ orderData, paymentType }) => {
+const PriceBreakdown = ({ orderData, paymentType, isDpVerified, isFullyPaid }) => {
   const isFull = paymentType === "full";
   const subtotal = orderData.subtotal || 0;
   const tax = orderData.tax || 0;
   const discount = orderData.discount || 0;
   const total = orderData.total || 0;
   const dpAmount = orderData.dpAmount || 0;
-  const amountToPay = isFull ? total : dpAmount;
+
+  const amountToPay = isFullyPaid
+    ? 0
+    : isDpVerified 
+      ? (total - dpAmount) 
+      : (isFull ? total : dpAmount);
 
   return (
     <div className="bg-white border border-[#0f131f]/15 p-5 flex flex-col gap-3">
@@ -34,7 +39,11 @@ const PriceBreakdown = ({ orderData, paymentType }) => {
         </div>
         <div className="flex justify-between items-center text-xs bg-[#0f131f]/5 border border-[#0f131f]/20 px-3 py-2.5">
           <span className="text-[#0f131f] font-medium">
-            {isFull ? "Metode: Bayar Lunas" : "Metode: DP 50%"}
+            {isFullyPaid
+              ? "Status: Lunas"
+              : isDpVerified 
+                ? "Metode: Pelunasan (Sisa 50%)" 
+                : (isFull ? "Metode: Bayar Lunas" : "Metode: DP 50%")}
           </span>
           <span className="text-[#0f131f] font-bold text-sm">
             Rp{amountToPay.toLocaleString("id-ID")}
