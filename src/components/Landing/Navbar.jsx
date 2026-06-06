@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, Shield } from "lucide-react";
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -113,34 +113,51 @@ function Navbar() {
         </ul>
 
         {/* Desktop Button */}
-        {isLoggedIn ? (
-          <Link href={"/profile"} className="hidden md:flex items-center">
-            <button
-              className={`px-5 py-2.5 border text-sm tracking-wide transition-all duration-300 flex items-center gap-2 ${
-                scrolled
-                  ? "bg-black text-white border-black hover:bg-neutral-800"
-                  : "bg-white/10 backdrop-blur-md text-white border-white/40 hover:bg-white hover:text-black"
-              }`}
-            >
-              <User size={14} />
-              <span className="font-crimson-pro">
-                {userProfile?.fullName ? userProfile.fullName.split(" ")[0] : "Profil"}
-              </span>
-            </button>
-          </Link>
-        ) : (
-          <Link href={"/login"} className="hidden md:flex items-center">
-            <button
-              className={`px-5 py-2.5 border text-sm tracking-wide transition-all duration-300 ${
-                scrolled
-                  ? "bg-black text-white border-black hover:bg-neutral-800"
-                  : "bg-white/10 backdrop-blur-md text-white border-white/40 hover:bg-white hover:text-black"
-              }`}
-            >
-              <span className="font-crimson-pro">Login</span>
-            </button>
-          </Link>
-        )}
+        <div className="hidden md:flex items-center gap-3">
+          {isLoggedIn && userProfile?.role?.toLowerCase() === "admin" && (
+            <Link href={"/admin"}>
+              <button
+                className={`px-4 py-2.5 border text-sm tracking-wide transition-all duration-305 flex items-center gap-2 ${
+                  scrolled
+                    ? "border-[#896d51] text-[#896d51] hover:bg-[#896d51] hover:text-white"
+                    : "bg-[#896d51]/20 border-[#896d51]/40 text-white hover:bg-[#896d51] hover:border-[#896d51]"
+                }`}
+              >
+                <Shield size={14} />
+                <span className="font-crimson-pro">Admin Panel</span>
+              </button>
+            </Link>
+          )}
+
+          {isLoggedIn ? (
+            <Link href={"/profile"} className="flex items-center">
+              <button
+                className={`px-5 py-2.5 border text-sm tracking-wide transition-all duration-300 flex items-center gap-2 ${
+                  scrolled
+                    ? "bg-black text-white border-black hover:bg-neutral-800"
+                    : "bg-white/10 backdrop-blur-md text-white border-white/40 hover:bg-white hover:text-black"
+                }`}
+              >
+                <User size={14} />
+                <span className="font-crimson-pro">
+                  {userProfile?.fullName ? userProfile.fullName.split(" ")[0] : "Profil"}
+                </span>
+              </button>
+            </Link>
+          ) : (
+            <Link href={"/login"} className="flex items-center">
+              <button
+                className={`px-5 py-2.5 border text-sm tracking-wide transition-all duration-300 ${
+                  scrolled
+                    ? "bg-black text-white border-black hover:bg-neutral-800"
+                    : "bg-white/10 backdrop-blur-md text-white border-white/40 hover:bg-white hover:text-black"
+                }`}
+              >
+                <span className="font-crimson-pro">Login</span>
+              </button>
+            </Link>
+          )}
+        </div>
 
         {/* Mobile Toggle */}
         <button
@@ -196,6 +213,17 @@ function Navbar() {
             >
               Galeri
             </Link>
+
+            {isLoggedIn && userProfile?.role?.toLowerCase() === "admin" && (
+              <Link
+                href={"/admin"}
+                onClick={() => setOpen(false)}
+                className="mt-4 border border-[#896d51] text-[#896d51] px-6 py-3 text-sm tracking-[0.2em] uppercase hover:bg-[#896d51] hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <Shield size={16} />
+                <span>Admin Panel</span>
+              </Link>
+            )}
 
             {isLoggedIn ? (
               <Link

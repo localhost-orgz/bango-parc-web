@@ -1,11 +1,53 @@
 "use client";
 
-import { useState } from "react";
-import { Menu } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Menu, Loader2 } from "lucide-react";
 import Sidebar from "@/components/admin/Sidebar";
 
 export default function AdminLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("bango_parc_token");
+    const profileStr = localStorage.getItem("bango_parc_user_profile");
+
+    if (!token || !profileStr) {
+      router.replace("/login");
+      return;
+    }
+
+    try {
+      const profile = JSON.parse(profileStr);
+      if (profile.role?.toLowerCase() === "admin") {
+        setIsAuthorized(true);
+        setIsLoading(false);
+      } else {
+        router.replace("/"); // Redirect unauthorized users to home page
+      }
+    } catch (e) {
+      console.error("Gagal memproses profil user:", e);
+      router.replace("/login");
+    }
+  }, [router]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center bg-[#f3f4f7] gap-3">
+        <Loader2 className="w-10 h-10 animate-spin text-[#896d51]" />
+        <p className="text-sm font-semibold text-[#0F131F] font-sans">
+          Memverifikasi Akses Admin...
+        </p>
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen bg-[#f3f4f7] relative">
@@ -34,3 +76,4 @@ export default function AdminLayout({ children }) {
     </div>
   );
 }
+

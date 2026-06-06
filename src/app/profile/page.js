@@ -12,7 +12,8 @@ import {
   ExternalLink,
   LogOut,
   Ticket,
-  Loader2
+  Loader2,
+  Shield
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -403,6 +404,16 @@ export default function ProfilePage() {
                 <LogOut size={16} className="text-red-500" />
                 Keluar
               </button>
+
+              {profile?.role?.toLowerCase() === "admin" && (
+                <Link
+                  href="/admin"
+                  className="flex-1 lg:flex-none flex items-center justify-center lg:justify-start gap-3 px-4 py-3 text-sm font-semibold transition-all duration-350 cursor-pointer text-[#896d51] hover:bg-[#896d51]/10 border border-[#896d51]/20 hover:text-[#0F131F]"
+                >
+                  <Shield size={16} className="text-[#896d51]" />
+                  Panel Admin
+                </Link>
+              )}
             </div>
           </div>
 
