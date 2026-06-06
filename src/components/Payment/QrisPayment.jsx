@@ -1,11 +1,13 @@
 import { CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 
-const QrisPayment = ({ orderData, paymentType, isDpVerified }) => {
+const QrisPayment = ({ orderData, paymentType, isDpVerified, amountToPay: propAmountToPay }) => {
   const isFull = paymentType === "full";
-  const amountToPay = isDpVerified
-    ? (orderData.total - orderData.dpAmount)
-    : (isFull ? orderData.total : orderData.dpAmount);
+  const amountToPay = propAmountToPay !== undefined
+    ? propAmountToPay
+    : (isDpVerified
+        ? (orderData.total - orderData.dpAmount)
+        : (isFull ? orderData.total : orderData.dpAmount));
 
   const paymentDesc = isDpVerified
     ? "Pembayaran pelunasan sisa 50%"

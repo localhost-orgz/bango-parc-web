@@ -1,10 +1,12 @@
 import { AlertCircle } from "lucide-react";
 
-const TransferPayment = ({ selected, orderData, copied, onCopy, paymentType, isDpVerified }) => {
+const TransferPayment = ({ selected, orderData, copied, onCopy, paymentType, isDpVerified, amountToPay: propAmountToPay }) => {
   const isFull = paymentType === "full";
-  const amountToPay = isDpVerified
-    ? (orderData.total - orderData.dpAmount)
-    : (isFull ? orderData.total : orderData.dpAmount);
+  const amountToPay = propAmountToPay !== undefined
+    ? propAmountToPay
+    : (isDpVerified
+        ? (orderData.total - orderData.dpAmount)
+        : (isFull ? orderData.total : orderData.dpAmount));
 
   const label = isDpVerified
     ? "Nominal Transfer (Pelunasan sisa 50%)"

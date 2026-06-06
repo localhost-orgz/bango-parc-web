@@ -1,4 +1,4 @@
-const PriceBreakdown = ({ orderData, paymentType, isDpVerified, isFullyPaid }) => {
+const PriceBreakdown = ({ orderData, paymentType, isDpVerified, isFullyPaid, amountToPay: propAmountToPay }) => {
   const isFull = paymentType === "full";
   const subtotal = orderData.subtotal || 0;
   const tax = orderData.tax || 0;
@@ -6,11 +6,13 @@ const PriceBreakdown = ({ orderData, paymentType, isDpVerified, isFullyPaid }) =
   const total = orderData.total || 0;
   const dpAmount = orderData.dpAmount || 0;
 
-  const amountToPay = isFullyPaid
-    ? 0
-    : isDpVerified 
-      ? (total - dpAmount) 
-      : (isFull ? total : dpAmount);
+  const amountToPay = propAmountToPay !== undefined
+    ? propAmountToPay
+    : (isFullyPaid
+        ? 0
+        : isDpVerified 
+          ? (total - dpAmount) 
+          : (isFull ? total : dpAmount));
 
   return (
     <div className="bg-white border border-[#0f131f]/15 p-5 flex flex-col gap-3">

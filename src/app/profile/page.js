@@ -227,6 +227,7 @@ export default function ProfilePage() {
         dpAmount: dpAmount,
         orderCode: r.code || r.bookingCode || `BP-${r.id}`,
         reservationId: r.id,
+        isDpVerified: r.paymentStatus === "PARTIAL",
       };
     } else {
       // Dummy reservation fallback
@@ -268,6 +269,7 @@ export default function ProfilePage() {
         dpAmount,
         orderCode: res.id,
         reservationId: null,
+        isDpVerified: res.paymentStatus === "PARTIAL",
       };
     }
 

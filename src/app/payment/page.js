@@ -201,12 +201,21 @@ export default function PaymentPage() {
     });
   };
 
-  const isDpVerified = reservation && reservation.paymentSchedules && reservation.paymentSchedules.some(
-    (s) => s.installmentNumber === 1 && (s.status === "PAID" || s.status === "VERIFIED" || s.status === "SUCCESS" || s.status === "APPROVED")
-  );
+  const isDpVerified = 
+    dynamicOrderData.isDpVerified === true ||
+    (reservation && (reservation.paymentStatus === "PARTIAL" || Number(reservation.paidAmount) > 0)) ||
+    (reservation && reservation.paymentSchedules && reservation.paymentSchedules.some(
+      (s) => s.installmentNumber === 1 && (s.status === "PAID" || s.status === "VERIFIED" || s.status === "SUCCESS" || s.status === "APPROVED" || s.status === "PARTIAL")
+    ));
 
-  const isFullyPaid = reservation && reservation.paymentSchedules && reservation.paymentSchedules.length > 0 && reservation.paymentSchedules.every(
-    (s) => s.status === "PAID" || s.status === "VERIFIED" || s.status === "SUCCESS" || s.status === "APPROVED"
+  const isFullyPaid = reservation && (
+    reservation.paymentStatus === "PAID" || 
+    reservation.paymentStatus === "FULL" || 
+    reservation.paymentStatus === "SUCCESS" ||
+    (reservation.totalPrice && Number(reservation.remainingBalance) === 0) ||
+    (reservation.paymentSchedules && reservation.paymentSchedules.length > 0 && reservation.paymentSchedules.every(
+      (s) => s.status === "PAID" || s.status === "VERIFIED" || s.status === "SUCCESS" || s.status === "APPROVED"
+    ))
   );
 
   useEffect(() => {
@@ -215,12 +224,24 @@ export default function PaymentPage() {
     }
   }, [isDpVerified]);
 
+  // Source of truth totals derived from reservation if loaded, else from dynamicOrderData
+  const reservationTotal = reservation ? Number(reservation.totalPrice) : (dynamicOrderData.total || 0);
+  const reservationDp = reservation 
+    ? (reservation.paymentSchedules?.find(s => s.installmentNumber === 1)?.amount 
+       ? Number(reservation.paymentSchedules.find(s => s.installmentNumber === 1).amount)
+       : (reservationTotal > 2000000 ? 1000000 : reservationTotal * 0.5))
+    : (dynamicOrderData.dpAmount || 0);
+
+  const reservationRemaining = reservation 
+    ? Number(reservation.remainingBalance) 
+    : (dynamicOrderData.isDpVerified ? dynamicOrderData.total : (reservationTotal - reservationDp));
+
   // Sync amount when payment option or order data changes
   const amountToPay = isFullyPaid
     ? 0
     : isDpVerified 
-      ? (dynamicOrderData.total - dynamicOrderData.dpAmount) 
-      : (paymentType === "full" ? dynamicOrderData.total : dynamicOrderData.dpAmount);
+      ? reservationRemaining
+      : (paymentType === "full" ? reservationTotal : reservationDp);
 
   useEffect(() => {
     if (amountToPay !== undefined && amountToPay !== null) {
@@ -266,6 +287,9 @@ export default function PaymentPage() {
       const found = res.data.data?.find((r) => r.id === Number(dynamicOrderData.reservationId));
       if (found) {
         setReservation(found);
+        if (found.customer?.fullName) {
+          setSenderName(found.customer.fullName);
+        }
       }
     } catch (err) {
       console.error("Gagal mengambil detail reservasi:", err);
@@ -437,10 +461,15 @@ export default function PaymentPage() {
             onRescheduleClick={canReschedule ? () => setShowReschedule(true) : null}
           />
           <PriceBreakdown 
-            orderData={dynamicOrderData} 
+            orderData={{
+              ...dynamicOrderData,
+              total: reservationTotal,
+              dpAmount: reservationDp,
+            }} 
             paymentType={paymentType} 
             isDpVerified={isDpVerified}
             isFullyPaid={isFullyPaid}
+            amountToPay={amountToPay}
           />
           <AlertPayment reservation={reservation} />
         </div>
@@ -479,8 +508,8 @@ export default function PaymentPage() {
               <PaymentTypeSelect
                 paymentType={paymentType}
                 onSelectPaymentType={setPaymentType}
-                total={dynamicOrderData.total}
-                dpAmount={dynamicOrderData.dpAmount}
+                total={reservationTotal}
+                dpAmount={reservationDp}
                 isDpVerified={isDpVerified}
               />
 
@@ -491,17 +520,31 @@ export default function PaymentPage() {
               />
 
               {selected.type === "qris" && (
-                <QrisPayment orderData={dynamicOrderData} paymentType={paymentType} isDpVerified={isDpVerified} />
+                <QrisPayment 
+                  orderData={{
+                    ...dynamicOrderData,
+                    total: reservationTotal,
+                    dpAmount: reservationDp,
+                  }} 
+                  paymentType={paymentType} 
+                  isDpVerified={isDpVerified} 
+                  amountToPay={amountToPay}
+                />
               )}
 
               {selected.type === "transfer" && (
                 <TransferPayment
                   selected={selected}
-                  orderData={dynamicOrderData}
+                  orderData={{
+                    ...dynamicOrderData,
+                    total: reservationTotal,
+                    dpAmount: reservationDp,
+                  }}
                   copied={copied}
                   onCopy={setCopied}
                   paymentType={paymentType}
                   isDpVerified={isDpVerified}
+                  amountToPay={amountToPay}
                 />
               )}
 
@@ -513,10 +556,10 @@ export default function PaymentPage() {
 
                 <div className="w-full h-px bg-[#0f131f]/10 mb-5" />
 
-                {/* Form Inputs for Sender and Amount */}
+                {/* Form Inputs for Sender and Amount (Read-Only Info Panels) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
-                  <div className="flex flex-col gap-1.5 text-left">
-                    <label htmlFor="senderName" className="text-xs font-semibold text-[#0f131f]/60 tracking-wide uppercase flex items-center gap-1.5">
+                  <div className="flex flex-col gap-1.5 text-left bg-black/[0.02] border border-[#0f131f]/10 p-3">
+                    <label htmlFor="senderName" className="text-[10px] font-bold text-[#0f131f]/50 tracking-wider uppercase flex items-center gap-1.5">
                       <User size={12} className="text-[#896d51]" />
                       Nama Pengirim
                     </label>
@@ -524,26 +567,26 @@ export default function PaymentPage() {
                       id="senderName"
                       type="text"
                       required
+                      readOnly
                       value={senderName}
-                      onChange={(e) => setSenderName(e.target.value)}
                       placeholder="Nama pengirim transfer"
-                      className="w-full h-10 border-b border-[#0f131f]/20 bg-transparent text-sm text-[#0f131f] placeholder:text-black/25 outline-none focus:border-[#0f131f] transition-colors px-1"
+                      className="w-full h-8 bg-transparent text-sm text-[#0f131f]/60 cursor-not-allowed outline-none font-semibold px-1"
                     />
                   </div>
 
-                  <div className="flex flex-col gap-1.5 text-left">
-                    <label htmlFor="paymentAmount" className="text-xs font-semibold text-[#0f131f]/60 tracking-wide uppercase flex items-center gap-1.5">
+                  <div className="flex flex-col gap-1.5 text-left bg-black/[0.02] border border-[#0f131f]/10 p-3">
+                    <label htmlFor="paymentAmount" className="text-[10px] font-bold text-[#0f131f]/50 tracking-wider uppercase flex items-center gap-1.5">
                       <CreditCard size={12} className="text-[#896d51]" />
-                      Nominal Transfer (Rp)
+                      Nominal Transfer
                     </label>
                     <input
                       id="paymentAmount"
-                      type="number"
+                      type="text"
                       required
-                      value={paymentAmount}
-                      onChange={(e) => setPaymentAmount(e.target.value)}
+                      readOnly
+                      value={paymentAmount ? `Rp${Number(paymentAmount).toLocaleString("id-ID")}` : ""}
                       placeholder="Nominal transfer"
-                      className="w-full h-10 border-b border-[#0f131f]/20 bg-transparent text-sm text-[#0f131f] placeholder:text-black/25 outline-none focus:border-[#0f131f] transition-colors px-1"
+                      className="w-full h-8 bg-transparent text-sm text-[#0f131f]/60 cursor-not-allowed outline-none font-bold px-1"
                     />
                   </div>
                 </div>
