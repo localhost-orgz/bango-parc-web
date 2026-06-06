@@ -27,6 +27,7 @@ import axiosInstance from "@/lib/axios";
 // ─── Internal Components & Data ────────────────────────────────────────────────
 import BookingCalendar from "@/components/BookingCalendar";
 import Navbar from "@/components/Landing/Navbar";
+import AuthRequiredModal from "@/components/AuthRequiredModal";
 import { reguler_packages, wedding_packages } from "@/constants/package";
 
 const OPEN_HOUR = 8;
@@ -689,12 +690,14 @@ function BookingCard({
   onEndChange,
 }) {
   const router = useRouter();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const selectedDateKey = selectedDate?.key || "";
   const areaIdsParam = selectedAreaIds.join(",");
   const isReady = selectedAreaIds.length > 0 && selectedDate && selectedStart && selectedEnd;
 
   const handleContinue = () => {
     if (!isReady) return;
+    
     const sessionData = {
       ids: areaIdsParam,
       type: pkg.type,
@@ -703,11 +706,19 @@ function BookingCard({
       end: selectedEnd,
     };
     localStorage.setItem("bango_parc_booking_session", JSON.stringify(sessionData));
+    
+    // Check if user is logged in
+    const token = localStorage.getItem("bango_parc_token");
+    if (!token) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     router.push("/paket/checkout");
   };
 
   return (
-    <div className="w-full p-5 border-2 border-[#0F131F] mt-8 bg-white">
+    <div className="w-full p-5 border-2 border-[#0F131F] mt-8 bg-white relative">
       <h6 className="text-xl font-crimson-text font-semibold mb-1">
         Booking Paket
       </h6>
@@ -760,6 +771,8 @@ function BookingCard({
           Dengan melanjutkan, Anda menyetujui syarat &amp; ketentuan kami
         </p>
       </div>
+      
+      <AuthRequiredModal isOpen={showAuthModal} onOpenChange={setShowAuthModal} />
     </div>
   );
 }

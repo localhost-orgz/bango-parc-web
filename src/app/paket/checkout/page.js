@@ -8,7 +8,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axios";
 import { reguler_packages, wedding_packages } from "@/constants/package";
-import { Loader2 } from "lucide-react";
+import { Loader2, Lock, LogIn, UserPlus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 const FALLBACK_ADDONS = [
@@ -79,9 +79,18 @@ function CheckoutContent() {
   const [selectedAddonIds, setSelectedAddonIds] = useState([]);
   const [bookingSession, setBookingSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
+    // 0. Check if user is logged in
+    const token = localStorage.getItem("bango_parc_token");
+    if (!token) {
+      setIsLoggedIn(false);
+      setLoading(false);
+      return;
+    }
+
     // 1. Get booking session from localStorage
     const saved = localStorage.getItem("bango_parc_booking_session");
     if (saved) {
@@ -135,6 +144,57 @@ function CheckoutContent() {
           <span>Memuat detail pemesanan...</span>
         </div>
       </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <main className="w-full min-h-screen bg-[#f3f4f7]">
+        <PageHeader />
+        <Navbar />
+        <div className="max-w-md mx-auto px-4 py-20 text-center">
+          <div className="bg-white border-2 border-[#0F131F] p-8 shadow-xl rounded-xl relative overflow-hidden">
+            {/* Elegant Icon Badge with Gradient Glow */}
+            <div className="relative mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-amber-50 text-[#896d51] border border-amber-100/50 shadow-inner">
+              <Lock size={26} strokeWidth={1.8} />
+              <div className="absolute inset-0 rounded-full bg-[#896d51]/5 animate-ping opacity-75 duration-1000" />
+            </div>
+
+            <h4 className="font-crimson-pro text-3xl font-semibold text-[#0F131F] mb-3">
+              Akses Terbatas
+            </h4>
+            <p className="text-sm text-neutral-500 leading-relaxed mb-8 px-2">
+              Untuk melanjutkan ke proses pembayaran dan reservasi venue di Bango Parc, silakan masuk ke akun Anda terlebih dahulu.
+            </p>
+
+            <div className="flex flex-col gap-3 w-full">
+              <button
+                onClick={() => router.push("/login")}
+                className="w-full bg-[#0F131F] text-white hover:bg-[#896d51] py-3 text-sm font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5"
+              >
+                <LogIn size={16} strokeWidth={2} />
+                Masuk ke Akun
+              </button>
+              
+              <button
+                onClick={() => router.push("/signup")}
+                className="w-full border-2 border-[#0F131F]/15 text-[#0F131F] hover:bg-[#0F131F]/5 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <UserPlus size={16} strokeWidth={2} />
+                Daftar Akun Baru
+              </button>
+              
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center gap-1.5 text-xs text-neutral-400 hover:text-neutral-600 transition-colors py-2 mt-2 font-medium"
+              >
+                <ArrowLeft size={13} strokeWidth={2.5} className="mr-1" />
+                Kembali ke Beranda
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
     );
   }
 

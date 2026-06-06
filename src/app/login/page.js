@@ -79,8 +79,13 @@ export default function LoginPage() {
         );
       }
 
-      // Redirect to profile page
-      router.push("/profile");
+      // Redirect to checkout if booking session exists, else profile
+      const bookingSession = localStorage.getItem("bango_parc_booking_session");
+      if (bookingSession) {
+        router.push("/paket/checkout");
+      } else {
+        router.push("/profile");
+      }
     } catch (err) {
       setError(err.message || "Koneksi terputus. Harap periksa jaringan Anda.");
     } finally {
