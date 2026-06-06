@@ -107,6 +107,30 @@ function formatTimeRange(startStr, endStr) {
   }
 }
 
+const STATUS_OPTIONS = [
+  { value: "ALL", label: "Semua Status" },
+  { value: "WAITING_DP", label: "Menunggu DP" },
+  { value: "WAITING_CONFIRMATION", label: "Menunggu Konfirmasi" },
+  { value: "CONFIRMED", label: "Dikonfirmasi" },
+  { value: "ONGOING", label: "Berjalan" },
+  { value: "COMPLETED", label: "Selesai" },
+  { value: "CANCELLED", label: "Dibatalkan" },
+  { value: "EXPIRED", label: "Kedaluwarsa" },
+];
+
+const TYPE_OPTIONS = [
+  { value: "ALL", label: "Semua Tipe" },
+  { value: "REGULER", label: "Reguler" },
+  { value: "WEDDING", label: "Wedding" },
+];
+
+const SORT_OPTIONS = [
+  { value: "date-desc", label: "Tanggal Reservasi (Terbaru)" },
+  { value: "date-asc", label: "Tanggal Reservasi (Terlama)" },
+  { value: "created-desc", label: "Tanggal Pemesanan (Terbaru)" },
+  { value: "created-asc", label: "Tanggal Pemesanan (Terlama)" },
+];
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ReservasiPage() {
@@ -114,6 +138,12 @@ export default function ReservasiPage() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Filter & Sort States
+  const [showFilters, setShowFilters] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [typeFilter, setTypeFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState("date-desc");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -141,16 +171,67 @@ export default function ReservasiPage() {
     fetchData();
   }, []);
 
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (statusFilter !== "ALL") count++;
+    if (typeFilter !== "ALL") count++;
+    if (sortBy !== "date-desc") count++;
+    return count;
+  }, [statusFilter, typeFilter, sortBy]);
+
+  const handleResetFilters = () => {
+    setStatusFilter("ALL");
+    setTypeFilter("ALL");
+    setSortBy("date-desc");
+  };
+
   const filteredReservations = useMemo(() => {
-    if (!searchTerm.trim()) return reservations;
-    const q = searchTerm.toLowerCase();
-    return reservations.filter(
-      (r) =>
-        r.bookingCode?.toLowerCase().includes(q) ||
-        r.customer?.fullName?.toLowerCase().includes(q) ||
-        r.customer?.email?.toLowerCase().includes(q)
-    );
-  }, [reservations, searchTerm]);
+    let result = [...reservations];
+
+    // 1. Search Term Filter
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase();
+      result = result.filter(
+        (r) =>
+          r.bookingCode?.toLowerCase().includes(q) ||
+          r.customer?.fullName?.toLowerCase().includes(q) ||
+          r.customer?.email?.toLowerCase().includes(q)
+      );
+    }
+
+    // 2. Status Filter
+    if (statusFilter !== "ALL") {
+      result = result.filter((r) => r.status === statusFilter);
+    }
+
+    // 3. Type Filter
+    if (typeFilter !== "ALL") {
+      result = result.filter((r) => {
+        const typeName = (r.reservationType?.name || "Reguler").toLowerCase();
+        return typeName === typeFilter.toLowerCase();
+      });
+    }
+
+    // 4. Sorting
+    result.sort((a, b) => {
+      let valA, valB;
+      if (sortBy.startsWith("date")) {
+        valA = a.startDateTime ? new Date(a.startDateTime).getTime() : 0;
+        valB = b.startDateTime ? new Date(b.startDateTime).getTime() : 0;
+      } else if (sortBy.startsWith("created")) {
+        valA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        valB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      }
+
+      if (sortBy.endsWith("-desc")) {
+        return valB - valA;
+      } else {
+        return valA - valB;
+      }
+    });
+
+    return result;
+  }, [reservations, searchTerm, statusFilter, typeFilter, sortBy]);
 
   if (error) {
     return <div className="p-8 text-red-500 text-sm">{error}</div>;
@@ -180,11 +261,99 @@ export default function ReservasiPage() {
             className="w-full pl-10 pr-4 py-2 border border-[#0F131F]/15 bg-white text-sm outline-none focus:border-[#0F131F]/40 transition-colors placeholder:text-black/25"
           />
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-[#0F131F]/15 hover:border-[#0F131F]/30 bg-white text-black/60 transition-colors text-sm font-semibold">
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`flex items-center gap-2 px-4 py-2 border transition-all duration-200 text-sm font-semibold relative cursor-pointer ${
+            showFilters || activeFiltersCount > 0
+              ? "border-[#0F131F] bg-[#0F131F] text-white"
+              : "border-[#0F131F]/15 hover:border-[#0F131F]/30 bg-white text-black/60"
+          }`}
+        >
           <SlidersHorizontal className="w-4 h-4" />
           <span>Filter</span>
+          {activeFiltersCount > 0 && (
+            <span className={`inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full ${
+              showFilters || activeFiltersCount > 0
+                ? "bg-white text-[#0F131F]"
+                : "bg-[#0F131F] text-white"
+            }`}>
+              {activeFiltersCount}
+            </span>
+          )}
         </button>
       </div>
+
+      {/* Collapsible Filter Panel */}
+      {showFilters && (
+        <div className="p-4 md:p-6 mb-6 bg-[#f9f8f6] border border-[#0F131F]/10 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Status Filter */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-[#0F131F]/40 uppercase tracking-widest">
+                Status Reservasi
+              </label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-[#0F131F]/15 bg-white text-sm outline-none focus:border-[#0F131F]/40 transition-colors text-[#0F131F]"
+              >
+                {STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Type Filter */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-[#0F131F]/40 uppercase tracking-widest">
+                Tipe Reservasi
+              </label>
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-[#0F131F]/15 bg-white text-sm outline-none focus:border-[#0F131F]/40 transition-colors text-[#0F131F]"
+              >
+                {TYPE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sort Options */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-[#0F131F]/40 uppercase tracking-widest">
+                Urutkan Tanggal
+              </label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full px-3 py-2 border border-[#0F131F]/15 bg-white text-sm outline-none focus:border-[#0F131F]/40 transition-colors text-[#0F131F]"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {activeFiltersCount > 0 && (
+            <div className="flex justify-end mt-4 pt-4 border-t border-[#0F131F]/5">
+              <button
+                onClick={handleResetFilters}
+                className="text-xs font-semibold text-red-600 hover:text-red-700 transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                Reset Semua Filter
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Table Container */}
       <div className="bg-white border border-[#0F131F]/10 overflow-x-auto">
@@ -192,23 +361,43 @@ export default function ReservasiPage() {
           <thead className="sticky top-0 bg-white z-10 border-b border-[#0F131F]/10">
             <tr>
               {[
-                "Kode",
-                "Customer",
-                "Tipe",
-                "Tanggal",
-                "Waktu (UTC)",
-                "Total Harga",
-                "Status",
-                "Pembayaran",
-                "Aksi",
-              ].map((head) => (
-                <th
-                  key={head}
-                  className="px-5 py-3 text-[10px] font-semibold text-black/40 uppercase tracking-widest whitespace-nowrap"
-                >
-                  {head}
-                </th>
-              ))}
+                { label: "Kode", sortKey: null },
+                { label: "Customer", sortKey: null },
+                { label: "Tipe", sortKey: null },
+                { label: "Tanggal", sortKey: "date" },
+                { label: "Waktu (UTC)", sortKey: null },
+                { label: "Total Harga", sortKey: null },
+                { label: "Status", sortKey: null },
+                { label: "Pembayaran", sortKey: null },
+                { label: "Aksi", sortKey: null },
+              ].map((head) => {
+                if (head.sortKey === "date") {
+                  const isSorted = sortBy.startsWith("date");
+                  const isDesc = sortBy === "date-desc";
+                  return (
+                    <th
+                      key={head.label}
+                      onClick={() => setSortBy(isSorted && isDesc ? "date-asc" : "date-desc")}
+                      className="px-5 py-3 text-[10px] font-semibold text-[#0F131F]/60 hover:text-[#0F131F] uppercase tracking-widest whitespace-nowrap cursor-pointer transition-colors group select-none"
+                    >
+                      <div className="flex items-center gap-1">
+                        <span>{head.label}</span>
+                        <span className="text-[#0F131F]/30 group-hover:text-[#0F131F]/60">
+                          {isSorted ? (isDesc ? "↓" : "↑") : "↕"}
+                        </span>
+                      </div>
+                    </th>
+                  );
+                }
+                return (
+                  <th
+                    key={head.label}
+                    className="px-5 py-3 text-[10px] font-semibold text-black/40 uppercase tracking-widest whitespace-nowrap"
+                  >
+                    {head.label}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
 
