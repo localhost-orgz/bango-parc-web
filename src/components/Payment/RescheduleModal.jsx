@@ -172,7 +172,7 @@ function AvailabilityLegend({ dayReservations }) {
   );
 }
 
-export default function RescheduleModal({ isOpen, onClose, reservation, onSuccess }) {
+export default function RescheduleModal({ isOpen, onClose, reservation, onSuccess, showNotification }) {
   const [allReservations, setAllReservations] = useState([]);
   const [loadingReservations, setLoadingReservations] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -300,12 +300,29 @@ export default function RescheduleModal({ isOpen, onClose, reservation, onSucces
         }
       );
       
-      alert("Jadwal reservasi Anda berhasil diubah!");
-      onSuccess(startDateTime, endDateTime);
-      onClose();
+      if (showNotification) {
+        showNotification(
+          "success",
+          "Reschedule Berhasil",
+          "Jadwal reservasi Anda berhasil diubah!",
+          () => {
+            onSuccess(startDateTime, endDateTime);
+            onClose();
+          }
+        );
+      } else {
+        alert("Jadwal reservasi Anda berhasil diubah!");
+        onSuccess(startDateTime, endDateTime);
+        onClose();
+      }
     } catch (err) {
       console.error("Gagal melakukan reschedule:", err);
-      alert(err.response?.data?.message || "Gagal mengubah jadwal reservasi. Silakan hubungi admin.");
+      const errMsg = err.response?.data?.message || "Gagal mengubah jadwal reservasi. Silakan hubungi admin.";
+      if (showNotification) {
+        showNotification("error", "Gagal Reschedule", errMsg);
+      } else {
+        alert(errMsg);
+      }
     } finally {
       setIsSubmitting(false);
     }

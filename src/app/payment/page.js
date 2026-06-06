@@ -27,6 +27,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import Navbar from "@/components/Landing/Navbar";
 import axiosInstance from "@/lib/axios";
 import RescheduleModal from "@/components/Payment/RescheduleModal";
+import NotificationModal from "@/components/Payment/NotificationModal";
 
 // Simulasi data tetap sama
 const orderData = {
@@ -182,6 +183,23 @@ export default function PaymentPage() {
   const [reservation, setReservation] = useState(null);
   const [loadingReservation, setLoadingReservation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    type: "info",
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
+  const showNotification = (type, title, message, onConfirm = null) => {
+    setNotification({
+      isOpen: true,
+      type,
+      title,
+      message,
+      onConfirm,
+    });
+  };
 
   const isDpVerified = reservation && reservation.paymentSchedules && reservation.paymentSchedules.some(
     (s) => s.installmentNumber === 1 && (s.status === "PAID" || s.status === "VERIFIED" || s.status === "SUCCESS" || s.status === "APPROVED")
@@ -303,15 +321,15 @@ export default function PaymentPage() {
   const handleSubmitPayment = async (e) => {
     if (e) e.preventDefault();
     if (!uploadedFile) {
-      alert("Silakan pilih atau seret berkas bukti pembayaran terlebih dahulu.");
+      showNotification("warning", "File Belum Dipilih", "Silakan pilih atau seret berkas bukti pembayaran terlebih dahulu.");
       return;
     }
     if (!senderName.trim()) {
-      alert("Silakan isi nama pengirim transfer.");
+      showNotification("warning", "Nama Pengirim Kosong", "Silakan isi nama pengirim transfer.");
       return;
     }
     if (!paymentAmount) {
-      alert("Silakan isi nominal transfer.");
+      showNotification("warning", "Nominal Kosong", "Silakan isi nominal transfer.");
       return;
     }
 
@@ -341,12 +359,16 @@ export default function PaymentPage() {
         setIsSubmitting(true);
         setTimeout(() => {
           setIsSubmitting(false);
-          alert("Bukti pembayaran dikirim! (Pemesanan dummy disimulasikan berhasil)");
-          router.push("/profile");
+          showNotification(
+            "success",
+            "Bukti Terkirim",
+            "Bukti pembayaran dikirim! (Pemesanan dummy disimulasikan berhasil)",
+            () => router.push("/profile")
+          );
         }, 1200);
         return;
       }
-      alert("Gagal memproses pembayaran: Jadwal pembayaran tidak ditemukan pada server.");
+      showNotification("error", "Error Pembayaran", "Gagal memproses pembayaran: Jadwal pembayaran tidak ditemukan pada server.");
       return;
     }
 
@@ -369,11 +391,19 @@ export default function PaymentPage() {
         }
       );
 
-      alert("Bukti pembayaran berhasil dikirim! Silakan tunggu konfirmasi admin.");
-      router.push("/profile");
+      showNotification(
+        "success",
+        "Bukti Berhasil Dikirim",
+        "Bukti pembayaran berhasil dikirim! Silakan tunggu konfirmasi admin.",
+        () => router.push("/profile")
+      );
     } catch (err) {
       console.error("Gagal mengirim bukti pembayaran:", err);
-      alert(err.response?.data?.message || "Gagal mengirim bukti pembayaran. Silakan coba lagi.");
+      showNotification(
+        "error",
+        "Gagal Mengirim",
+        err.response?.data?.message || "Gagal mengirim bukti pembayaran. Silakan coba lagi."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -651,6 +681,16 @@ export default function PaymentPage() {
         onClose={() => setShowReschedule(false)}
         reservation={reservation}
         onSuccess={handleRescheduleSuccess}
+        showNotification={showNotification}
+      />
+
+      <NotificationModal
+        isOpen={notification.isOpen}
+        onClose={() => setNotification((prev) => ({ ...prev, isOpen: false }))}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onConfirm={notification.onConfirm}
       />
     </main>
   );
